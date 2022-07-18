@@ -1,0 +1,26 @@
+---
+- name: Update mysql configuration
+  template:
+    src: mysqld.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+  notify:
+    - restart mysql
+
+- name: Put replication configuration file
+  template:
+    src: replication.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/replication.cnf
+  notify:
+   - restart mysql
+
+- name: Creating MySQL systemd custom dir
+  file:
+    path: /etc/systemd/system/mysql.service.d
+    state: directory
+
+- name: Update mysql systemd configuration
+  template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/mysql.service.d/override.conf
+  notify:
+    - restart mysql
