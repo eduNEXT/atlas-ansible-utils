@@ -1,0 +1,18 @@
+---
+
+mysql_5_7_debian_pkgs:
+  - python3-mysqldb
+
+mysql_server_5_7_pkg: "mysql-server=5.7.*"
+mysql_client_5_7_pkg: "mysql-client=5.7.*"
+mysql_community_server_5_7_pkg: "mysql-server=5.7.*"
+
+mysql_5_7_socket: /var/run/mysqld/mysqld.sock
+
+MYSQL_5_7_APT_KEYSERVER: "keyserver.ubuntu.com"
+MYSQL_5_7_APT_KEY: "467B942D3A79BD29"
+MYSQL_5_7_REPO: "deb http://repo.mysql.com/apt//ubuntu/ bionic mysql-5.7"
+
+MYSQL_5_7_SUPPORTED_DISTRIBUTIONS:
+  - 'focal'
+  - 'bionic'
