@@ -48,7 +48,7 @@ MONGO_USERS:
 # and/or you are configuring mongo replication. If the override value is
 # 0.0.0.0 mongo will listen on all IPs. The value may also be set to a
 # specific IP.
-MONGO_BIND_IP: 127.0.0.1
+MONGO_BIND_IP: '0.0.0.0'
 
 MONGO_REPL_SET: "rs0"
 MONGO_AUTH: true
