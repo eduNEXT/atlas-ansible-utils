@@ -1,0 +1,21 @@
+---
+- name: Add common_users
+  user:
+    name: "{{ item }}"
+    shell: /bin/false
+  with_items:
+    - "{{ common_web_user }}"
+    - "{{ common_log_user }}"
+
+- name: Create common directories
+  file:
+    path: "{{ item.path }}"
+    state: "{{ item.state | default('directory') }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "0755"
+  with_items: "{{ common_directories }}"
+  tags:
+    - install
+    - install:configuration
+    - common_directories
