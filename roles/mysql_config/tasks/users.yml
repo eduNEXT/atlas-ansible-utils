@@ -1,0 +1,12 @@
+---
+- name: Adding extra MySQL users
+  mysql_user:
+    name: "{{ item.user }}"
+    host: "{{ item.host | default(MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS) }}"
+    password: "{{ item.pass }}"
+    priv: "{{ item.priv if item.priv is defined else (item.db + '.*:ALL' if item.db is defined else '') }}"
+    state: "{{ item.state | default('present') }}"
+    append_privs: "{{ item.append_privs | default('no') }}"
+    encrypted: "{{ item.encrypted | default('no') }}"
+  when: item.user != None and item.user != ''
+  with_items: "{{ MYSQL_CONFIG_USERS }}"
