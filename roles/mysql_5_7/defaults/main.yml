@@ -16,3 +16,9 @@ MYSQL_5_7_REPO: "deb http://repo.mysql.com/apt//ubuntu/ bionic mysql-5.7"
 MYSQL_5_7_SUPPORTED_DISTRIBUTIONS:
   - 'focal'
   - 'bionic'
+
+# List of dictionaries as described in the mount_ebs role's default
+# for the volumes.
+# Useful if you want to store your MySQL data on separate
+# disks from the root volume.
+MYSQL_VOLUMES: []
