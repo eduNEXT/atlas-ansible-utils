@@ -90,6 +90,11 @@ read_only         = {{ MYSQL_CONFIG_READ_ONLY }}
 #binlog_do_db		= include_database_name
 #binlog_ignore_db	= include_database_name
 #
+# * Character set and collation configuration
+#
+character-set-server = {{ MYSQL_CONFIG_CHARACTER_SET_SERVER }}
+collation-server = {{ MYSQL_CONFIG_COLLATION_SERVER }}
+#
 # * InnoDB
 #
 # InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
