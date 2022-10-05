@@ -2,14 +2,14 @@
 - name: Update mysql configuration
   template:
     src: mysqld.cnf.j2
-    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/mysqld.cnf"
   notify:
     - restart mysql
 
 - name: Put replication configuration file
   template:
     src: replication.cnf.j2
-    dest: /etc/mysql/mysql.conf.d/replication.cnf
+    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/replication.cnf"
   notify:
    - restart mysql
 
