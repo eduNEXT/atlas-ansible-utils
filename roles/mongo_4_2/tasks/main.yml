@@ -389,6 +389,25 @@
     - "manage:db-users"
     - "manage:db-replication"
 
+- name: create mongodb users in a standalone DB
+  mongodb_user:
+    database: "{{ item.database }}"
+    login_database: 'admin'
+    login_user: "{{ MONGO_ADMIN_USER }}"
+    login_password: "{{ MONGO_ADMIN_PASSWORD }}"
+    name: "{{ item.user }}"
+    password: "{{ item.password }}"
+    roles: "{{ item.roles }}"
+    state: present
+  with_items: "{{ MONGO_USERS }}"
+  run_once: true
+  when: not mongo_configure_replica_set
+  tags:
+    - "manage"
+    - "manage:db"
+    - "manage:db-users"
+    - "manage:db-standalone"
+
 - name: ensure mongo starts at boot time
   service:
     name: mongod
