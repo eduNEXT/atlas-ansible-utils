@@ -3,3 +3,6 @@ collections:
   - name: community.mongodb
   - name: amazon.aws
   - name: community.aws
+  - name: ansible-role-percona-cluster
+    src: https://github.com/eduNEXT/ansible-role-percona-cluster.git
+    version: release-ednx
