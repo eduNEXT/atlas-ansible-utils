@@ -29,3 +29,6 @@ common_directories:
 common_web_user: www-data
 common_web_group: www-data
 common_log_user: syslog
+
+# override this var to set a different hostname
+COMMON_HOSTNAME: ""
