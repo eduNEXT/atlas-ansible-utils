@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
-
 ## [1.0.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/0.1.0...1.0.0) - 2022-10-27
 
 ### Features
