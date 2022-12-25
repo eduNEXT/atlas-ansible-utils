@@ -13,35 +13,34 @@ Please do not update the unreleased notes.
 
 ## [1.0.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/0.1.0...1.0.0) - 2022-10-27
 
-### Added
+### Features
 
-- Generic Ansible configuration generated with "$ ansible-config init --disabled > ansible.cfg".
-- MySQL role just to install MySQL Inspired on openedx-configuration MySQL role.
-- Role to configure MySQL installation.
-- Main MySQL 5.7 playbook.
-- Mongo 4.2 role and other main roles.
-- Custom modules required by Mongo 4.2 role.
-- Main Mongo 4.2 playbook.
-- Role to mount volumes in MySQL and Mongo roles.
-- Support to define MySQL server charset and collation.
-- First version of Percona 5.7 playbook.
-- Playbook to deploy Percona database in specific hosts.
-- Support for machine hostnames.
+- Adding generic Ansible configuration generated with "$ ansible-config init --disabled > ansible.cfg".
+- Adding MySQL role just to install MySQL Inspired on openedx-configuration MySQL role.
+- Adding role to configure MySQL installation.
+- Adding main MySQL 5.7 playbook.
+- Adding mongo 4.2 role and other main roles.
+- Adding custom modules required by Mongo 4.2 role.
+- Adding main Mongo 4.2 playbook.
+- Adding role to mount volumes in MySQL and Mongo roles.
+- Adding support to define MySQL server charset and collation.
+- Adding first version of Percona 5.7 playbook.
+- Adding playbook to deploy Percona database in specific hosts.
+- Adding support for machine hostnames.
 
-### Changed
+### Code Refactoring
 
-- Updating requirements.
-- Add a new variable in the mysql_config role to control where to store the custom MySQL configuration files.
-- Update cache before installing python3-pip.
 - Update requirements to use Pymongo.
+- Update cache before installing python3-pip.
+- Use a new variable in the mysql_config role to control where to store the custom MySQL configuration files.
+- Updating requirements.
 
-### Fixed
+### Bug fixes
 
-- Move percona role under the proper key in requirements file.
-- Create Mongo DBs when using a standalone installation to avoid connection failures.
-- Fixing a couple of issues with Mongo and MySQL roles.
 - Add missing bracket in jinja template.
-
+- Fixing a couple of issues with Mongo and MySQL roles.
+- Create Mongo DBs when using a standalone installation to avoid connection failures.
+- Move percona role under the proper key in requirements file.
 
 ## [0.1.0] - 2022-10-27
 
