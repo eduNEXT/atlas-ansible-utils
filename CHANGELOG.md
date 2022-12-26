@@ -43,10 +43,10 @@ Please do not update the unreleased notes.
 - Create Mongo DBs when using a standalone installation to avoid connection failures.
 - Move percona role under the proper key in requirements file.
 
-## [0.1.0] - 2022-10-27
+## [0.1.0](https://github.com/eduNEXT/atlas-ansible-utils/commits/0.1.0) - 2022-10-27
 
-### [0.1.0] (2022-10-27)
+### [0.1.0](https://github.com/eduNEXT/atlas-ansible-utils/commits/0.1.0) (2022-10-27)
 
-#### Added
+#### Features
 
 - First release on GitHub before being a stable library.
