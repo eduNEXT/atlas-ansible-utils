@@ -10,10 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
-
 ## [1.0.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/0.1.0...1.0.0) - 2022-10-27
 
-### Features
+### [1.0.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/0.1.0...1.0.0) (2022-10-27)
+
+#### Features
 
 - Adding generic Ansible configuration generated with "$ ansible-config init --disabled > ansible.cfg".
 - Adding MySQL role just to install MySQL Inspired on openedx-configuration MySQL role.
@@ -28,22 +29,24 @@ Please do not update the unreleased notes.
 - Adding playbook to deploy Percona database in specific hosts.
 - Adding support for machine hostnames.
 
-### Code Refactoring
+#### Code Refactoring
 
 - Update requirements to use Pymongo.
 - Update cache before installing python3-pip.
 - Use a new variable in the mysql_config role to control where to store the custom MySQL configuration files.
 - Updating requirements.
 
-### Bug fixes
+#### Bug fixes
 
 - Add missing bracket in jinja template.
 - Fixing a couple of issues with Mongo and MySQL roles.
 - Create Mongo DBs when using a standalone installation to avoid connection failures.
 - Move percona role under the proper key in requirements file.
 
-## [0.1.0] - 2022-10-27
+## [0.1.0](https://github.com/eduNEXT/atlas-ansible-utils/commits/0.1.0) - 2022-10-27
 
-### Added
+### [0.1.0](https://github.com/eduNEXT/atlas-ansible-utils/commits/0.1.0) (2022-10-27)
+
+#### Features
 
 - First release on GitHub before being a stable library.
