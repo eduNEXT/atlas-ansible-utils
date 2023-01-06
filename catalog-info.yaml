@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: Ansible Utils for Atlas
+  name: atlas-ansible-utils
   description: Ansible roles for the persistence layer of k8s installations
 spec:
   type: library
