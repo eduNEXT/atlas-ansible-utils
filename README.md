@@ -35,7 +35,7 @@ Inventory is generally separated per environment, and contains a **hosts** file 
 
 Let's say we want to provision a machine to run MySQL, so we run the following in the CNC machine:
 
-    mkdir db_ops
+    mkdir -p db_ops && cd db_ops
     git clone git@github.com:eduNEXT/atlas-ansible-utils.git
     git clone git@github.com:eduNEXT/your-inventory-repo.git
     virtualenv venv
