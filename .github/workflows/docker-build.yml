@@ -1,0 +1,22 @@
+name: Build atlas-ansible-utils Docker Image
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  IMAGE_NAME: atlas-ansible-utils
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
+
+      - name: Run Docker image to make sure ansible-playbook binary is usable
+        run: docker run --rm ${{ env.IMAGE_NAME }}:${{ github.sha }}
