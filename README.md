@@ -47,6 +47,28 @@ Let's say we want to provision a machine to run MySQL, so we run the following i
 Full options for **ansible-playbook** command can be found [here](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html)
 
 ---
+
+## Use docker image
+
+This repo contains a Dockerfile that can be used to build a docker image with all the requirements to run the playbooks. To build the image, run the following command:
+
+    docker run --rm -it atlas-ansible-util:1.0.0
+
+When this command is executed:
+
+No additional parameters are provided on the command line. Therefore, the default values defined in the Dockerfile and the image will be used.
+
+The environment variable **ATLAS_ANSIBLE_PLAYBOOK** is set to "test_os_info.yml" by default which is used for testing purposes **ONLY**, helps verify that the ansible-playbook binary can run playbooks as expected..
+
+The environment variable **ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS** is set to an empty string by default, which means no additional parameters will be added to the ansible-playbook command.
+
+
+
+    docker run --rm -it -v "/your/local/path/ssh-key/id_key:/app/.ssh/id_rsa" -v "/your/local/path/inventory:/app/inventory" -e "ATLAS_ANSIBLE_PLAYBOOK=mysql_5_7.yml" -e "ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS=-i /app/inventory/hosts.ini -u ubuntu -v" atlas-ansible-utils:1.0.0
+
+The command above will run the playbook **mysql_5_7.yml** using the inventory file **hosts.ini** and the user **ubuntu**. The SSH key is mounted in the container to allow the connection to the target machine.
+
+---
 **NOTE**
 
 For now this repo supports the playbooks for:
