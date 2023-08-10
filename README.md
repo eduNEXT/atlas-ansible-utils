@@ -52,7 +52,7 @@ Full options for **ansible-playbook** command can be found [here](https://docs.a
 
 This repo contains a Dockerfile that can be used to build a docker image with all the requirements to run the playbooks. To build the image, run the following command:
 
-    docker run --rm -it atlas-ansible-util:1.0.0
+    docker run --rm -it ednxops/atlas-ansible-utils:1.0.0
 
 When this command is executed:
 
@@ -67,7 +67,7 @@ When this command is executed:
 
 Use other command line parameters to override the default values. For example:
 
-    docker run --rm -it -v "/your/local/path/ssh-key/id_key:/app/.ssh/id_rsa" -v "/your/local/path/inventory:/app/inventory" -e "ATLAS_ANSIBLE_PLAYBOOK=mysql_5_7.yml" -e "ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS=-i /app/inventory/hosts.ini -u ubuntu -v" atlas-ansible-utils:1.0.0
+    docker run --rm -it -v "/your/local/path/ssh-key/id_key:/app/.ssh/id_rsa" -v "/your/local/path/inventory:/app/inventory" -e "ATLAS_ANSIBLE_PLAYBOOK=mysql_5_7.yml" -e "ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS=-i /app/inventory/hosts.ini -u ubuntu -v" ednxops/atlas-ansible-utils:1.0.0
 
 In this case, we can override the default variables using:
 
