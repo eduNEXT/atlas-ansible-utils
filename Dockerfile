@@ -3,8 +3,8 @@ FROM docker.io/ubuntu:20.04
 RUN apt update && \
   apt upgrade -y && \
   # python 3.8
-  apt install -y git python3 python3-pip make
-RUN ln -s /usr/bin/python3 /usr/bin/python
+  apt install -y git python3 python3-pip make python-is-python3 && \
+  rm -rf /var/lib/apt/lists/*
 
 ARG APP_USER_ID=1000
 RUN useradd --home-dir /app --create-home --shell /bin/bash --uid ${APP_USER_ID} app
