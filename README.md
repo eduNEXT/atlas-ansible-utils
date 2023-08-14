@@ -48,9 +48,9 @@ Full options for **ansible-playbook** command can be found [here](https://docs.a
 
 ---
 
-## Use docker image
+## Using the Docker image
 
-This repo contains a Dockerfile that can be used to build a docker image with all the requirements to run the playbooks. To build the image, run the following command:
+This repo contains a Dockerfile that can be used to build a Docker image with all the requirements and run the playbooks. To run the image, run the following command:
 
     docker run --rm -it ednxops/atlas-ansible-utils:<tagname>
 
@@ -63,7 +63,6 @@ When this command is executed:
 - The environment variable **ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS** is set to an empty string by default, which means no additional parameters will be added to the ansible-playbook command.
 
 - **--rm** flag is used to remove the container when it exits after running the command.
-
 
 Use other command line parameters to override the default values. For example:
 
