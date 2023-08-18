@@ -8,6 +8,7 @@
   apt:
     name: "{{ mysql_5_7_debian_pkgs }}"
     install_recommends: yes
+    update_cache: yes
     state: present
 
 - name: add the mysql signing key
