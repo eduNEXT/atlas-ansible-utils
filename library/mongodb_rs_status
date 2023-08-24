@@ -100,7 +100,9 @@ def main():
     if auth_database:
         mongo_uri += '/{}'.format(quote_plus(auth_database))
 
-    client = MongoClient(mongo_uri)
+    # The directConnection parameter was changed in Pymongo 4.x.x. More details in
+    # https://pymongo.readthedocs.io/en/stable/migrate-to-pymongo4.html#directconnection-defaults-to-false
+    client = MongoClient(mongo_uri, directConnection=True)
 
     # This checks to see if you have a replSetName configured
     # This generally means that /etc/mongod.conf has been changed
