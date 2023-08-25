@@ -329,7 +329,9 @@ def get_client(some_host, some_port, username, password, auth_database):
     exceptions.
     '''
     mongo_uri = get_mongo_uri(some_host, some_port, username, password, auth_database)
-    client = MongoClient(mongo_uri)
+    # The directConnection parameter was changed in Pymongo 4.x.x. More details in
+    # https://pymongo.readthedocs.io/en/stable/migrate-to-pymongo4.html#directconnection-defaults-to-false
+    client = MongoClient(mongo_uri, directConnection=True)
     return client
 
 ################ Main ################
