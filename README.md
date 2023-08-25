@@ -72,15 +72,101 @@ In this case, we can override the default variables using:
 
 - When this command is executed, it mounts the private SSH key file id_key from the directory **/your/local/path/ssh-key** on the host to the container at the location **/app/.ssh/id_rsa**. It also mounts the inventory directory from **/your/local/path//inventory** on the host to **/app/inventory** in the container.
 
+> **_NOTE:_** SSH credentials can be shared in any path on the docker container using the **ANSIBLE_PRIVATE_KEY_FILE** environment variable which allows to define the path where SSH credentials are located.
+
 - The environment variable **ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS** is set to **"-i /app/inventory/hosts.ini -u ubuntu -v"**, which adds additional parameters to the ansible-playbook command. These parameters specify the inventory file, remote user, and verbose mode for Ansible.
 
 - The **-u** flag is used to set the user to connect to the target machines. In this case, the user is **ubuntu**.
 
 ---
+
+## Using in Kubernetes
+
+To run the atlas-ansible-utils playbooks to provision external servers from Kubernetes, jobs or cronjobs can be implemented using the atlas-ansible-utils Docker image. Let's look at the following example:
+
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: ansible-playbook-mysql-job
+      namespace: "tokio-openedx"
+    spec:
+      template:
+        spec:
+          securityContext:
+            fsGroup: 1000
+          containers:
+          - name: ansible-runner
+            image: ednxops/atlas-ansible-utils:1.1.0
+            env:
+            - name: ATLAS_ANSIBLE_PLAYBOOK
+              value: "mysql_5_7.yml"
+            - name: ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS
+              value: "-i /git/manifests/manifests-yamato.git/ansible_inventory/hosts -u ubuntu -v"
+            - name: ANSIBLE_PRIVATE_KEY_FILE
+              value: "/tmp/extra-ssh-keys/id-rsa"
+            volumeMounts:
+            - mountPath: /git
+              name: inventory-content
+            - mountPath: /tmp/extra-ssh-keys
+              readOnly: true
+              name: sshdir
+          initContainers:
+          - name: inventory-git-sync
+            image: registry.k8s.io/git-sync/git-sync:v4.0.0
+            volumeMounts:
+            - mountPath: /git
+              name: inventory-content
+            - mountPath: /tmp/extra-ssh-keys
+              readOnly: true
+              name: sshdir
+            env:
+            - name: GITSYNC_MAX_FAILURES
+              value: "3"
+            - name: GITSYNC_ONE_TIME
+              value: "true"
+            - name: GITSYNC_REF
+              value: "mar/test-provisioning-db"
+            - name: GITSYNC_REPO
+              value: "git@github.com:eduNEXT/manifests-yamato.git"
+            - name: GITSYNC_ROOT
+              value: "/git/manifests"
+            - name: GITSYNC_SSH
+              value: "true"
+            - name: GITSYNC_SSH_KEY_FILE
+              value: "/tmp/extra-ssh-keys/id-rsa"
+            - name: GITSYNC_SSH_KNOWN_HOSTS
+              value: "false"
+          volumes:
+          - name: inventory-content
+            emptyDir: {}
+          - name: sshdir
+            secret:
+              secretName: ssh-github
+              items:
+              - key: ssh-privatekey
+                path: id-rsa
+          restartPolicy: Never
+      backoffLimit: 4
+
+This job has the following features:
+
+- It mounts a secret called **ssh-github** in a volume. Such secret should contain the ssh credentials to connect to the Ansible external target servers, as well as to fetch the inventory repository. For convenience, such credentials are the same for both, servers access and repository cloning. The secret can be creates with the command:
+
+      kubectl create secret generic ssh-github --from-file=path/to/you/ssh-private-key
+
+or you can create it via ArgoCD.
+
+- There's a single initContainer whose unique function is to fetch the inventory repository. It uses the [gitsync tool](https://github.com/kubernetes/git-sync) to do so.
+
+- The **atlas-ansible-utils** image is used in the main pod container to execute the desired ansible-playbook in the target servers, mounting the ssh-key and the inventory repository as volumes. The configuration is defined through environment variables.
+
+---
+
 **NOTE**
 
 For now this repo supports the playbooks for:
 - MySQL 5.7
 - Mongo 4.2
 - Percona 5.7
+
 ---
