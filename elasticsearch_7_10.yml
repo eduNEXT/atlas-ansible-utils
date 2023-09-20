@@ -1,0 +1,7 @@
+# Deploy ElasticSearch
+- name: Deploy ElasticSearch
+  hosts: elasticsearch_servers
+  become: True
+  gather_facts: True
+  roles:
+    - role: elasticsearch_7_10
