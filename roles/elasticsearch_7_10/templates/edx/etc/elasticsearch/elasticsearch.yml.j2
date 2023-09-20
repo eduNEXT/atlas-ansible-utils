@@ -60,9 +60,6 @@ path.logs: {{ elasticsearch_log_dir }}
 #
 #http.port: 9200
 #
-{% if vagrant_cluster|bool %}
-network.host: {{ ansible_ssh_host }}
-{% endif %}
 # For more information, consult the network module documentation.
 #
 # --------------------------------- Discovery ----------------------------------
