@@ -1,16 +1,4 @@
 ---
-# This role installs what is required to connect to a remote storage and upload passed files to the remote storage
-# Right now this role support two types of storages:
-# - aws
-#
-# Example aws object options:
-# STORAGE_BACKUPS_OPTIONS:
-#   EXTERNAL_STORAGE_TYPE: "aws"
-#   EXTERNAL_STORAGE_OPTIONS:
-#     S3_BUCKET_NAME: "BUCKET_NAME"
-#     AWS_ACCESS_KEY_ID: "your key id"
-#     AWS_SECRET_ACCESS_KEY: "your access key"
-#     AWS_EXTRA_PARAMS: "--endpoint-url=https://endpoint-url.com ..." #https://docs.aws.amazon.com/cli/latest/reference/
 
 STORAGE_BACKUPS_OPTIONS: {}
 STORAGE_BACKUPS_FILES_TO_UPLOAD: []
