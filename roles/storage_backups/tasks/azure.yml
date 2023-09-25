@@ -1,0 +1,54 @@
+---
+- name: check if azcopy is installed
+  package:
+    name: azcopy
+    state: present
+  ignore_errors: yes
+  check_mode: true
+  register: azcopy_check
+
+- name: Installing microsoft gpg key
+  shell: curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg \
+  when: not azcopy_check.changed
+
+- name: Adding microsoft repo to sourceslists
+  shell: sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main" > /etc/apt/sources.list.d/dotnetdev.list'
+  when: not azcopy_check.changed
+
+- name: Update apt cache
+  apt:  update_cache=yes
+  when: not azcopy_check.changed
+
+- name: Install packages needed for azcopy
+  apt:
+    name: "{{ item }}"
+    install_recommends: yes
+    state: present
+  with_items: "{{ storage_backups_aznet_packages }}"
+  when: not azcopy_check.changed
+
+- name: Downloading azcopy source code
+  get_url: url=https://aka.ms/downloadazcopyprlinux dest=/tmp/azcopy.tar.gz
+  when: not azcopy_check.changed
+
+- name: Creates directory
+  file: path=/tmp/azcp state=directory
+  when: not azcopy_check.changed
+
+- name: Extract azcopy
+  unarchive:
+    src: /tmp/azcopy.tar.gz
+    dest: /tmp/azcp
+    remote_src: yes
+  when: not azcopy_check.changed
+
+- name: Install azcopy
+  shell: ./install.sh
+  args:
+    chdir: /tmp/azcp
+  when: not azcopy_check.changed
+
+- name: Upload files to azure storage
+  shell: >
+   {{ storage_backups_azure_command }}
+  with_items: "{{ STORAGE_BACKUPS_FILES_TO_UPLOAD }}"

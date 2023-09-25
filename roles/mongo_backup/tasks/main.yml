@@ -1,0 +1,56 @@
+---
+
+- name: Clean the backup root path before starting the routine
+  file:
+    state: absent
+    path: "{{ mongo_artifact_path }}/"
+  when: MONGO_BACKUP_PRE_CLEAN_ROOT and mongo_artifact_path is defined and mongo_artifact_path != "" and
+        MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+
+- name: Create backup directory
+  file:
+    path: "{{ MONGO_BACKUP_LOCATION }}"
+    state: directory
+
+- name: Check if current mongo backup already exists
+  stat:
+    path: "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.tar.gz"
+    get_checksum: false
+    get_md5: false
+  register: mongo_backup_status
+
+- name: Create mongo database backup
+  shell: >
+    mongodump
+    --authenticationDatabase admin
+    -u admin -p '{{ MONGO_ADMIN_PASSWORD }}'
+    -o {{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}.mongo
+  when: mongo_backup_status.stat.exists == False
+
+- name: Compress mongo backup file
+  command: "tar -czf {{ MONGO_BACKUP_DATE }}_mongo.tar.gz {{ MONGO_BACKUP_LOCATION}}/{{ MONGO_BACKUP_DATE }}.mongo --remove-files"
+  args:
+    chdir: "{{ MONGO_BACKUP_LOCATION}}"
+  when: mongo_backup_status.stat.exists == False
+
+- name: Give the server time to recover
+  pause:
+    minutes: 1
+    prompt: Pausing to give the server time to recover
+  when: mongo_backup_status.stat.exists == False
+
+- name: Execute the storage of the backup
+  include_role:
+    name: storage_backups
+  vars:
+    STORAGE_BACKUPS_OPTIONS: "{{ MONGO_BACKUP_STORAGE_OPTIONS }}"
+    STORAGE_BACKUPS_FILES_TO_UPLOAD:
+      - "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.tar.gz"
+    STORAGE_BACKUPS_FOLDER: "mongo"
+
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "{{ mongo_artifact_path }}/"
+  when: mongo_artifact_path is defined and mongo_artifact_path != "" and
+        MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""

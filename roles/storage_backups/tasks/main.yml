@@ -1,0 +1,9 @@
+---
+
+# Azure option
+- include: azure.yml
+  when: STORAGE_BACKUPS_TYPE == 'azure'
+
+# S3 option
+- include: aws.yml
+  when: STORAGE_BACKUPS_TYPE == 'aws'

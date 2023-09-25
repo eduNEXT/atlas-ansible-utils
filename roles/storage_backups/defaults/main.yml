@@ -1,0 +1,42 @@
+---
+# This role installs what is required to connect to a remote storage and upload passed files to the remote storage
+# Right now this role support two types of storages:
+# - aws
+# - azure
+#
+# Example aws object options:
+# STORAGE_BACKUPS_OPTIONS:
+#   EXTERNAL_STORAGE_TYPE: "aws"
+#   EXTERNAL_STORAGE_OPTIONS:
+#     S3_BUCKET_NAME: "BUCKET_NAME"
+#     AWS_ACCESS_KEY_ID: "your key id"
+#     AWS_SECRET_ACCESS_KEY: "your access key"
+#     AWS_EXTRA_PARAMS: "--endpoint-url=https://endpoint-url.com ..." #https://docs.aws.amazon.com/cli/latest/reference/
+#
+# Example azure object options:
+# STORAGE_BACKUPS_OPTIONS:
+#   EXTERNAL_STORAGE_TYPE: "azure"
+#   EXTERNAL_STORAGE_OPTIONS:
+#     AZURE_CONTAINER_NAME: "your container name"
+#     AZURE_ACCOUNT_KEY: "your account key"
+#     AZURE_ACCOUNT_NAME: "your account name"
+
+STORAGE_BACKUPS_OPTIONS: {}
+STORAGE_BACKUPS_FILES_TO_UPLOAD: []
+
+STORAGE_BACKUPS_TYPE: "{{ STORAGE_BACKUPS_OPTIONS.EXTERNAL_STORAGE_TYPE | default('') }}"
+STORAGE_BACKUPS_TYPE_OPTIONS: "{{ STORAGE_BACKUPS_OPTIONS.EXTERNAL_STORAGE_OPTIONS | default({}) }}"
+STORAGE_BACKUPS_S3_BUCKET_NAME: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.S3_BUCKET_NAME | default('SET ME PLEASE') }}"
+STORAGE_BACKUPS_AWS_ACCESS_KEY_ID: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AWS_ACCESS_KEY_ID | default('SET ME PLEASE') }}"
+STORAGE_BACKUPS_AWS_SECRET_ACCESS_KEY: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AWS_SECRET_ACCESS_KEY | default('SET ME PLEASE') }}"
+STORAGE_BACKUPS_AWS_EXTRA_PARAMS: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AWS_EXTRA_PARAMS | default('') }}"
+
+STORAGE_BACKUPS_AZURE_CONTAINER_NAME: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AZURE_CONTAINER_NAME | default('SET ME PLEASE') }}"
+STORAGE_BACKUPS_AZURE_ACCOUNT_KEY: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AZURE_ACCOUNT_KEY | default('SET ME PLEASE') }}"
+STORAGE_BACKUPS_AZURE_ACCOUNT_NAME: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AZURE_ACCOUNT_NAME | default('SET ME PLEASE') }}"
+
+storage_backups_azure_remote_dest: "https://{{ STORAGE_BACKUPS_AZURE_ACCOUNT_NAME }}.blob.core.windows.net/{{ STORAGE_BACKUPS_AZURE_CONTAINER_NAME }/{{ item | basename }}"
+storage_backups_azure_command: "azcopy --source {{ item }} --destination {{ storage_backups_azure_remote_dest }} --dest-key {{AZURE_ACCOUNT_KEY}}"
+
+storage_backups_aznet_packages:
+  - dotnet-sdk-2.0.2
