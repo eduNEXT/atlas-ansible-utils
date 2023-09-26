@@ -1,7 +1,8 @@
 ---
 
 MYSQL_BACKUP_USER: "admin"
-MYSQL_BACKUP_PASSWORD: "mongo_password"
+MYSQL_BACKUP_PASSWORD: "mysql_password"
+MYSQL_BACKUP_DATABASE: "edxapp"
 MYSQL_BACKUP_ROOT: "/var/edunext_tmp/mysql"
 MYSQL_BACKUP_DATE: "{{ ansible_date_time.date }}"
 MYSQL_BACKUP_LOCATION: "{{ MYSQL_BACKUP_ROOT }}/{{ MYSQL_BACKUP_DATE }}.d"
