@@ -19,7 +19,7 @@
     {% if MYSQL_BACKUP_ALL_DATABASES %}
     --all-databases
     {% else %}
-    --databases {{ MYSQL_BACKUP_DATABASE }}
+    --databases {{ MYSQL_BACKUP_DATABASES }}
     {% endif %}
     > {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql
   args:
