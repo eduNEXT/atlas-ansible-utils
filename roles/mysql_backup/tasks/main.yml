@@ -14,7 +14,14 @@
     state: directory
 
 - name: Create MySQL database backup
-  shell: "mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }} --add-drop-database --skip-lock-tables {{ MYSQL_BACKUP_DATABASE }} > {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
+  shell: >
+    mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }} --add-drop-database --skip-lock-tables
+    {% if MYSQL_BACKUP_ALL_DATABASES %}
+    --all-databases
+    {% else %}
+    --databases {{ MYSQL_BACKUP_DATABASE }}
+    {% endif %}
+    > {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql
   args:
     chdir: "{{ MYSQL_BACKUP_LOCATION }}"
 
