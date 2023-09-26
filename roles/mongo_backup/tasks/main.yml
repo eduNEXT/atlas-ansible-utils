@@ -1,3 +1,5 @@
+# Description: Playbook to launch Mongo backups
+# It is compatible with the S3 API for storage.
 ---
 
 - name: Clean the backup root path before starting the routine
@@ -12,32 +14,18 @@
     path: "{{ MONGO_BACKUP_LOCATION }}"
     state: directory
 
-- name: Check if current mongo backup already exists
-  stat:
-    path: "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.tar.gz"
-    get_checksum: false
-    get_md5: false
-  register: mongo_backup_status
-
 - name: Create mongo database backup
   shell: >
     mongodump
     --authenticationDatabase admin
-    -u admin -p '{{ MONGO_ADMIN_PASSWORD }}'
-    -o {{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}.mongo
-  when: mongo_backup_status.stat.exists == False
-
-- name: Compress mongo backup file
-  command: "tar -czf {{ MONGO_BACKUP_DATE }}_mongo.tar.gz {{ MONGO_BACKUP_LOCATION}}/{{ MONGO_BACKUP_DATE }}.mongo --remove-files"
-  args:
-    chdir: "{{ MONGO_BACKUP_LOCATION}}"
-  when: mongo_backup_status.stat.exists == False
+    -u {{ MONGO_BACKUP_USER }} -p '{{ MONGO_BACKUP_PASSWORD }}'
+    --gzip
+    --archive={{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}.mongo
 
 - name: Give the server time to recover
   pause:
     minutes: 1
     prompt: Pausing to give the server time to recover
-  when: mongo_backup_status.stat.exists == False
 
 - name: Execute the storage of the backup
   include_role:
@@ -45,7 +33,7 @@
   vars:
     STORAGE_BACKUPS_OPTIONS: "{{ MONGO_BACKUP_STORAGE_OPTIONS }}"
     STORAGE_BACKUPS_FILES_TO_UPLOAD:
-      - "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.tar.gz"
+      - "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}.mongo"
     STORAGE_BACKUPS_FOLDER: "mongo"
 
 - name: Clean artifact path

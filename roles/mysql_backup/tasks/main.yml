@@ -1,3 +1,5 @@
+# Description: Playbook to launch MySQL backups
+# It is compatible with the S3 API for storage.
 ---
 - name: Clean the backup root path before starting the routine
   file:
@@ -11,30 +13,20 @@
     path: "{{ MYSQL_BACKUP_LOCATION }}"
     state: directory
 
-- name: Check if current MySQL backup already exists
-  stat:
-    path: "{{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql.gz"
-    get_checksum: false
-    get_md5: false
-  register: mysql_backup_status
-
 - name: Create MySQL database backup
-  shell: "mysqldump -u root -p{{ MYSQL_ADMIN_PASSWORD }} --add-drop-database --skip-lock-tables edxapp > {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
+  shell: "mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }} --add-drop-database --skip-lock-tables edxapp > {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
   args:
     chdir: "{{ MYSQL_BACKUP_LOCATION }}"
-  when: mysql_backup_status.stat.exists == False
 
 - name: Compress mysql backup file
   shell: "gzip {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
   args:
     chdir: "{{ MYSQL_BACKUP_LOCATION}}"
-  when: mysql_backup_status.stat.exists == False
 
 - name: Give the server time to recover
   pause:
     minutes: 1
     prompt: Pausing to give the server time to recover
-  when: mysql_backup_status.stat.exists == False
 
 - name: Execute the storage of the backup
   include_role:
