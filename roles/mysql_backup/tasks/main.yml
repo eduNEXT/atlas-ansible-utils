@@ -35,7 +35,7 @@
     minutes: 1
     prompt: Pausing to give the server time to recover
 
-- name: Execute the storage of the backup
+- name: Upload the backup to a remote storage
   include_role:
     name: storage_backups
   vars:
