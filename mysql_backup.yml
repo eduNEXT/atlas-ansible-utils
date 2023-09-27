@@ -1,0 +1,9 @@
+# Description: Playbook to launch MySQL backups
+- name: Launch MySQL backups
+  hosts: mysql_servers
+  become: True
+  gather_facts: True
+  roles:
+    - role: mysql_backup
+      tags:
+        - mysql_backup

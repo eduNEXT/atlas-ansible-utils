@@ -1,0 +1,12 @@
+---
+- name: Install AWS CLI
+  pip:
+    name: awscli
+  become: true
+
+- name: Put files in S3
+  command: "aws {{ STORAGE_BACKUPS_AWS_EXTRA_PARAMS }} s3 cp --quiet {{ item }} s3://{{ STORAGE_BACKUPS_S3_BUCKET_NAME }}/{{ STORAGE_BACKUPS_S3_BUCKET_PATH|regex_replace('([^/])$', '\\1/') }}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{ STORAGE_BACKUPS_AWS_ACCESS_KEY_ID }}"
+    AWS_SECRET_ACCESS_KEY: "{{ STORAGE_BACKUPS_AWS_SECRET_ACCESS_KEY }}"
+  with_items: "{{ STORAGE_BACKUPS_FILES_TO_UPLOAD }}"
