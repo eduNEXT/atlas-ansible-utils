@@ -1,11 +1,31 @@
 ---
+# This HELPER role handles the upload of backup artifacts to different storage systems.
+# Generally the following variables:
+# - STORAGE_BACKUPS_OPTIONS
+# - STORAGE_BACKUPS_FILES_TO_UPLOAD
+# should be defined when invoking this role.
+# For now, only aws S3 is supported as storage type
+
+# For aws S3, the STORAGE_BACKUPS_OPTIONS should look like this:
+
+# STORAGE_BACKUPS_OPTIONS:
+#   EXTERNAL_STORAGE_TYPE: "aws"
+#   EXTERNAL_STORAGE_OPTIONS:
+#     S3_BUCKET_NAME: "s3_bucket_name"
+#     S3_BUCKET_PATH: "s3_bucket_path"
+#     AWS_ACCESS_KEY_ID: "s3_access_key"
+#     AWS_SECRET_ACCESS_KEY: "s3_secret_key"
+#     AWS_EXTRA_PARAMS: "some extra awscli parameters"
 
 STORAGE_BACKUPS_OPTIONS: {}
 STORAGE_BACKUPS_FILES_TO_UPLOAD: []
 
 STORAGE_BACKUPS_TYPE: "{{ STORAGE_BACKUPS_OPTIONS.EXTERNAL_STORAGE_TYPE | default('') }}"
 STORAGE_BACKUPS_TYPE_OPTIONS: "{{ STORAGE_BACKUPS_OPTIONS.EXTERNAL_STORAGE_OPTIONS | default({}) }}"
+
+# AWS storage options extraction
 STORAGE_BACKUPS_S3_BUCKET_NAME: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.S3_BUCKET_NAME | default('SET ME PLEASE') }}"
+STORAGE_BACKUPS_S3_BUCKET_PATH: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.S3_BUCKET_PATH | default('') }}"
 STORAGE_BACKUPS_AWS_ACCESS_KEY_ID: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AWS_ACCESS_KEY_ID | default('SET ME PLEASE') }}"
 STORAGE_BACKUPS_AWS_SECRET_ACCESS_KEY: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AWS_SECRET_ACCESS_KEY | default('SET ME PLEASE') }}"
 STORAGE_BACKUPS_AWS_EXTRA_PARAMS: "{{ STORAGE_BACKUPS_TYPE_OPTIONS.AWS_EXTRA_PARAMS | default('') }}"

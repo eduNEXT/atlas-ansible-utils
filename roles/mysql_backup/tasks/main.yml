@@ -42,8 +42,6 @@
     STORAGE_BACKUPS_OPTIONS: "{{ MYSQL_BACKUP_STORAGE_OPTIONS }}"
     STORAGE_BACKUPS_FILES_TO_UPLOAD:
       - "{{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql.gz"
-    STORAGE_BACKUPS_FOLDER:
-      - "mysql"
 
 - name: Clean artifact path
   file:
