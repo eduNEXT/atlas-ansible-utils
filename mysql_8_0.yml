@@ -1,0 +1,11 @@
+---
+# Playbook to provision MySQL
+
+- name: Configure db MySQL instances
+  hosts: mysql_servers
+  become: True
+  gather_facts: True
+  roles:
+    # The geerlingguy role does not allow to install a custom MySQL repository, reason why we use a helper role to install MySQL 5.7
+    - role: mysql_8_0
+    - role: mysql_config
