@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.1.0...HEAD)
+## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.2.0...HEAD)
 
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
+## [v1.2.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.1.0...v1.2.0) - 2023-10-02
+
+### [1.2.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.1.0...v1.2.0) (2023-10-02)
+
+#### Features
+
+- add backup ansible playbooks ([#11](https://github.com/eduNEXT/atlas-ansible-utils/issues/11)) ([3f7433f](https://github.com/eduNEXT/atlas-ansible-utils/commit/3f7433f7c7aba0aeb1573d7e8d8164bf8a0d0104))
+
 ## [v1.1.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/1.0.0...v1.1.0) - 2023-08-25
 
 ### [1.1.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.0.0...v1.1.0) (2023-08-25)
