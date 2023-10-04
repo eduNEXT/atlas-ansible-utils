@@ -25,15 +25,30 @@ MYSQL_CONFIG_SERVER_ID: 1
 # In this path we store the MySQL configuration we create via templates
 MYSQL_CONFIG_EXTRA_CONFIG_PATH: "/etc/mysql/mysql.conf.d"
 
-# Using default MySQL 5.7 settings
+# Using default MySQL 5.7 or 8.0 settings
 # For more information check the links below:
+# 5.7
 # - https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html
 # - https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html
+# 8.0
+# - https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html
+# - https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html
+
+# Config for MySQL 5.7
+MYSQL_CONFIG_EXPIRE_LOGS_DAYS: 5
+MYSQL_CONFIG_INNODB_LOG_FILE_SIZE: 48M
+MYSQL_CONFIG_CHARACTER_SET_SERVER: "utf8"
+MYSQL_CONFIG_COLLATION_SERVER: "utf8_general_ci"
+# Config for MySQL 8.0
+MYSQL_CONFIG_EXPIRE_LOGS_SECONDS: 432000 # 5 days
+MYSQL_CONFIG_INNODB_LOG_CAPACITY: 48M
+MYSQL_8_0_CONFIG_CHARACTER_SET_SERVER: "utf8mb4"
+MYSQL_8_0_CONFIG_COLLATION_SERVER: "utf8mb4_0900_ai_ci"
+
 MYSQL_CONFIG_KEY_BUFFER_SIZE: 8M
 MYSQL_CONFIG_MAX_CONNECTIONS: 1200
 MYSQL_CONFIG_OPEN_FILES_LIMIT: 5000
 MYSQL_CONFIG_TABLE_OPEN_CACHE: 2000
-MYSQL_CONFIG_EXPIRE_LOGS_DAYS: 5
 MYSQL_CONFIG_MAX_ALLOWED_PACKET: 16M
 MYSQL_CONFIG_INNODB_BUFFER_POOL_SIZE: 128M
 MYSQL_CONFIG_INNODB_IO_CAPACITY: 200
@@ -43,11 +58,9 @@ MYSQL_CONFIG_INNODB_LOG_BUFFER_SIZE: 16M
 MYSQL_CONFIG_INNODB_READ_IO_THREADS: 4
 MYSQL_CONFIG_INNODB_WRITE_IO_THREADS: 4
 MYSQL_CONFIG_INNODB_FLUSH_LOG_AT_TRX_COMMIT: 1
-MYSQL_CONFIG_CHARACTER_SET_SERVER: "utf8"
-MYSQL_CONFIG_COLLATION_SERVER: "utf8_general_ci"
 
 MYSQL_CONFIG_ENABLE_SLOW_QUERY_LOGS: false
-MYSQL_CONFIG_READ_ONLY: 0
+MYSQL_CONFIG_READ_ONLY: false
 
 # Replication
 MYSQL_CONFIG_REPL_ENABLE_GTID_MODE: false

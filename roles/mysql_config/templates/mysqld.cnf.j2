@@ -11,6 +11,7 @@
 #
 # For explanations see
 # http://dev.mysql.com/doc/mysql/en/server-system-variables.html
+# https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html
 
 # This will be passed to all mysql clients
 # It has been reported that passwords should be enclosed with ticks/quotes
@@ -57,10 +58,12 @@ open_files_limit       = {{ MYSQL_CONFIG_OPEN_FILES_LIMIT }}
 #table_cache            = 64
 #thread_concurrency     = 10
 #
+{% if MYSQL_CONFIG_VERSION == '5.7' %}
 # * Query Cache Configuration
 #
 query_cache_limit	      = 1M
 query_cache_size        = 16M
+{% endif %}
 #
 # * Logging and Replication
 #
@@ -85,15 +88,24 @@ long_query_time          = 2
 # The following can be used as easy to replay backup logs or for replication.
 # note: if you are setting up a replication slave, see README.Debian about
 #       other settings you may need to change.
+{% if MYSQL_CONFIG_VERSION == '5.7' %}
 expire_logs_days	= {{ MYSQL_CONFIG_EXPIRE_LOGS_DAYS }}
+{% elif MYSQL_CONFIG_VERSION == '8.0' %}
+binlog_expire_logs_seconds = {{ MYSQL_CONFIG_EXPIRE_LOGS_SECONDS }}
+{% endif %}
 read_only         = {{ MYSQL_CONFIG_READ_ONLY }}
 #binlog_do_db		= include_database_name
 #binlog_ignore_db	= include_database_name
 #
 # * Character set and collation configuration
 #
+{% if MYSQL_CONFIG_VERSION == '5.7' %}
 character-set-server = {{ MYSQL_CONFIG_CHARACTER_SET_SERVER }}
 collation-server = {{ MYSQL_CONFIG_COLLATION_SERVER }}
+{% elif MYSQL_CONFIG_VERSION == '8.0' %}
+character-set-server = {{ MYSQL_8_0_CONFIG_CHARACTER_SET_SERVER }}
+collation-server = {{ MYSQL_8_0_CONFIG_COLLATION_SERVER }}
+{% endif %}
 #
 # * InnoDB
 #
@@ -114,7 +126,11 @@ collation-server = {{ MYSQL_CONFIG_COLLATION_SERVER }}
 innodb_buffer_pool_size = {{ MYSQL_CONFIG_INNODB_BUFFER_POOL_SIZE }}
 innodb_io_capacity = {{ MYSQL_CONFIG_INNODB_IO_CAPACITY }}
 innodb_io_capacity_max = {{ MYSQL_CONFIG_INNODB_IO_CAPACITY_MAX }}
+{% if MYSQL_CONFIG_VERSION == '5.7' %}
 innodb_log_file_size = {{ MYSQL_CONFIG_INNODB_LOG_FILE_SIZE }}
+{% elif MYSQL_CONFIG_VERSION == '8.0' %}
+innodb_redo_log_capacity = {{ MYSQL_CONFIG_INNODB_LOG_CAPACITY }}
+{% endif %}
 innodb_log_buffer_size = {{ MYSQL_CONFIG_INNODB_LOG_BUFFER_SIZE }}
 innodb_read_io_threads = {{ MYSQL_CONFIG_INNODB_READ_IO_THREADS }}
 innodb_write_io_threads = {{ MYSQL_CONFIG_INNODB_WRITE_IO_THREADS }}
