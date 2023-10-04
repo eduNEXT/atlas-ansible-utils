@@ -9,3 +9,5 @@
     # The geerlingguy role does not allow to install a custom MySQL repository, reason why we use a helper role to install MySQL 5.7
     - role: mysql_5_7
     - role: mysql_config
+      vars:
+        MYSQL_CONFIG_VERSION: '5.7'

@@ -8,4 +8,6 @@
   roles:
     # The geerlingguy role does not allow to install a custom MySQL repository, reason why we use a helper role to install MySQL 8.0
     - role: mysql_8_0
-    - role: mysql_8_0_config
+    - role: mysql_config
+      vars:
+        MYSQL_CONFIG_VERSION: '8.0'
