@@ -11,12 +11,17 @@
     update_cache: yes
     state: present
 
-- name: add the mysql signing key
+- name: Add MySQL repository key
   apt_key:
     keyserver: "{{ MYSQL_8_0_APT_KEYSERVER }}"
     id: "{{ MYSQL_8_0_APT_KEY }}"
+    state: present
 
-- name: add the mysql-8.0 repo to the sources list
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+- name: Add MySQL repository to sources list
   apt_repository:
     repo: "{{ MYSQL_8_0_REPO }}"
     state: present
@@ -56,5 +61,5 @@
 
 - name: Alter user root to use mysql_native_password
   shell:
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password;set password=password('')"
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password AS PASSWORD('password');"
   become: true
