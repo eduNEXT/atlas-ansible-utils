@@ -63,3 +63,8 @@
   shell:
     mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password; SET PASSWORD='';"
   become: true
+
+- name: Post MySQL installation configuration
+  include_tasks: configure.yml
+- include_tasks: databases.yml
+- include_tasks: users.yml
