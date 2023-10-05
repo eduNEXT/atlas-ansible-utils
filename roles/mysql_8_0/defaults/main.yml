@@ -52,15 +52,18 @@ MYSQL_CONFIG_EXTRA_CONFIG_PATH: "/etc/mysql/mysql.conf.d"
 # Using default MySQL 8.0 settings
 # For more information check the links below:
 # 8.0
-# - https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html
-# - https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html
+# - https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html
+# - https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html
 
 
 # Config for MySQL 8.0
+# This variables are only compatible with MySQL 8.0
+# More info: https://dev.mysql.com/doc/refman/8.0/en/added-deprecated-removed.html
 MYSQL_CONFIG_EXPIRE_LOGS_SECONDS: 432000 # 5 days
 MYSQL_CONFIG_INNODB_LOG_CAPACITY: 48M
+
 MYSQL_CONFIG_CHARACTER_SET_SERVER: "utf8mb4"
-MYSQL_CONFIG_COLLATION_SERVER: "utf8mb4_0900_ai_ci"
+MYSQL_CONFIG_COLLATION_SERVER: "utf8mb4_unicode_ci"
 MYSQL_CONFIG_KEY_BUFFER_SIZE: 8M
 MYSQL_CONFIG_MAX_CONNECTIONS: 1200
 MYSQL_CONFIG_OPEN_FILES_LIMIT: 5000

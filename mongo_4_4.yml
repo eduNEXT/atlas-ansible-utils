@@ -10,6 +10,8 @@
 # ADDING A NEW CLUSTER MEMBER
 # If you are adding a member to a cluster, you must be sure that the new machine is not first in your inventory
 # ansible-playbook mongo_4_4.yml -i 203.0.113.11,203.0.113.12,new-machine-ip -e@/path/to/edx.yml -e@/path/to/ed.yml
+# If you are needing more information, please see this link: https://github.com/openedx/configuration/blob/master/playbooks/mongo_4_4.yml
+
 - name: Deploy MongoDB
   hosts: mongo_servers
   become: True
