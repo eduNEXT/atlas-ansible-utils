@@ -81,3 +81,5 @@ mongo_dbpath: "{{ mongo_data_dir }}/mongodb"
 # In environments that do not require durability (devstack / Jenkins)
 # you can disable the journal to reduce disk usage
 mongo_enable_journal: true
+
+MONGO_LOG_SERVERSTATUS: true
