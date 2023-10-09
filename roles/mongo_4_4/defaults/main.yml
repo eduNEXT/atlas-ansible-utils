@@ -16,6 +16,8 @@ mongo_log_dir: "{{ COMMON_LOG_DIR }}/mongo"
 mongo_journal_dir: "{{ COMMON_DATA_DIR }}/mongo/mongodb/journal"
 mongo_user: mongodb
 
+# In Ubuntu 22, 'mongo-org' is not available, so it is necessary to use the MongoDB focal repository to obtain the packages
+# We use this information as a reference: https://blog.yucas.net/2023/03/13/install-mongodb-4-4-5-0-over-ubuntu-22-04/
 MONGODB_REPO: "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/{{ MONGO_VERSION_MAJOR_MINOR }} multiverse"
 
 mongodb_debian_pkgs:
