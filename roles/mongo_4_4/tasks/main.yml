@@ -56,6 +56,7 @@
     - "mongo_packages"
 
 # MongoDB 4.4 uses the libssl1.1 library, but this library is not available by default in Ubuntu 22.04. Therefore, it is necessary to install it manually.
+# For more information, see: https://blog.yucas.net/2023/03/13/install-mongodb-4-4-5-0-over-ubuntu-22-04/
 - name: Download libssl1.1
   get_url:
     url: http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
