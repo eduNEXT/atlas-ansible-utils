@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.2.0...HEAD)
+## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.3.0...HEAD)
 
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
+## [v1.3.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.2.0...v1.3.0) - 2023-10-09
+
+### [1.3.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.2.0...v1.3.0) (2023-10-09)
+
+#### Features
+
+- add mysql8.0 and mongo4.4 playbooks ([#13](https://github.com/eduNEXT/atlas-ansible-utils/issues/13)) ([33184f0](https://github.com/eduNEXT/atlas-ansible-utils/commit/33184f01195b91202ae858b39d4a2dff5b751545))
+
 ## [v1.2.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.1.0...v1.2.0) - 2023-10-02
 
 ### [1.2.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.1.0...v1.2.0) (2023-10-02)
