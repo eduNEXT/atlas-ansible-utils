@@ -11,7 +11,7 @@ mysql_8_0_socket: /var/run/mysqld/mysqld.sock
 
 MYSQL_8_0_APT_KEYSERVER: "keyserver.ubuntu.com"
 MYSQL_8_0_APT_KEY: "467B942D3A79BD29"
-MYSQL_8_0_REPO: "deb http://repo.mysql.com/apt//ubuntu/ focal mysql-8.0"
+MYSQL_8_0_REPO: "deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.0"
 
 MYSQL_8_0_SUPPORTED_DISTRIBUTIONS:
   - 'focal'
