@@ -1,0 +1,5 @@
+- name: Caddy installation
+  hosts: localhost
+  become: yes
+  roles:
+    - caddy
