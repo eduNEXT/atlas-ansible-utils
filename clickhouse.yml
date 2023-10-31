@@ -1,0 +1,8 @@
+# Manages a clickhouse.
+
+- name: Deploy Clickhouse
+  hosts: target_group
+  become: True
+  gather_facts: True
+  roles:
+    - role: clickhouse

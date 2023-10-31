@@ -1,0 +1,9 @@
+CLICKHOUSE_VERSION: 23.8.2.7
+
+CLICKHOUSE_VOLUMES: []
+
+CLICKHOUSE_USERS:
+  - name: prod
+    password: prod
+  - name: stage
+    password: stage
