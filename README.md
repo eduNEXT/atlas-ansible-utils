@@ -25,9 +25,10 @@ environment
 │   hosts.ini
 └───group_vars
        all.yaml
+       caddy_servers.yaml
 ```
 
-Inventory is generally separated per environment, and contains a **hosts** file (hosts.ini including target hosts to provision) and a **group_vars** folder which can contain multiple files in yaml format. These files contain configuration variables. For simplicity, we store our variables in a file called **all.yaml**. Important to mention that inventories can get as complicated as the use case requires. Please visit [Ansible docs page](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) to get further information about inventories.
+Inventory is generally separated per environment, and contains a **hosts** file (hosts.ini including target hosts to provision) and a **group_vars** folder which can contain multiple files in yaml format. These files contain configuration variables. For simplicity, we store our variables in a file called **all.yaml**  and **caddy_servers.yaml** for the caddy installation. Important to mention that inventories can get as complicated as the use case requires. Please visit [Ansible docs page](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) to get further information about inventories.
 
 > **_NOTE:_** Generally our inventories are included in the manifest repositories. There you can find examples on how to create a new inventory.
 
@@ -168,5 +169,6 @@ For now this repo supports the playbooks for:
 - MySQL 5.7
 - Mongo 4.2
 - Percona 5.7
+- Caddy
 
 ---
