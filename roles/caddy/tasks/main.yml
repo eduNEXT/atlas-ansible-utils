@@ -9,12 +9,11 @@
     state: present
 
 - name: Add Caddy apt key.
-  apt_key:
-    url: "{{ caddy_apt_gpg_key }}"
-    id: 65760C51EDEA2017CEA2CA15155B6D79CA56EA34
-    state: present
-  register: add_repository_key
-  ignore_errors: "{{ caddy_apt_ignore_key_error }}"
+  ansible.builtin.get_url:
+    url: "{{ caddy_apt_gpg_key }}"  
+    dest: /etc/apt/trusted.gpg.d/caddy.asc
+    mode: '0644'
+    force: true
 
 - name: Add Caddy repository.
   apt_repository:
@@ -26,7 +25,6 @@
   package:
     name: "{{  caddy_package }}"
     state: "{{ caddy_package_state }}"
-  notify: restart caddy
 
 - name: Copy Caddyfile 
   template:
@@ -35,5 +33,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-    - restart caddy
+
+- name: Start caddy 
+  command: caddy start --config /etc/caddy/Caddyfile
+
