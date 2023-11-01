@@ -51,7 +51,7 @@
   loop: "{{ CLICKHOUSE_USERS }}"
   register: clickhouse_client
   shell: |
-    clickhouse-client --multiquery <<'EOF'
+    clickhouse-client --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
 
     CREATE ROLE '{{ item.name }}_admin';
 
