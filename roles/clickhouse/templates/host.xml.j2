@@ -3,7 +3,7 @@
           This interface is also used by ODBC and JDBC drivers (DataGrip, Db>
           and by most of web interfaces (embedded UI, Grafana, Redash, ...).
      -->
-     <http_port>8123</http_port>
+     <http_port>{{ CLICKHOUSE_HOST_INSECURE_HTTP_PORT }}</http_port>
 
      <!-- Port for interaction by native protocol with:
           - clickhouse-client and other native ClickHouse tools (clickhouse->
@@ -13,7 +13,7 @@
           (this protocol is also informally called as "the TCP protocol");
           See also 'tcp_port_secure' for secure connections.
      -->
-     <tcp_port>9000</tcp_port>
+     <tcp_port>{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }}</tcp_port>
      <listen_host>::</listen_host>
      <listen_host>0.0.0.0</listen_host>
 {% for host in CLICKHOUSE_LISTEN_HOSTS %}

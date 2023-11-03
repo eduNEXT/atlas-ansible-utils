@@ -55,14 +55,17 @@
 
     CREATE ROLE '{{ item.name }}_admin';
 
-    GRANT ALL PRIVILEGES ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL PRIVILEGES ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL PRIVILEGES ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL PRIVILEGES ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL PRIVILEGES ON {{ item.name }}_vector.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON system.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_vector.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT CREATE USER ON *.* to '{{ item.name }}_admin';
     GRANT ALTER USER ON *.* to '{{ item.name }}_admin';
     GRANT DROP FUNCTION ON *.* to '{{ item.name }}_admin';
+    GRANT CREATE FUNCTION ON *.* to '{{ item.name }}_admin';
 
     CREATE USER {{ item.name }} identified with plaintext_password by '{{ item.password }}';
 
