@@ -9,3 +9,5 @@ CLICKHOUSE_USERS:
     password: prod
   - name: stage
     password: stage
+
+CLICKHOUSE_LISTEN_HOSTS: []
