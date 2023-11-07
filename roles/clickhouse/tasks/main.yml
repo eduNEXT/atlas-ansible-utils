@@ -1,0 +1,74 @@
+---
+- name: install clickhouse
+  apt:
+    name:
+    - apt-transport-https
+    - ca-certificates
+    - dirmngr
+    state: present
+    update_cache: yes
+
+- name: add clickhouse repository
+  shell: |
+    GNUPGHOME=$(mktemp -d)
+    GNUPGHOME="$GNUPGHOME" gpg --no-default-keyring --keyring /usr/share/keyrings/clickhouse-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8919F6BD2B48D754
+    rm -r "$GNUPGHOME"
+    chmod +r /usr/share/keyrings/clickhouse-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee \
+    /etc/apt/sources.list.d/clickhouse.list
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+- name: install clickhouse
+  apt:
+    state: present
+    update_cache: yes
+    name:
+    - clickhouse-common-static={{ CLICKHOUSE_VERSION }}
+    - clickhouse-server={{ CLICKHOUSE_VERSION }}
+    - clickhouse-client={{ CLICKHOUSE_VERSION }}
+
+- name: Create /etc/clickhouse-server/config.d/host.xml
+  template:
+    src: host.xml.j2
+    dest: /etc/clickhouse-server/config.d/host.xml
+
+# - name: Grant default user permissions to create users and groups
+- name: Edit /etc/clickhouse-server/users.xml
+  template:
+    src: users.xml.j2
+    dest: /etc/clickhouse-server/users.xml
+
+- name: start clickhouse service
+  service:
+    name: clickhouse-server
+    state: started
+    enabled: yes
+
+- name: Create SQL Roles, Users and grant permissions
+  loop: "{{ CLICKHOUSE_USERS }}"
+  register: clickhouse_client
+  shell: |
+    clickhouse-client --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
+
+    CREATE ROLE '{{ item.name }}_admin';
+
+    GRANT ALL ON system.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON {{ item.name }}_vector.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT CREATE USER ON *.* to '{{ item.name }}_admin';
+    GRANT ALTER USER ON *.* to '{{ item.name }}_admin';
+    GRANT DROP FUNCTION ON *.* to '{{ item.name }}_admin';
+    GRANT CREATE FUNCTION ON *.* to '{{ item.name }}_admin';
+
+    CREATE USER {{ item.name }} identified with plaintext_password by '{{ item.password }}';
+
+    GRANT {{ item.name }}_admin to {{ item.name }};
+
+    EOF
