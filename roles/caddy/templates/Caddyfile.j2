@@ -1,7 +1,19 @@
 :8080 {
 respond "Hello, world!"
 }
+{{ caddy_global_options }}
 
-{{ caddy_extra_sites }}
+(https-proxy) {
+    reverse_proxy {
+        to {args[0]}
+        lb_policy round_robin
+    }
+}
+
+{% if caddy_extra_sites|length>0 %}
+{{ caddy_extra_sites|join(', ') }} {
+    import https-proxy {{caddy_backend_target}}
+}
+{% endif %}
 
 {{ caddy_extra_options }}

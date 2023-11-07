@@ -13,5 +13,7 @@ caddy_apt_repository: deb https://dl.cloudsmith.io/public/caddy/stable/deb/debia
 caddy_apt_gpg_key: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
 
 # Caddy options
-caddy_extra_sites: null
+caddy_extra_sites: []
 caddy_extra_options: null
+caddy_backend_target: null
+caddy_global_options: null
