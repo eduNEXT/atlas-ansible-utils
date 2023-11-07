@@ -14,8 +14,6 @@
           See also 'tcp_port_secure' for secure connections.
      -->
      <tcp_port>{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }}</tcp_port>
-     <listen_host>::</listen_host>
-     <listen_host>0.0.0.0</listen_host>
 {% for host in CLICKHOUSE_LISTEN_HOSTS %}
      <listen_host>{{ host }}</listen_host>
 {% endfor %}
