@@ -1,7 +1,8 @@
+{{ caddy_global_options }}
+
 :8080 {
 respond "Hello, world!"
 }
-{{ caddy_global_options }}
 
 (https-proxy) {
     reverse_proxy {
@@ -16,4 +17,4 @@ respond "Hello, world!"
 }
 {% endif %}
 
-{{ caddy_extra_options }}
+{{ caddy_extra_rules }}
