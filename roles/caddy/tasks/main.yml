@@ -1,0 +1,42 @@
+- name: Ensure dependencies are installed.
+  apt:
+    name:
+      - debian-keyring
+      - debian-archive-keyring
+      - apt-transport-https
+      - gnupg2
+      - curl 
+    state: present
+
+- name: Add Caddy apt key.
+  ansible.builtin.get_url:
+    url: "{{ caddy_apt_gpg_key }}"  
+    dest: /etc/apt/trusted.gpg.d/caddy.asc
+    mode: '0644'
+    force: true
+
+- name: Add Caddy repository.
+  apt_repository:
+    repo: "{{ caddy_apt_repository }}"
+    state: present
+    update_cache: true
+
+- name: Install Caddy
+  package:
+    name: "{{  caddy_package }}"
+    state: "{{ caddy_package_state }}"
+
+- name: Copy Caddyfile 
+  template:
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Format Caddyfile
+  command: caddy fmt /etc/caddy/Caddyfile --overwrite
+
+- name: Start caddy 
+  command: caddy start --config /etc/caddy/Caddyfile
+

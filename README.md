@@ -168,5 +168,6 @@ For now this repo supports the playbooks for:
 - MySQL 5.7
 - Mongo 4.2
 - Percona 5.7
+- Caddy
 
 ---
