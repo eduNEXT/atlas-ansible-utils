@@ -10,9 +10,9 @@ respond "Hello, world!"
     }
 }
 
-{% if caddy_extra_sites|length>0 %}
-{{ caddy_extra_sites|join(', ') }} {
-    import https-proxy {{caddy_backend_target}}
+{% if caddy_sites|length>0 %}
+{{ caddy_sites|join(', ') }} {
+    import https-proxy {{caddy_backend_targets}}
 }
 {% endif %}
 
