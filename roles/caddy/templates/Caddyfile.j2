@@ -1,4 +1,9 @@
-{{ caddy_global_options }}
+{
+    {{ caddy_global_options }}
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
 
 :8080 {
 respond "Hello, world!"
@@ -6,14 +11,14 @@ respond "Hello, world!"
 
 (https-proxy) {
     reverse_proxy {
-        to {args[0]}
+        to {args[:]}
         lb_policy round_robin
     }
 }
 
 {% if caddy_sites|length>0 %}
 {{ caddy_sites|join(', ') }} {
-    import https-proxy {{caddy_backend_targets}}
+    import https-proxy {{caddy_backend_targets|join(' ')}}
 }
 {% endif %}
 

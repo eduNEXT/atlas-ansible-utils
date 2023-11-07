@@ -17,7 +17,8 @@ caddy_sites: []
 caddy_extra_rules: null
 # Set the backend servers targets for reverse proxy in the format specified in 
 # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#to
-caddy_backend_target: "localhost:8080" 
+caddy_backend_target: 
+  - "localhost:8080"
 # To configure this variable, please refer to 
 # https://caddyserver.com/docs/caddyfile/options
 caddy_global_options: null
