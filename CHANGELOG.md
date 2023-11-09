@@ -5,11 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.4.0...HEAD)
+## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.5.0...HEAD)
 
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
+## [v1.5.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.4.0...v1.5.0) - 2023-11-09
+
+### [1.5.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.4.0...v1.5.0) (2023-11-09)
+
+#### Features
+
+- caddy files ([#16](https://github.com/eduNEXT/atlas-ansible-utils/issues/16)) ([27d963a](https://github.com/eduNEXT/atlas-ansible-utils/commit/27d963a3e6cf33b8ee088faf1a34e0e4489d0df7))
+- elasticsearch role ([#14](https://github.com/eduNEXT/atlas-ansible-utils/issues/14)) ([3beea01](https://github.com/eduNEXT/atlas-ansible-utils/commit/3beea01bdee0faf5ed24dba37c273b394cddf50e))
+- redis role ([#15](https://github.com/eduNEXT/atlas-ansible-utils/issues/15)) ([a13fc51](https://github.com/eduNEXT/atlas-ansible-utils/commit/a13fc51946e8c91ce6f82b7d094abab5bc9a91fd))
+
 ## [v1.4.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.3.0...v1.4.0) - 2023-11-07
 
 ### [1.4.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.3.0...v1.4.0) (2023-11-07)
