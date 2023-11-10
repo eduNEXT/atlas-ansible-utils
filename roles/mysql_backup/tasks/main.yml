@@ -1,5 +1,5 @@
 # Description: Playbook to launch MySQL backups
-# It is compatible with the S3 API for storage.
+# It is compatible with the S3 API and Azure Blob Storage.
 ---
 - name: Clean the backup root path before starting the routine
   file:

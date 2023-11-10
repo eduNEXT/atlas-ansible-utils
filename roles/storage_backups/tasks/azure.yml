@@ -1,54 +1,47 @@
 ---
-- name: check if azcopy is installed
-  package:
-    name: azcopy
-    state: present
+- name: Ensure azcopy is not installed
+  command: azcopy --version
+  register: azcopy_version
   ignore_errors: yes
-  check_mode: true
-  register: azcopy_check
 
-- name: Installing microsoft gpg key
-  shell: curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg \
-  when: not azcopy_check.changed
+- name: Download the latest version of azcopy v10
+  get_url:
+    url: https://aka.ms/downloadazcopy-v10-linux
+    dest: /tmp/azcopy.tar.gz
+    mode: 0755
+  when: azcopy_version.rc != 0
 
-- name: Adding microsoft repo to sourceslists
-  shell: sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main" > /etc/apt/sources.list.d/dotnetdev.list'
-  when: not azcopy_check.changed
-
-- name: Update apt cache
-  apt:  update_cache=yes
-  when: not azcopy_check.changed
-
-- name: Install packages needed for azcopy
-  apt:
-    name: "{{ item }}"
-    install_recommends: yes
-    state: present
-  with_items: "{{ storage_backups_aznet_packages }}"
-  when: not azcopy_check.changed
-
-- name: Downloading azcopy source code
-  get_url: url=https://aka.ms/downloadazcopyprlinux dest=/tmp/azcopy.tar.gz
-  when: not azcopy_check.changed
-
-- name: Creates directory
-  file: path=/tmp/azcp state=directory
-  when: not azcopy_check.changed
-
-- name: Extract azcopy
+- name: Extract the azcopy archive
   unarchive:
     src: /tmp/azcopy.tar.gz
-    dest: /tmp/azcp
+    dest: /tmp
     remote_src: yes
-  when: not azcopy_check.changed
+  when: azcopy_version.rc != 0
 
-- name: Install azcopy
-  shell: ./install.sh
-  args:
-    chdir: /tmp/azcp
-  when: not azcopy_check.changed
+- name: Find the azcopy file in the extracted directory
+  find:
+    paths: /tmp
+    patterns: 'azcopy_linux_amd64_*, azcopy'
+    file_type: any
+  register: azcopy_file
+  when: azcopy_version.rc != 0
+
+- name: Copy the azcopy file to /tmp/azcopy
+  command: "sudo cp -r {{ item.path }} /tmp/azcopy"
+  loop: "{{ azcopy_file.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: azcopy_version.rc != 0
+
+- name: Move the azcopy file to the /usr/bin/ directory
+  command: "sudo mv /tmp/azcopy/azcopy /usr/bin/"
+  when: azcopy_version.rc != 0
+
+- name: Delete azcopy temporary files
+  shell: "sudo rm -rf /tmp/azcopy*"
+  when: azcopy_version.rc != 0
 
 - name: Upload files to azure storage
   shell: >
-   {{ storage_backups_azure_command }}
+   {{ STORAGE_BACKUPS_AZURE_COMMAND }}
   with_items: "{{ STORAGE_BACKUPS_FILES_TO_UPLOAD }}"
