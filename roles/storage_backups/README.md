@@ -25,4 +25,4 @@ The task responsible for storing backups in Azure Blobs performs the following s
 2. **Upload Files to Azure Storage:**
     - Executes the `azcopy cp` to copy backup files to the Azure Blobs container.
 
-> **Note:** For the installation and execution of AzCopy, we are utilizing AzCopy version 10. You can find more information about AzCopy v10 [here](https://learn.microsoft.com/es-es/azure/storage/common/storage-use-azcopy-v10#download-azcopy).
+> **Note:** For the installation and execution of AzCopy, we are utilizing AzCopy version 10. You can find more information about AzCopy v10 [here](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10#download-azcopy).
