@@ -36,7 +36,6 @@
 
 - name: Format Caddyfile
   command: caddy fmt /etc/caddy/Caddyfile --overwrite
+  notify: reload caddy
 
-- name: Start caddy 
-  command: caddy start --config /etc/caddy/Caddyfile
 
