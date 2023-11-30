@@ -1,4 +1,5 @@
 ---
+elasticsearch_node_name: "elastic-node"
 elasticsearch_app_dir: "{{ COMMON_APP_DIR }}/elasticsearch"
 elasticsearch_data_dir: "{{ COMMON_DATA_DIR }}/elasticsearch"
 elasticsearch_log_dir: "{{ COMMON_LOG_DIR }}/elasticsearch"
