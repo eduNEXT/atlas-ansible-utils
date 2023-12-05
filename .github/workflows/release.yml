@@ -13,6 +13,8 @@ jobs:
       bump_commit_sha: ${{ steps.bumpversion.outputs.commit_hash }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ATLAS_PAT }}
       - name: Get next version
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.0
@@ -48,6 +50,8 @@ jobs:
       changelog: ${{ steps.tag_version.outputs.changelog }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ATLAS_PAT }}
       - name: Create tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.0
@@ -70,6 +74,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ATLAS_PAT }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to Docker Hub
