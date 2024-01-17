@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.1...HEAD)
+## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.2...HEAD)
 
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
+## [v1.6.2](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.1...v1.6.2) - 2024-01-17
+
+### [1.6.2](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.1...v1.6.2) (2024-01-17)
+
+### Bug Fixes
+
+- add variables in elasticsearch template ([#21](https://github.com/eduNEXT/atlas-ansible-utils/issues/21)) ([6de8d0a](https://github.com/eduNEXT/atlas-ansible-utils/commit/6de8d0aec593f647cf6f9fd3b807fe1b05105491))
+- set maxmemory-policy to allkeys-lru ([#23](https://github.com/eduNEXT/atlas-ansible-utils/issues/23)) ([c9798c2](https://github.com/eduNEXT/atlas-ansible-utils/commit/c9798c20a126ce47b8a0790390fdb8ec7ba3bf5e))
+
 ## [v1.6.1](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.0...v1.6.1) - 2023-11-22
 
 ### [1.6.1](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.0...v1.6.1) (2023-11-22)
