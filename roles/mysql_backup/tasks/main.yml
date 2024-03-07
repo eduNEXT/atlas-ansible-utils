@@ -43,6 +43,13 @@
     STORAGE_BACKUPS_FILES_TO_UPLOAD:
       - "{{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql.gz"
 
+- name: Launch restore MySQL Backup
+  include_tasks: ../../mysql_restore/tasks/restore.yml
+  vars:
+    MYSQL_BACKUP_FILE: "{{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
+    MYSQL_BACKUP_FILE_LOCATION: "{{ MYSQL_BACKUP_LOCATION }}"
+  when: MYSQL_RESTORE_BACKUP | bool
+
 - name: Clean artifact path
   file:
     state: absent

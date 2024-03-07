@@ -1,0 +1,15 @@
+- name: Upload the backup to a remote storage
+  include_role:
+    name: available_storage
+  vars:
+    DISK_TO_CHECK: "{{ MYSQL_VOLUMES[0].device }}"
+
+- name: Launch MySQL backup
+  include_role:
+    name: mysql_backup
+  vars:
+    MYSQL_RESTORE_BACKUP: True
+    MYSQL_BACKUP_ALL_DATABASES: false
+    MYSQL_BACKUP_USER: "{{ MYSQL_RESTORE_USER }}"
+    MYSQL_BACKUP_PASSWORD: "{{ MYSQL_RESTORE_PASSWORD }}"
+    MYSQL_BACKUP_DATABASES: "{{ MYSQL_RESTORE_DATABASE }}"

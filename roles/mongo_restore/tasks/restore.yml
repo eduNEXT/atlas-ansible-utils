@@ -1,0 +1,9 @@
+- name: Restore database
+  shell: >
+    mongorestore
+    --authenticationDatabase admin
+    -u {{ MONGO_RESTORE_STAGE_USER  }} -p '{{ MONGO_RESTORE_STAGE_PASSWORD }}'
+    --gzip
+    --archive={{ MONGO_BACKUP_FILE }}
+    --nsFrom={{ MONGO_RESTORE_DATABASE }}.*
+    --nsTo={{ MONGO_RESTORE_STAGE_DATABASE }}.*

@@ -9,6 +9,7 @@ MYSQL_BACKUP_DATE: "{{ ansible_date_time.date }}"
 MYSQL_BACKUP_LOCATION: "{{ MYSQL_BACKUP_ROOT }}/{{ MYSQL_BACKUP_DATE }}.d"
 mysql_artifact_path: "{{ MYSQL_BACKUP_ROOT }}"
 MYSQL_BACKUP_PRE_CLEAN_ROOT: false
+MYSQL_RESTORE_BACKUP: False
 
 # MySQL backup storage options
 

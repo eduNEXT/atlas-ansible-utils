@@ -1,0 +1,9 @@
+# Description: Playbook to launch MySQL restore backups
+- name: Launch MySQL restore backups
+  hosts: mysql_servers
+  become: True
+  gather_facts: True
+  roles:
+    - role: mysql_restore
+      tags:
+        - mysql_restore
