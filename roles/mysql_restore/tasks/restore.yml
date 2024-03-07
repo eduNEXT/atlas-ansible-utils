@@ -3,18 +3,6 @@
   args:
     chdir: "{{ MYSQL_BACKUP_FILE_LOCATION }}"
 
-- name: Read the content of the SQL file
-  ansible.builtin.slurp:
-    src: "{{ MYSQL_BACKUP_FILE }}"
-  register: sql_file_content
-
-- name: Replace database name
-  ansible.builtin.replace:
-    path: "{{ MYSQL_BACKUP_FILE }}"
-    regexp: '{{ MYSQL_RESTORE_DATABASE }}'
-    replace: '{{ MYSQL_RESTORE_STAGE_DATABASE }}'
-  when: sql_file_content['content'] is defined
-
 - name: Restore database
   shell: >
     mysql -u {{ MYSQL_RESTORE_STAGE_USER }} -p{{ MYSQL_RESTORE_STAGE_PASSWORD }}

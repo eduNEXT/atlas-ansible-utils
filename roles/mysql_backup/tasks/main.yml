@@ -18,6 +18,8 @@
     mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }} --add-drop-database --skip-lock-tables
     {% if MYSQL_BACKUP_ALL_DATABASES %}
     --all-databases
+    {% elif MYSQL_RESTORE_BACKUP %}
+    {{ MYSQL_BACKUP_DATABASES }}
     {% else %}
     --databases {{ MYSQL_BACKUP_DATABASES }}
     {% endif %}
