@@ -1,52 +1,11 @@
-# Description: Playbook to launch Mongo backups
-# It is compatible with the S3 API and Azure Blob Storage.
----
-
-- name: Clean the backup root path before starting the routine
-  file:
-    state: absent
-    path: "{{ mongo_artifact_path }}/"
-  when: MONGO_BACKUP_PRE_CLEAN_ROOT and mongo_artifact_path is defined and mongo_artifact_path != "" and
-        MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
-
-- name: Create backup directory
-  file:
-    path: "{{ MONGO_BACKUP_LOCATION }}"
-    state: directory
-
-- name: Create mongo database backup
-  shell: >
-    mongodump
-    --authenticationDatabase admin
-    -u {{ MONGO_BACKUP_USER }} -p '{{ MONGO_BACKUP_PASSWORD }}'
-    --gzip
-    --archive={{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}.gz
-    {% if not MONGO_BACKUP_ALL_DATABASES %}
-    --db={{ MONGO_BACKUP_DATABASES }}
-    {% endif %}
-
-- name: Give the server time to recover
-  pause:
-    minutes: 1
-    prompt: Pausing to give the server time to recover
-
-- name: Upload the backup to a remote storage
-  include_role:
-    name: storage_backups
-  vars:
-    STORAGE_BACKUPS_OPTIONS: "{{ MONGO_BACKUP_STORAGE_OPTIONS }}"
-    STORAGE_BACKUPS_FILES_TO_UPLOAD:
-      - "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}.gz"
-
-- name: Launch restore MongoDB Backup
-  include_tasks: ../../mongo_restore/tasks/restore.yml
-  vars:
-    MONGO_BACKUP_FILE: "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}.gz"
-  when: MONGO_RESTORE_BACKUP | bool
+- name: Launch Mongo Backups
+  include_tasks: backup.yml
 
 - name: Clean artifact path
-  file:
-    state: absent
-    path: "{{ mongo_artifact_path }}/"
-  when: mongo_artifact_path is defined and mongo_artifact_path != "" and
-        MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+  include_role:
+    name: clean_path
+  vars:
+    CLEAN_PATH: "{{ mongo_artifact_path }}"
+  when: mysql_artifact_path is defined and mysql_artifact_path != "" and
+        MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != "" and
+        not MONGO_RESTORE_BACKUP | bool

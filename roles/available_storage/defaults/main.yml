@@ -1,3 +1,2 @@
-AVAILABLE_STORAGE_DISK_TO_CHECK: "{{ DISK_TO_CHECK }}"
 # Minimum percentage of free disk space expected after restoring a database
 AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE: 20

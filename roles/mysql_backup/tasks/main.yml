@@ -1,60 +1,11 @@
-# Description: Playbook to launch MySQL backups
-# It is compatible with the S3 API and Azure Blob Storage.
----
-- name: Clean the backup root path before starting the routine
-  file:
-    state: absent
-    path: "{{ mysql_artifact_path }}/"
-  when: MYSQL_BACKUP_PRE_CLEAN_ROOT and mysql_artifact_path is defined and mysql_artifact_path != "" and
-        MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
-
-- name: Create backup directory
-  file:
-    path: "{{ MYSQL_BACKUP_LOCATION }}"
-    state: directory
-
-- name: Create MySQL database backup
-  shell: >
-    mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }} --add-drop-database --skip-lock-tables
-    {% if MYSQL_BACKUP_ALL_DATABASES %}
-    --all-databases
-    {% elif MYSQL_RESTORE_BACKUP %}
-    {{ MYSQL_BACKUP_DATABASES }}
-    {% else %}
-    --databases {{ MYSQL_BACKUP_DATABASES }}
-    {% endif %}
-    > {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql
-  args:
-    chdir: "{{ MYSQL_BACKUP_LOCATION }}"
-
-- name: Compress mysql backup file
-  shell: "gzip {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
-  args:
-    chdir: "{{ MYSQL_BACKUP_LOCATION}}"
-
-- name: Give the server time to recover
-  pause:
-    minutes: 1
-    prompt: Pausing to give the server time to recover
-
-- name: Upload the backup to a remote storage
-  include_role:
-    name: storage_backups
-  vars:
-    STORAGE_BACKUPS_OPTIONS: "{{ MYSQL_BACKUP_STORAGE_OPTIONS }}"
-    STORAGE_BACKUPS_FILES_TO_UPLOAD:
-      - "{{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql.gz"
-
-- name: Launch restore MySQL Backup
-  include_tasks: ../../mysql_restore/tasks/restore.yml
-  vars:
-    MYSQL_BACKUP_FILE: "{{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
-    MYSQL_BACKUP_FILE_LOCATION: "{{ MYSQL_BACKUP_LOCATION }}"
-  when: MYSQL_RESTORE_BACKUP | bool
+- name: Launch MySQL Backups
+  include_tasks: backup.yml
 
 - name: Clean artifact path
-  file:
-    state: absent
-    path: "{{ mysql_artifact_path }}/"
+  include_role:
+    name: clean_path
+  vars:
+    CLEAN_PATH: "{{ mysql_artifact_path }}"
   when: mysql_artifact_path is defined and mysql_artifact_path != "" and
-        MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+        MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != "" and
+        not MYSQL_RESTORE_BACKUP | bool

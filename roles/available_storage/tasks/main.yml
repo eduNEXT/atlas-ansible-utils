@@ -1,5 +1,5 @@
 - name: Get disk information
-  shell: df -B 1 "{{ AVAILABLE_STORAGE_DISK_TO_CHECK }}" | awk 'NR==2 {print $2","$3}'
+  shell: df -B 1 "{{ DISK_TO_CHECK }}" | awk 'NR==2 {print $2","$3}'
   register: disk_info
 
 - name: Extract values
@@ -15,5 +15,5 @@
 
 - name: Validate free storage
   fail:
-    msg: "The expected free space on {{ AVAILABLE_STORAGE_DISK_TO_CHECK }} is less than {{ AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE }}%. Expected free space after restore: {{ disk_free_percentage }}%"
+    msg: "The expected free space on {{ DISK_TO_CHECK }} is less than {{ AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE }}%. Expected free space after restore: {{ disk_free_percentage }}%"
   when: disk_free_after_restore < disk_free_required
