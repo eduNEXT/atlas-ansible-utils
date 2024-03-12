@@ -1,3 +1,10 @@
+- name: Clean the backup root path before starting the routine
+  file:
+    state: absent
+    path: "{{ mysql_artifact_path }}/"
+  when: MYSQL_BACKUP_PRE_CLEAN_ROOT and mysql_artifact_path is defined and mysql_artifact_path != "" and
+        MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+
 - name: Launch MySQL Backups
   include_tasks: backup.yml
 
