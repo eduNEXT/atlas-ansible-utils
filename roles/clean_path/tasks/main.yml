@@ -1,4 +1,0 @@
-- name: Clean artifact path
-  file:
-    state: absent
-    path: "{{ CLEAN_PATH }}/"

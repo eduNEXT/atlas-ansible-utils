@@ -23,7 +23,6 @@
     MONGO_BACKUP_FILE: "{{ MONGO_RESTORE_BACKUP_LOCATION }}/{{ MONGO_RESTORE_BACKUP_DATE }}.gz"
 
 - name: Clean artifact path
-  include_role:
-    name: clean_path
-  vars:
-    CLEAN_PATH: "{{ MONGO_RESTORE_BACKUP_ROOT }}"
+  file:
+    state: absent
+    path: "{{ MONGO_RESTORE_BACKUP_ROOT }}"

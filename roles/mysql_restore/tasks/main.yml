@@ -24,7 +24,6 @@
     MYSQL_BACKUP_FILE_LOCATION: "{{ MYSQL_RESTORE_BACKUP_LOCATION }}"
 
 - name: Clean artifact path
-  include_role:
-    name: clean_path
-  vars:
-    CLEAN_PATH: "{{ MYSQL_RESTORE_BACKUP_ROOT }}"
+  file:
+    state: absent
+    path: "{{ MYSQL_RESTORE_BACKUP_ROOT }}"

@@ -9,10 +9,9 @@
   include_tasks: backup.yml
 
 - name: Clean artifact path
-  include_role:
-    name: clean_path
-  vars:
-    CLEAN_PATH: "{{ mysql_artifact_path }}"
+  file:
+    state: absent
+    path: "{{ mysql_artifact_path }}/"
   when: mysql_artifact_path is defined and mysql_artifact_path != "" and
         MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != "" and
         not MYSQL_RESTORE_BACKUP | bool
