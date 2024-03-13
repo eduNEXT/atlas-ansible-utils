@@ -14,4 +14,4 @@
     path: "{{ mongo_artifact_path }}/"
   when: mysql_artifact_path is defined and mysql_artifact_path != "" and
         MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != "" and
-        not MONGO_RESTORE_BACKUP | bool
+        not MONGO_BACKUP_DISABLED_CLEAN_ARTIFACT_PATH | bool
