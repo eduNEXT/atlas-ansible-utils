@@ -6,15 +6,20 @@
     path: "{{ MYSQL_BACKUP_LOCATION }}"
     state: directory
 
+- name: Convert MySQL backups databases to list to provide backwards compatibility
+  set_fact:
+    MYSQL_BACKUP_DATABASES: "{{ MYSQL_BACKUP_DATABASES | split }}"
+  when: MYSQL_BACKUP_DATABASES is string
+
 - name: Create MySQL database backup
   shell: >
     mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }} --add-drop-database --skip-lock-tables
     {% if MYSQL_BACKUP_ALL_DATABASES %}
     --all-databases
-    {% elif MYSQL_RESTORE_BACKUP %}
-    {{ MYSQL_BACKUP_DATABASES }}
+    {% elif MYSQL_BACKUP_DATABASES | length == 1 %}
+    {{ MYSQL_BACKUP_DATABASES | join(" ") }}
     {% else %}
-    --databases {{ MYSQL_BACKUP_DATABASES }}
+    --databases {{ MYSQL_BACKUP_DATABASES | join(" ") }}
     {% endif %}
     > {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql
   args:

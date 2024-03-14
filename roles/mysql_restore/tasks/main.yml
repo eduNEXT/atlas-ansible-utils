@@ -2,14 +2,12 @@
   include_role:
     name: available_storage
   vars:
-    DISK_TO_CHECK: "{{ MYSQL_VOLUMES[0].device }}"
+    AVAILABLE_STORAGE_DISK_TO_CHECK: "{{ MYSQL_VOLUMES[0].device }}"
 
 - name: Launch MySQL backup
   include_role:
     name: mysql_backup
   vars:
-    MYSQL_RESTORE_BACKUP: True
-    MYSQL_BACKUP_DISABLED_CLEAN_ARTIFACT_PATH : True
     MYSQL_BACKUP_ALL_DATABASES: false
     MYSQL_BACKUP_USER: "{{ MYSQL_RESTORE_USER }}"
     MYSQL_BACKUP_PASSWORD: "{{ MYSQL_RESTORE_PASSWORD }}"
