@@ -4,18 +4,6 @@
   vars:
     AVAILABLE_STORAGE_DISK_TO_CHECK: "{{ MYSQL_VOLUMES[0].device }}"
 
-- name: Launch MySQL backup
-  include_role:
-    name: mysql_backup
-  vars:
-    MYSQL_BACKUP_ALL_DATABASES: false
-    MYSQL_BACKUP_USER: "{{ MYSQL_RESTORE_USER }}"
-    MYSQL_BACKUP_PASSWORD: "{{ MYSQL_RESTORE_PASSWORD }}"
-    MYSQL_BACKUP_DATABASES: "{{ MYSQL_RESTORE_DATABASE }}"
-    MYSQL_BACKUP_ROOT: "{{ MYSQL_RESTORE_BACKUP_ROOT }}"
-    MYSQL_BACKUP_DATE: "{{ MYSQL_RESTORE_BACKUP_DATE }}"
-    MYSQL_BACKUP_LOCATION: "{{ MYSQL_RESTORE_BACKUP_LOCATION }}"
-
 - name: Launch restore MySQL Backup
   include_tasks: restore.yml
   vars:

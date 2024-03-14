@@ -1,12 +1,8 @@
-# Source database configuration
+# The user that will perform the MySQL restore operation
 MYSQL_RESTORE_USER: "{{ EDXAPP_MYSQL_USER }}"
 MYSQL_RESTORE_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
-MYSQL_RESTORE_DATABASE: "{{ EDXAPP_MYSQL_DB_NAME }}"
-
-# Destination database configuration
-MYSQL_RESTORE_STAGE_USER: "{{ STAGE_EDXAPP_MYSQL_USER }}"
-MYSQL_RESTORE_STAGE_PASSWORD: "{{ STAGE_EDXAPP_MYSQL_PASSWORD }}"
-MYSQL_RESTORE_STAGE_DATABASE: "{{ STAGE_EDXAPP_MYSQL_DB_NAME }}"
+# If this is empty, the restore will be applied over the whole MySQL instance
+MYSQL_RESTORE_DATABASE: ""
 
 # Backup folders
 MYSQL_RESTORE_BACKUP_ROOT: "/var/edunext_tmp/mysql"
