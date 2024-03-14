@@ -10,8 +10,8 @@
 - name: Calculate free storage
   set_fact:
     disk_free_after_restore: disk_size - (2 * disk_used )
-    disk_free_required: (disk_size * (AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE / 100))
-    disk_free_percentage: ((disk_size | int - (2 * disk_used )) / disk_size ) * 100
+    disk_free_required: disk_size * (AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE / 100)
+    disk_free_percentage: ((disk_size - (2 * disk_used )) / disk_size ) * 100
 
 - name: Validate free storage
   fail:
