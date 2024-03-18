@@ -17,11 +17,6 @@
   set_fact:
     new_clone_db_name: "{{ item + MONGO_CLONE_RESTORE_SUFFIX }}"
 
-- name: Drop database if exists
-  mongodb_collection:
-    database: "{{ new_clone_db_name }}"
-    state: "absent"
-
 - name: Restore Mongo backup on database {{ new_clone_db_name }}
   include_role:
     name: mongo_restore
