@@ -2,8 +2,10 @@
   shell: >
     mongorestore
     --authenticationDatabase admin
-    -u {{ MONGO_RESTORE_STAGE_USER  }} -p '{{ MONGO_RESTORE_STAGE_PASSWORD }}'
+    -u {{ MONGO_RESTORE_USER  }} -p '{{ MONGO_RESTORE_PASSWORD }}'
     --gzip
     --archive={{ MONGO_BACKUP_FILE }}
+    {% if MYSQL_RESTORE_DATABASE %}
     --nsFrom={{ MONGO_RESTORE_DATABASE }}.*
     --nsTo={{ MONGO_RESTORE_CLONE_DATABASE }}.*
+    {% endif %}

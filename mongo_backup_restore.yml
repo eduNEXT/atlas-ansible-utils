@@ -15,5 +15,5 @@
 
   tasks:
     - name: Backup and restore every single database in the clone list
-      include_tasks: backups_restore_routine.yml
+      include_tasks: mongo_backups_restore_routine.yml
       loop: "{{ MONGO_CLONE_DB_LIST }}"
