@@ -1,0 +1,33 @@
+---
+- name: Extract Mongo backup from database {{ item }}
+  include_role:
+    name: mongo_backup
+  vars:
+    MONGO_BACKUP_ALL_DATABASES: false
+    MONGO_BACKUP_USER: "{{ MONGO_CLONE_USER }}"
+    MONGO_BACKUP_PASSWORD: "{{ MONGO_CLONE_PASSWORD }}"
+    MONGO_BACKUP_DATABASES:
+    - "{{ item }}"
+    MONGO_BACKUP_ROOT: "{{ MONGO_CLONE_ROOT }}"
+    MONGO_BACKUP_STORAGE_OPTIONS:
+      EXTERNAL_STORAGE_TYPE: ""
+      EXTERNAL_STORAGE_OPTIONS: {}
+
+- name: Generate new database name with suffix
+  set_fact:
+    new_clone_db_name: "{{ item + MONGO_CLONE_RESTORE_SUFFIX }}"
+
+- name: Drop database if exists
+  mongodb_collection:
+    database: "{{ new_clone_db_name }}"
+    state: "absent"
+
+- name: Restore Mongo backup on database {{ new_clone_db_name }}
+  include_role:
+    name: mongo_restore
+  vars:
+    MONGO_RESTORE_BACKUP_ROOT: "{{ MYSQL_CLONE_ROOT }}"
+    MONGO_RESTORE_USER: "{{ MYSQL_CLONE_USER }}"
+    MONGO_RESTORE_PASSWORD: "{{ MYSQL_CLONE_PASSWORD }}"
+    MONGO_RESTORE_DATABASE: "{{ item }}"
+    MONGO_RESTORE_CLONE_DATABASE: "{{ new_clone_db_name }}"

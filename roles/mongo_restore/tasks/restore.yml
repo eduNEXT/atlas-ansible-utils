@@ -6,4 +6,4 @@
     --gzip
     --archive={{ MONGO_BACKUP_FILE }}
     --nsFrom={{ MONGO_RESTORE_DATABASE }}.*
-    --nsTo={{ MONGO_RESTORE_STAGE_DATABASE }}.*
+    --nsTo={{ MONGO_RESTORE_CLONE_DATABASE }}.*

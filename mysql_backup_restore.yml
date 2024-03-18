@@ -5,8 +5,8 @@
   become: True
   gather_facts: True
   vars:
-    MYSQL_CLONE_USER: migrate
-    MYSQL_CLONE_PASSWORD: 922fxW9H1pSf14C2hUa8MaVYfEPTOQFDStn
+    MYSQL_CLONE_USER: admin
+    MYSQL_CLONE_PASSWORD: admin_pass
     MYSQL_CLONE_ROOT: /var/edunext_tmp/mysql
     MYSQL_CLONE_DB_LIST:
     - edxapp
@@ -15,5 +15,5 @@
 
   tasks:
     - name: Backup and restore every single database in the clone list
-      include_tasks: backups_restore_routine.yml
+      include_tasks: mysql_backups_restore_routine.yml
       loop: "{{ MYSQL_CLONE_DB_LIST }}"

@@ -1,0 +1,19 @@
+# Description: Playbook to clone Mongo databases by extracting backups and restore them with
+# changed database names in the same Mongo instance.
+- name: Launch Mongo backup and restore
+  hosts: mongo_servers
+  become: True
+  gather_facts: True
+  vars:
+    MONGO_CLONE_USER: admin
+    MONGO_CLONE_PASSWORD: admin_pass
+    MONGO_CLONE_ROOT: /var/edunext_tmp/mongo
+    MONGO_CLONE_DB_LIST:
+    - edxapp
+    - cs_comments_service
+    MONGO_CLONE_RESTORE_SUFFIX: "_clone"
+
+  tasks:
+    - name: Backup and restore every single database in the clone list
+      include_tasks: backups_restore_routine.yml
+      loop: "{{ MONGO_CLONE_DB_LIST }}"
