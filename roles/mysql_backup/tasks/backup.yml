@@ -13,7 +13,8 @@
 
 - name: Create MySQL database backup
   shell: >
-    mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }} --add-drop-database --skip-lock-tables
+    mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }}
+    --opt --single-transaction --add-drop-database --no-tablespaces
     {% if MYSQL_BACKUP_ALL_DATABASES %}
     --all-databases
     {% elif MYSQL_BACKUP_DATABASES | length == 1 %}
