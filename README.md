@@ -174,7 +174,7 @@ For now this repo supports the playbooks for:
 
 ## Extract and Restore databases:
 
-The procedure involves extracting specific databases, creating backups of each, and subsequently restoring them into a new database. A list of databases to process will be compiled, and for each, a backup will be created followed by a restoration. The outcome will be a new database named after the original with an appended suffix. For instance, if the original database is named `edxapp`, the new database will be called `edxapp_clone`, containing the data from the original database.
+The procedure involves extracting specific databases, creating backups of each, and subsequently restoring them into a new database. A list of databases to process will be compiled, and for each, a backup will be created followed by a restoration. The outcome will be a new database named after the original with an appended suffix. For example, if the original database is named `edxapp`, the new database will be called `edxapp_clone`, containing the data from the original database.
 
 This process will be carried out using the `admin` user for MySQL and Mongo, which must have the necessary permissions to perform these operations.
 
