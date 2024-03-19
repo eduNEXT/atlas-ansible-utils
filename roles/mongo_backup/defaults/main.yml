@@ -3,13 +3,13 @@
 MONGO_BACKUP_USER: "admin"
 MONGO_BACKUP_PASSWORD: "mongo_password"
 MONGO_BACKUP_ALL_DATABASES: true
-MONGO_BACKUP_DATABASES: "edxapp"
+MONGO_BACKUP_DATABASES:
+- edxapp
 MONGO_BACKUP_ROOT: "/var/edunext_tmp/mongo"
 MONGO_BACKUP_DATE: "{{ ansible_date_time.date }}"
 MONGO_BACKUP_LOCATION: "{{ MONGO_BACKUP_ROOT }}/{{ MONGO_BACKUP_DATE }}.d"
 mongo_artifact_path: "{{ MONGO_BACKUP_ROOT }}"
 MONGO_BACKUP_PRE_CLEAN_ROOT: false
-MONGO_BACKUP_DISABLED_CLEAN_ARTIFACT_PATH: False
 
 # Mongo backup storage options
 
