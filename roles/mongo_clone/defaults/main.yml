@@ -1,0 +1,7 @@
+MONGO_CLONE_USER: admin
+MONGO_CLONE_PASSWORD: admin_pass
+MONGO_CLONE_ROOT: /var/edunext_tmp/mongo
+MONGO_CLONE_DB_LIST:
+- edxapp
+- cs_comments_service
+MONGO_CLONE_RESTORE_SUFFIX: "_clone"

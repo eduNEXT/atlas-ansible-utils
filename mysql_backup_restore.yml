@@ -4,16 +4,7 @@
   hosts: mysql_servers
   become: True
   gather_facts: True
-  vars:
-    MYSQL_CLONE_USER: admin
-    MYSQL_CLONE_PASSWORD: admin_pass
-    MYSQL_CLONE_ROOT: /var/edunext_tmp/mysql
-    MYSQL_CLONE_DB_LIST:
-    - edxapp
-    - edx_notes_api
-    MYSQL_CLONE_RESTORE_SUFFIX: "_clone"
-
-  tasks:
-    - name: Backup and restore every single database in the clone list
-      include_tasks: mysql_backups_restore_routine.yml
-      loop: "{{ MYSQL_CLONE_DB_LIST }}"
+  roles:
+    - role: mysql_clone
+      tags:
+        - mysql_clone

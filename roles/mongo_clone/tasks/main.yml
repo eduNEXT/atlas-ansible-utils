@@ -1,0 +1,3 @@
+- name: Backup and restore every single database in the clone list
+  include_tasks: clone.yml
+  loop: "{{ MONGO_CLONE_DB_LIST }}"

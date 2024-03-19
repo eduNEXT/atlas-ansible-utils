@@ -1,6 +1,8 @@
 # Source database configuration
 MONGO_RESTORE_USER: "{{ EDXAPP_MONGO_USER }}"
 MONGO_RESTORE_PASSWORD: "{{ EDXAPP_MONGO_PASSWORD }}"
+
+# Sets the number of collections being restoren in parallel, shich can be adjusted depending on server performance
 MONGO_RESTORE_NUM_PARALLEL_COLLECTIONS: 4
 
 # If this is empty, the restore will be applied over the whole MongoDB instance
