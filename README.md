@@ -180,7 +180,7 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
 
 ### Launching Database Restoration:
 
-1. Install atlas-ansible-utils following these instructions.
+1. Install atlas-ansible-utils following [these instructions](https://github.com/eduNEXT/atlas-ansible-utils?tab=readme-ov-file#how-to-use-this-repo).
 2. Define the credentials of the user responsible for performing backups and restoring databases and specify the databasees to be restored in `mysql_backup_restore.yml` for MySQL and in `mongo_backup_restore.yml` for Mongo.
 3. Execute the routine to restore the databases:
 
