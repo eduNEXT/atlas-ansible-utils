@@ -8,6 +8,7 @@
     MONGO_CLONE_USER: admin
     MONGO_CLONE_PASSWORD: admin_pass
     MONGO_CLONE_ROOT: /var/edunext_tmp/mongo
+    MONGO_CLONE_NUM_PARALLEL_COLLECTIONS: 4
     MONGO_CLONE_DB_LIST:
     - edxapp
     - cs_comments_service
