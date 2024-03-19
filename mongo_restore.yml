@@ -1,9 +1,0 @@
-# Description: Playbook to launch Mongo restore backups
-- name: Launch restore backups
-  hosts: mongo_servers
-  become: True
-  gather_facts: True
-  roles:
-    - role: mongo_restore
-      tags:
-        - mongo_restore
