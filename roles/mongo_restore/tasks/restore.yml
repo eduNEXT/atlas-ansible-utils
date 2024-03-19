@@ -6,7 +6,7 @@
     --gzip
     --archive={{ MONGO_BACKUP_FILE }}
     --numParallelCollections={{ MONGO_RESTORE_NUM_PARALLEL_COLLECTIONS }}
-    {% if MYSQL_RESTORE_DATABASE %}
+    {% if MONGO_RESTORE_DATABASE %}
     --nsFrom={{ MONGO_RESTORE_DATABASE }}.*
     --nsTo={{ MONGO_RESTORE_CLONE_DATABASE }}.*
     {% endif %}
