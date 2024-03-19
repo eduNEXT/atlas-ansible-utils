@@ -171,3 +171,29 @@ For now this repo supports the playbooks for:
 - Caddy
 
 ---
+
+## Extract and Restore databases:
+
+The procedure involves extracting specific databases, creating backups of each, and subsequently restoring them into a new database. A list of databases to process will be compiled, and for each, a backup will be created followed by a restoration. The outcome will be a new database named after the original with an appended suffix. For instance, if the original database is named `edxapp`, the new database will be called `edxapp_clone`, containing the data from the original database.
+
+This process will be carried out using the `admin` user for MySQL and Mongo, which must have the necessary permissions to perform these operations.
+
+### Launching Database Restoration:
+
+1. Install atlas-ansible-utils following these instructions.
+2. Define the credentials of the user responsible for performing backups and restoring databases and specify the databasees to be restored in `mysql_backup_restore.yml` for MySQL and in `mongo_backup_restore.yml` for Mongo.
+3. Execute the routine to restore the databases:
+
+  For mongo:
+
+   ```bash
+   ansible-playbook mongo_backup_restore.yml -i /path/inventory/host.ini -v
+   ```
+
+  For mongo:
+
+   ```bash
+   ansible-playbook mysql_backup_restore.yml -i /path/inventory/host.ini -v
+   ```
+
+Upon completion of the execution, you should observe both the existing databases and the new databases suffixed with `_clone` in your database instance, as per the default configuration.
