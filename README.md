@@ -181,9 +181,9 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
 ### Launching Database Restoration:
 
 1. Install atlas-ansible-utils following [these instructions](https://github.com/eduNEXT/atlas-ansible-utils?tab=readme-ov-file#how-to-use-this-repo).
-2. Define the credentials of the user responsible for performing backups and restoring databases and specify the databasees to be restored in `mysql_clone` role for MySQL and in `mongo_clone.yml` role for Mongo.
+2. Configure the variables that the roles mysql_clone and mongo_clone need to work.
 
-  #### How to set up credentials and databases to clone:
+  #### How to set variables to clone:
 
   ##### MySQL
   The variables that you must configure in [defaults.yml](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml) are:
