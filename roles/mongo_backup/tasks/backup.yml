@@ -8,9 +8,11 @@
 
 - name: Convert Mongo backups databases to list to provide backwards compatibility
   set_fact:
-    MYSQL_BACKUP_DATABASES: "{{ MONGO_BACKUP_DATABASES | split }}"
-  when: MONGO_BACKUP_DATABASES is string
+    MYSQL_BACKUP_DATABASES: "{{ MONGO_BACKUP_DATABASE | split }}"
+  when: MONGO_BACKUP_DATABASE is string
 
+# To clone the databases, we use the commands recommended by MongoDB:
+# https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
 - name: Create mongo database backup
   shell: >
     mongodump

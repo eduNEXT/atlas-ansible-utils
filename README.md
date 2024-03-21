@@ -182,6 +182,24 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
 
 1. Install atlas-ansible-utils following [these instructions](https://github.com/eduNEXT/atlas-ansible-utils?tab=readme-ov-file#how-to-use-this-repo).
 2. Define the credentials of the user responsible for performing backups and restoring databases and specify the databasees to be restored in `mysql_clone` role for MySQL and in `mongo_clone.yml` role for Mongo.
+
+  #### How to set up credentials and databases to clone:
+
+  ##### MySQL
+  - You must set the credentials of the user with the necessary privileges to clone the databases in the variables [`MYSQL_CLONE_USER`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml#L1) and [`MYSQL_CLONE_PASSWORD`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml#L2).
+  - In the [`MYSQL_CLONE_DB_LIST`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml#L4-L6) list, you can add or remove elements; the elements you define correspond to the names of the databases you want to clone.
+    The list of databases should look like this:
+    ``` yaml
+    MYSQL_CLONE_DB_LIST:
+    - clone_db1
+    - clone_db2
+    - clone_db3
+    ```
+
+  ##### MongoDB
+  - Similar to the MySQL configuration, it's essential to configure the credentials of the user with the necessary privileges for database cloning within the variables [`MONGO_CLONE_USER`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml#L1) and [`MONGO_CLONE_PASSWORD`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml#L2).
+  - In the [`MONGO_CLONE_DB_LIST`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml#L4-L6) list, you can include or exclude elements as needed; each element corresponds to the name of a database you intend to clone.
+
 3. Execute the routine to restore the databases:
 
   For mongo:
