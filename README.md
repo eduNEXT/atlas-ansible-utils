@@ -187,13 +187,14 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
 
   ##### MySQL
   The variables that you must configure in [defaults.yml](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml) are:
-  `MYSQL_CLONE_USER`: User with the necessary privileges to perform backups and restore databases.
-  `MYSQL_CLONE_PASSWORD`: Password of this user.
-  `MYSQL_CLONE_DB_LIST`: List of databases you wish to clone.
-  `MYSQL_CLONE_TARGET_PATH`: Path where the database is mounted to check available space.
 
-  The variable configuration should look like this:
-    ``` yaml
+  - `MYSQL_CLONE_USER`: User with the necessary privileges to perform backups and restore databases.
+  - `MYSQL_CLONE_PASSWORD`: Password of this user.
+  - `MYSQL_CLONE_DB_LIST`: List of databases you wish to clone.
+  - `MYSQL_CLONE_TARGET_PATH`: Path where the database is mounted to check available space.
+
+    The variable configuration should look like this:
+    ```yaml
       MYSQL_CLONE_USER: admin
       MYSQL_CLONE_PASSWORD: ABCDefgh12345
       MYSQL_CLONE_TARGET_PATH: /var/lib/mysql
@@ -203,16 +204,16 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
 
       # Other variables...
     ```
-
   ##### MongoDB
-  - Similar to the MySQL configuration, the variables that you must configure in [defaults.yml](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml) are:
-  `MONGO_CLONE_USER`: User with the necessary privileges to perform backups and restore databases.
-  `MONGO_CLONE_PASSWORD`: Password of this user.
-  `MONGO_CLONE_DB_LIST`: List of databases you wish to clone.
-  `MONGO_CLONE_TARGET_PATH`: Path where the database is mounted to check available space.
+  Similar to the MySQL configuration, the variables that you must configure in [defaults.yml](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml) are:
+
+  - `MONGO_CLONE_USER`: User with the necessary privileges to perform backups and restore databases.
+  - `MONGO_CLONE_PASSWORD`: Password of this user.
+  - `MONGO_CLONE_DB_LIST`: List of databases you wish to clone.
+  - `MONGO_CLONE_TARGET_PATH`: Path where the database is mounted to check available space.
 
     The variable configuration should look like this:
-      ``` yaml
+      ```yaml
         MONGO_CLONE_USER: admin
         MONGO_CLONE_PASSWORD: ABCDefgh12345
         MONGO_CLONE_TARGET_PATH: /edx/var/mongo/mongodb
