@@ -221,7 +221,7 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
         - cs_comments_service
 
         # Other variables...
-    ```
+      ```
 3. Execute the routine to restore the databases:
 
   For mongo:
