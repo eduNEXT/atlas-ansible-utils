@@ -7,7 +7,7 @@
 - name: Restore database
   shell: >
     mysql -u {{ MYSQL_RESTORE_USER }} -p{{ MYSQL_RESTORE_PASSWORD }}
-    {% if MYSQL_RESTORE_DATABASE %}{{ MYSQL_RESTORE_DATABASE }}{% endif %} < {{ MYSQL_BACKUP_FILE }}
+    {% if MYSQL_RESTORE_DATABASE %}{{ MYSQL_RESTORE_DATABASE }}{% endif %} < {{ MYSQL_RESTORE_BACKUP_LOCATION }}/{{ MYSQL_RESTORE_BACKUP_DATE }}_mysql.sql
 
 - name: Clean artifact path
   file:
