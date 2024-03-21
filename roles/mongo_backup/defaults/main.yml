@@ -1,10 +1,8 @@
 ---
-
 MONGO_BACKUP_USER: "admin"
 MONGO_BACKUP_PASSWORD: "mongo_password"
 MONGO_BACKUP_ALL_DATABASES: true
-MONGO_BACKUP_DATABASE:
-- edxapp
+MONGO_BACKUP_DATABASE: "edxapp"
 MONGO_BACKUP_ROOT: "/var/edunext_tmp/mongo"
 MONGO_BACKUP_DATE: "{{ ansible_date_time.date }}"
 MONGO_BACKUP_LOCATION: "{{ MONGO_BACKUP_ROOT }}/{{ MONGO_BACKUP_DATE }}.d"

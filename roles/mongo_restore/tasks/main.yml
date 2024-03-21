@@ -1,13 +1,17 @@
-- name: Launch Mongo check available storage
-  include_role:
-    name: available_storage
-  vars:
-    AVAILABLE_STORAGE_DISK_TO_CHECK: "{{ MONGO_VOLUMES[0].device }}"
-
-- name: Launch restore MongoDB Backup
-  include_tasks: restore.yml
-  vars:
-    MONGO_BACKUP_FILE: "{{ MONGO_RESTORE_BACKUP_LOCATION }}/{{ MONGO_RESTORE_BACKUP_DATE }}_mongo.gz"
+# To clone the databases, we use the commands recommended by MongoDB:
+# https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
+- name: Restore database
+  shell: >
+    mongorestore
+    --authenticationDatabase admin
+    -u {{ MONGO_RESTORE_USER  }} -p '{{ MONGO_RESTORE_PASSWORD }}'
+    --gzip
+    --archive={{ MONGO_RESTORE_BACKUP_LOCATION }}/{{ MONGO_RESTORE_BACKUP_DATE }}_mongo.gz
+    --numParallelCollections={{ MONGO_RESTORE_NUM_PARALLEL_COLLECTIONS }}
+    {% if MONGO_RESTORE_DATABASE %}
+    --nsFrom={{ MONGO_RESTORE_DATABASE }}.*
+    --nsTo={{ MONGO_RESTORE_CLONE_DATABASE }}.*
+    {% endif %}
 
 - name: Clean artifact path
   file:

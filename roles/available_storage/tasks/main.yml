@@ -1,11 +1,11 @@
 - name: Get disk information
-  shell: df -B 1 "{{ AVAILABLE_STORAGE_DISK_TO_CHECK }}" | awk 'NR==2 {print $2","$3}'
+  shell: df -BM "{{ AVAILABLE_STORAGE_DISK_TO_CHECK }}" | awk 'NR==2 {print $2","$3}'
   register: disk_info
 
 - name: Extract values
   set_fact:
-    disk_size: disk_info.stdout.split(',')[0] | int
-    disk_used: disk_info.stdout.split(',')[1] | int
+    disk_size: disk_info.stdout.split(',')[0].replace('M', '') | int
+    disk_used: disk_info.stdout.split(',')[1].replace('M', '') | int
 
 - name: Calculate free storage
   set_fact:

@@ -6,11 +6,6 @@
     path: "{{ MONGO_BACKUP_LOCATION }}"
     state: directory
 
-- name: Convert Mongo backups databases to list to provide backwards compatibility
-  set_fact:
-    MYSQL_BACKUP_DATABASES: "{{ MONGO_BACKUP_DATABASE | split }}"
-  when: MONGO_BACKUP_DATABASE is string
-
 # To clone the databases, we use the commands recommended by MongoDB:
 # https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
 - name: Create mongo database backup
@@ -21,7 +16,7 @@
     --gzip
     --archive={{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.gz
     {% if not MONGO_BACKUP_ALL_DATABASES %}
-    --db={{ MONGO_BACKUP_DATABASES | join(" ") }}
+    --db={{ MONGO_BACKUP_DATABASE }}
     {% endif %}
 
 - name: Give the server time to recover

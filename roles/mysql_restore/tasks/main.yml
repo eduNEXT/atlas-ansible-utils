@@ -1,14 +1,13 @@
-- name: Upload the backup to a remote storage
-  include_role:
-    name: available_storage
-  vars:
-    AVAILABLE_STORAGE_DISK_TO_CHECK: "{{ MYSQL_VOLUMES[0].device }}"
+# TODO: Verify that the file is indeed a .gz file
+- name: Unzip backup file
+  shell: "gzip -d {{ MYSQL_RESTORE_BACKUP_LOCATION }}/{{ MYSQL_RESTORE_BACKUP_DATE }}_mysql.sql.gz"
+  args:
+    chdir: "{{ MYSQL_RESTORE_BACKUP_LOCATION }}"
 
-- name: Launch restore MySQL Backup
-  include_tasks: restore.yml
-  vars:
-    MYSQL_BACKUP_FILE: "{{ MYSQL_RESTORE_BACKUP_LOCATION }}/{{ MYSQL_RESTORE_BACKUP_DATE }}_mysql.sql"
-    MYSQL_BACKUP_FILE_LOCATION: "{{ MYSQL_RESTORE_BACKUP_LOCATION }}"
+- name: Restore database
+  shell: >
+    mysql -u {{ MYSQL_RESTORE_USER }} -p{{ MYSQL_RESTORE_PASSWORD }}
+    {% if MYSQL_RESTORE_DATABASE %}{{ MYSQL_RESTORE_DATABASE }}{% endif %} < {{ MYSQL_BACKUP_FILE }}
 
 - name: Clean artifact path
   file:
