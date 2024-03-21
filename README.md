@@ -194,14 +194,14 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
 
   The variable configuration should look like this:
     ``` yaml
-    MYSQL_CLONE_USER: admin
-    MYSQL_CLONE_PASSWORD: ABCDefgh12345
-    MYSQL_CLONE_TARGET_PATH: /var/lib/mysql
-    MYSQL_CLONE_DB_LIST:
-    - edxapp
-    - edx_notes_api
+      MYSQL_CLONE_USER: admin
+      MYSQL_CLONE_PASSWORD: ABCDefgh12345
+      MYSQL_CLONE_TARGET_PATH: /var/lib/mysql
+      MYSQL_CLONE_DB_LIST:
+      - edxapp
+      - edx_notes_api
 
-    # Other variables...
+      # Other variables...
     ```
 
   ##### MongoDB
@@ -211,17 +211,17 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
   `MONGO_CLONE_DB_LIST`: List of databases you wish to clone.
   `MONGO_CLONE_TARGET_PATH`: Path where the database is mounted to check available space.
 
-  The variable configuration should look like this:
-    ``` yaml
-    MONGO_CLONE_USER: admin
-    MONGO_CLONE_PASSWORD: ABCDefgh12345
-    MONGO_CLONE_TARGET_PATH: /edx/var/mongo/mongodb
-    MONGO_CLONE_DB_LIST:
-    - edxapp
-    - cs_comments_service
+    The variable configuration should look like this:
+      ``` yaml
+        MONGO_CLONE_USER: admin
+        MONGO_CLONE_PASSWORD: ABCDefgh12345
+        MONGO_CLONE_TARGET_PATH: /edx/var/mongo/mongodb
+        MONGO_CLONE_DB_LIST:
+        - edxapp
+        - cs_comments_service
 
-    # Other variables...
-
+        # Other variables...
+    ```
 3. Execute the routine to restore the databases:
 
   For mongo:
