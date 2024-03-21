@@ -186,19 +186,41 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
   #### How to set up credentials and databases to clone:
 
   ##### MySQL
-  - You must set the credentials of the user with the necessary privileges to clone the databases in the variables [`MYSQL_CLONE_USER`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml#L1) and [`MYSQL_CLONE_PASSWORD`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml#L2).
-  - In the [`MYSQL_CLONE_DB_LIST`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml#L4-L6) list, you can add or remove elements; the elements you define correspond to the names of the databases you want to clone.
-    The list of databases should look like this:
+  The variables that you must configure in [defaults.yml](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mysql_clone/defaults/main.yml) are:
+  `MYSQL_CLONE_USER`: User with the necessary privileges to perform backups and restore databases.
+  `MYSQL_CLONE_PASSWORD`: Password of this user.
+  `MYSQL_CLONE_DB_LIST`: List of databases you wish to clone.
+  `MYSQL_CLONE_TARGET_PATH`: Path where the database is mounted to check available space.
+
+  The variable configuration should look like this:
     ``` yaml
+    MYSQL_CLONE_USER: admin
+    MYSQL_CLONE_PASSWORD: ABCDefgh12345
+    MYSQL_CLONE_TARGET_PATH: /var/lib/mysql
     MYSQL_CLONE_DB_LIST:
-    - clone_db1
-    - clone_db2
-    - clone_db3
+    - edxapp
+    - edx_notes_api
+
+    # Other variables...
     ```
 
   ##### MongoDB
-  - Similar to the MySQL configuration, it's essential to configure the credentials of the user with the necessary privileges for database cloning within the variables [`MONGO_CLONE_USER`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml#L1) and [`MONGO_CLONE_PASSWORD`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml#L2).
-  - In the [`MONGO_CLONE_DB_LIST`](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml#L4-L6) list, you can include or exclude elements as needed; each element corresponds to the name of a database you intend to clone.
+  - Similar to the MySQL configuration, the variables that you must configure in [defaults.yml](https://github.com/eduNEXT/atlas-ansible-utils/blob/main/roles/mongo_clone/defaults/main.yml) are:
+  `MONGO_CLONE_USER`: User with the necessary privileges to perform backups and restore databases.
+  `MONGO_CLONE_PASSWORD`: Password of this user.
+  `MONGO_CLONE_DB_LIST`: List of databases you wish to clone.
+  `MONGO_CLONE_TARGET_PATH`: Path where the database is mounted to check available space.
+
+  The variable configuration should look like this:
+    ``` yaml
+    MONGO_CLONE_USER: admin
+    MONGO_CLONE_PASSWORD: ABCDefgh12345
+    MONGO_CLONE_TARGET_PATH: /edx/var/mongo/mongodb
+    MONGO_CLONE_DB_LIST:
+    - edxapp
+    - cs_comments_service
+
+    # Other variables...
 
 3. Execute the routine to restore the databases:
 

@@ -1,8 +1,8 @@
 MYSQL_CLONE_USER: admin
 MYSQL_CLONE_PASSWORD: admin_pass
 MYSQL_CLONE_TARGET_PATH: /var/lib/mysql
-MYSQL_CLONE_ROOT: /var/edunext_tmp/mysql
 MYSQL_CLONE_DB_LIST:
 - edxapp
 - edx_notes_api
+MYSQL_CLONE_ROOT: /var/edunext_tmp/mysql
 MYSQL_CLONE_RESTORE_SUFFIX: "_clone"
