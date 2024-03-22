@@ -8,9 +8,9 @@
     --gzip
     --archive={{ MONGO_RESTORE_BACKUP_LOCATION }}/{{ MONGO_RESTORE_BACKUP_DATE }}_mongo.gz
     --numParallelCollections={{ MONGO_RESTORE_NUM_PARALLEL_COLLECTIONS }}
-    {% if MONGO_RESTORE_DATABASE %}
-    --nsFrom={{ MONGO_RESTORE_DATABASE }}.*
-    --nsTo={{ MONGO_RESTORE_CLONE_DATABASE }}.*
+    {% if MONGO_RESTORE_ORIGINAL_DATABASE_NAME and MONGO_RESTORE_TARGET_DATABASE_NAME %}
+    --nsFrom={{ MONGO_RESTORE_ORIGINAL_DATABASE_NAME }}.*
+    --nsTo={{ MONGO_RESTORE_TARGET_DATABASE_NAME }}.*
     {% endif %}
 
 - name: Clean artifact path
