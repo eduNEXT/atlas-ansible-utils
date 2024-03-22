@@ -1,3 +1,9 @@
-AVAILABLE_STORAGE_DISK_TO_CHECK: "/dev/nvme1n1"
+# This role helps validating there's enough space in a disk to duplicate its data. This is useful when we
+# want to clone databases stored in a volume.
+# AVAILABLE_STORAGE_PATH_TO_CHECK is checked to make sure we can create a full copy of the data on this path
+# in the disk the path belongs to with no issues
+
+
+AVAILABLE_STORAGE_PATH_TO_CHECK: "/root"
 # Minimum percentage of free disk space expected after restoring a database
 AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE: 20

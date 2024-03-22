@@ -2,7 +2,7 @@
   include_role:
     name: available_storage
   vars:
-    AVAILABLE_STORAGE_DISK_TO_CHECK: "{{ MONGO_CLONE_TARGET_PATH }}"
+    AVAILABLE_STORAGE_PATH_TO_CHECK: "{{ MONGO_CLONE_TARGET_PATH }}"
 
 - name: Backup and restore every single database in the clone list
   include_tasks: clone.yml
