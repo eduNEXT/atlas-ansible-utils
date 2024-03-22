@@ -1,0 +1,10 @@
+# Description: Playbook to clone Mongo databases by extracting backups and restore them with
+# changed database names in the same Mongo instance.
+- name: Launch Mongo backup and restore
+  hosts: mongo_servers
+  become: True
+  gather_facts: True
+  roles:
+    - role: mongo_clone
+      tags:
+        - mongo_clone

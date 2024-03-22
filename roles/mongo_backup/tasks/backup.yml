@@ -1,0 +1,33 @@
+# Description: Playbook to launch Mongo backups
+# It is compatible with the S3 API and Azure Blob Storage.
+---
+- name: Create backup directory
+  file:
+    path: "{{ MONGO_BACKUP_LOCATION }}"
+    state: directory
+
+# To clone the databases, we use the commands recommended by MongoDB:
+# https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
+- name: Create mongo database backup
+  shell: >
+    mongodump
+    --authenticationDatabase admin
+    -u {{ MONGO_BACKUP_USER }} -p '{{ MONGO_BACKUP_PASSWORD }}'
+    --gzip
+    --archive={{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.gz
+    {% if not MONGO_BACKUP_ALL_DATABASES %}
+    --db={{ MONGO_BACKUP_DATABASE }}
+    {% endif %}
+
+- name: Give the server time to recover
+  pause:
+    minutes: 1
+    prompt: Pausing to give the server time to recover
+
+- name: Upload the backup to a remote storage
+  include_role:
+    name: storage_backups
+  vars:
+    STORAGE_BACKUPS_OPTIONS: "{{ MONGO_BACKUP_STORAGE_OPTIONS }}"
+    STORAGE_BACKUPS_FILES_TO_UPLOAD:
+      - "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.gz"

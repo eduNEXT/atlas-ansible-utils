@@ -1,0 +1,38 @@
+---
+- name: Extract MySQL backup from database {{ item }}
+  include_role:
+    name: mysql_backup
+  vars:
+    MYSQL_BACKUP_ALL_DATABASES: false
+    MYSQL_BACKUP_PRE_CLEAN_ROOT: true
+    MYSQL_BACKUP_USER: "{{ MYSQL_CLONE_USER }}"
+    MYSQL_BACKUP_PASSWORD: "{{ MYSQL_CLONE_PASSWORD }}"
+    MYSQL_BACKUP_DATABASES:
+    - "{{ item }}"
+    MYSQL_BACKUP_ROOT: "{{ MYSQL_CLONE_ROOT }}"
+    MYSQL_BACKUP_STORAGE_OPTIONS:
+      EXTERNAL_STORAGE_TYPE: ""
+      EXTERNAL_STORAGE_OPTIONS: {}
+
+- name: Generate new database name with suffix
+  set_fact:
+    new_clone_db_name: "{{ item + MYSQL_CLONE_RESTORE_SUFFIX }}"
+
+- name: Drop database if exists
+  mysql_db:
+    name: "{{ new_clone_db_name }}"
+    state: "absent"
+
+- name: Create new database
+  mysql_db:
+    name: "{{ new_clone_db_name }}"
+    state: "present"
+
+- name: Restore MySQL backup on database {{ new_clone_db_name }}
+  include_role:
+    name: mysql_restore
+  vars:
+    MYSQL_RESTORE_BACKUP_ROOT: "{{ MYSQL_CLONE_ROOT }}"
+    MYSQL_RESTORE_USER: "{{ MYSQL_CLONE_USER }}"
+    MYSQL_RESTORE_PASSWORD: "{{ MYSQL_CLONE_PASSWORD }}"
+    MYSQL_RESTORE_DATABASE: "{{ new_clone_db_name }}"
