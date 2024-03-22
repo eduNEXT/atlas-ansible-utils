@@ -1,5 +1,5 @@
 # To clone the databases, we use the commands recommended by MongoDB:
-# https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
+# https://www.mongodb.com/docs/database-tools/mongorestore/#copy-clone-a-database
 - name: Restore database
   shell: >
     mongorestore
