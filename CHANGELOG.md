@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.3...HEAD)
+## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.7.0...HEAD)
 
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
+## [v1.7.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.3...v1.7.0) - 2024-04-03
+
+### [1.7.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.3...v1.7.0) (2024-04-03)
+
+#### Features
+
+- add support for restore dbs ([#25](https://github.com/eduNEXT/atlas-ansible-utils/issues/25)) ([3bc5fa7](https://github.com/eduNEXT/atlas-ansible-utils/commit/3bc5fa77a4859234e25a75bb41f952c91fe8997f))
+
 ## [v1.6.3](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.2...v1.6.3) - 2024-02-06
 
 ### [1.6.3](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.2...v1.6.3) (2024-02-06)
