@@ -1,7 +1,7 @@
 ---
 - name: Verify if the suffix for database cloning is valid
   fail:
-    msg: "The variable MONGO_CLONE_RESTORE_SUFFIX must be defined and contain characters so that the destination database is not the same as the source database."
+    msg: "The variable MONGO_CLONE_RESTORE_SUFFIX must be defined and contain a meaningful suffix so that the cloned databases names are not the same as the source databases names."
   when: "MONGO_CLONE_RESTORE_SUFFIX is not defined or MONGO_CLONE_RESTORE_SUFFIX | trim == ''"
 
 - name: Extract Mongo backup from database {{ item }}
