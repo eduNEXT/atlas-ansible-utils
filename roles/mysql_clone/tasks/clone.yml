@@ -1,4 +1,9 @@
 ---
+- name: Verify if the suffix for database cloning is valid
+  fail:
+    msg: "The variable MYSQL_CLONE_RESTORE_SUFFIX must be defined and contain characters so that the destination database is not the same as the source database."
+  when: "MYSQL_CLONE_RESTORE_SUFFIX is not defined or MYSQL_CLONE_RESTORE_SUFFIX | trim == ''"
+
 - name: Extract MySQL backup from database {{ item }}
   include_role:
     name: mysql_backup
