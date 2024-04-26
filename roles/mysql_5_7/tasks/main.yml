@@ -11,6 +11,12 @@
     update_cache: yes
     state: present
 
+- name: Install GPG
+  apt:
+    name: "gpg"
+    update_cache: yes
+    state: present
+
 - name: add the mysql signing key
   apt_key:
     keyserver: "{{ MYSQL_5_7_APT_KEYSERVER }}"
