@@ -11,12 +11,6 @@
     update_cache: yes
     state: present
 
-- name: Install GPG
-  apt:
-    name: "gpg"
-    update_cache: yes
-    state: present
-
 - name: Add MySQL repository key
   apt_key:
     keyserver: "{{ MYSQL_8_0_APT_KEYSERVER }}"
