@@ -5,11 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.7.0...HEAD)
+## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.8.0...HEAD)
 
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
+## [v1.8.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.7.0...v1.8.0) - 2024-05-07
+
+### [1.8.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.7.0...v1.8.0) (2024-05-07)
+
+#### Features
+
+- add gpg in mysql dependencies ([#28](https://github.com/eduNEXT/atlas-ansible-utils/issues/28)) ([eb03b97](https://github.com/eduNEXT/atlas-ansible-utils/commit/eb03b9704bda89a5eac2bb32cca9ada435d72cfb))
+
+#### Bug Fixes
+
+- include the --drop flag to delete the destination database before the restore mongo ([#26](https://github.com/eduNEXT/atlas-ansible-utils/issues/26)) ([aa0b02f](https://github.com/eduNEXT/atlas-ansible-utils/commit/aa0b02fc3553806e760b3f8d88b88c3b30e45cbd))
+- use default auth plugin in mysql8 ([#29](https://github.com/eduNEXT/atlas-ansible-utils/issues/29)) ([517f8d3](https://github.com/eduNEXT/atlas-ansible-utils/commit/517f8d3c13eab1b78df97822ffc90815ef7e0e96))
+- verify that the content of the variable defining the suffix contains characters ([#27](https://github.com/eduNEXT/atlas-ansible-utils/issues/27)) ([2d58400](https://github.com/eduNEXT/atlas-ansible-utils/commit/2d584007cb79dc5f262ccf2c41de0ff34c98fdec))
+
 ## [v1.7.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.3...v1.7.0) - 2024-04-03
 
 ### [1.7.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.6.3...v1.7.0) (2024-04-03)
