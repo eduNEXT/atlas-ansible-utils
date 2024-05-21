@@ -21,12 +21,6 @@
     - "manage"
     - "manage:start"
 
-- name: install pip3
-  apt:
-    name: python3-pip
-    state: present
-    update_cache: yes
-
 - name: install python pymongo for mongo_user ansible module
   pip:
     name: pymongo
@@ -42,9 +36,11 @@
     url: "https://www.mongodb.org/static/pgp/server-{{ MONGO_VERSION_MAJOR_MINOR }}.asc"
     state: present
   retries: 3
+  register: add_mongo_signing_key
   tags:
     - "install"
     - "install:app-requirements"
+  until: add_mongo_signing_key is succeeded
 
 - name: add the mongodb repo to the sources list
   apt_repository:
@@ -54,20 +50,6 @@
     - "install"
     - "install:app-requirements"
     - "mongo_packages"
-
-# MongoDB 4.4 uses the libssl1.1 library, but this library is not available by default in Ubuntu 22.04. Therefore, it is necessary to install it manually.
-# For more information, see: https://blog.yucas.net/2023/03/13/install-mongodb-4-4-5-0-over-ubuntu-22-04/
-- name: Download libssl1.1
-  get_url:
-    url: http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-    dest: /tmp/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-  register: wget_result
-  when: ansible_distribution_release == 'jammy'
-
-- name: Install libssl1.1
-  command: dpkg -i /tmp/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-  when: wget_result.changed
-  when: ansible_distribution_release == 'jammy'
 
 - name: install mongo server and recommends
   apt:
