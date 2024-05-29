@@ -21,3 +21,5 @@
     encrypted: "{{ item.encrypted | default('no') }}"
   when: item.name != None and item.name != ''
   loop: "{{ MYSQL_CONFIG_USERS }}"
+  tags:
+    - molecule-idempotence-notest

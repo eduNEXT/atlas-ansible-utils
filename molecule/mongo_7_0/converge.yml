@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include atlas-ansible-utils"
+      include_role:
+        name: "atlas-ansible-utils"
+- import_playbook: ../../mongo_7_0.yml

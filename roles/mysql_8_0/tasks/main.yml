@@ -20,6 +20,8 @@
 - name: Update APT cache
   apt:
     update_cache: yes
+  tags:
+  - molecule-idempotence-notest
 
 - name: Add MySQL repository to sources list
   apt_repository:

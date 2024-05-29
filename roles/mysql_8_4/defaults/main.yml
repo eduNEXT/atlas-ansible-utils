@@ -2,6 +2,7 @@
 mysql_8_4_debian_pkgs:
   - python3-mysqldb
   - gpg
+  - dirmngr
 
 mysql_server_8_4_pkg: "mysql-server=8.4.*"
 mysql_client_8_4_pkg: "mysql-client=8.4.*"

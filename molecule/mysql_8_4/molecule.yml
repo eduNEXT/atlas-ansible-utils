@@ -1,0 +1,31 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: mysql-8-4-instance
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+    groups:
+      - mysql_servers
+provisioner:
+  name: ansible
+  inventory:
+    all:
+      MYSQL_CONFIG_USERS:
+      - name: user
+        host: '%'
+        password: password
+verifier:
+  name: ansible

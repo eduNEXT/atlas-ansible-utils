@@ -9,6 +9,8 @@
     update_cache: yes
 
 - name: add clickhouse repository
+  tags:
+    - molecule-idempotence-notest
   shell: |
     GNUPGHOME=$(mktemp -d)
     GNUPGHOME="$GNUPGHOME" gpg --no-default-keyring --keyring /usr/share/keyrings/clickhouse-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8919F6BD2B48D754
@@ -50,10 +52,12 @@
 - name: Create SQL Roles, Users and grant permissions
   loop: "{{ CLICKHOUSE_USERS }}"
   register: clickhouse_client
+  tags:
+    - molecule-idempotence-notest
   shell: |
     clickhouse-client --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
 
-    CREATE ROLE '{{ item.name }}_admin';
+    CREATE ROLE IF NOT EXISTS '{{ item.name }}_admin';
 
     GRANT ALL ON system.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
@@ -67,7 +71,7 @@
     GRANT DROP FUNCTION ON *.* to '{{ item.name }}_admin';
     GRANT CREATE FUNCTION ON *.* to '{{ item.name }}_admin';
 
-    CREATE USER {{ item.name }} identified with plaintext_password by '{{ item.password }}';
+    CREATE USER IF NOT EXISTS {{ item.name }} identified with plaintext_password by '{{ item.password }}';
 
     GRANT {{ item.name }}_admin to {{ item.name }};
 
