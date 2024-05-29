@@ -1,0 +1,43 @@
+name: Integration Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  molecule:
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+        - caddy
+        - clickhouse
+        - elasticsearch_7_10
+        - mongo_4_2
+        - mongo_4_4
+        - mongo_7_0
+        - mysql_5_7
+        - mysql_8_0
+        - mysql_8_4
+        - redis_6_2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      - name: Install test dependencies
+        run: pip3 install molecule[docker] yamllint ansible-lint
+
+      - name: Run molecule tests
+        run: molecule test -s ${{ matrix.environment }}
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLORS: '1'

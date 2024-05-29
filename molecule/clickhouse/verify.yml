@@ -1,0 +1,17 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Verify ClickHouse HTTP
+    uri:
+      url: "http://localhost:8123/"
+      status_code: 200
+      timeout: 1
+      return_content: yes
+  - name: Verify ClickHouse installation
+    register: clickhouse_client
+    shell: |
+      clickhouse-client --user "default" --password="password" --query "SELECT 1"
