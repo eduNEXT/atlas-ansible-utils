@@ -1,0 +1,10 @@
+---
+- name: Ensure MySQL databases are present.
+  mysql_db:
+    name: "{{ item.name }}"
+    collation: "{{ item.collation | default('') }}"
+    encoding: "{{ item.encoding | default('') }}"
+    state: "{{ item.state | default('present') }}"
+    target: "{{ item.target | default(omit) }}"
+  when: item.name != None and item.name != ''
+  with_items: "{{ MYSQL_CONFIG_DATABASES }}"
