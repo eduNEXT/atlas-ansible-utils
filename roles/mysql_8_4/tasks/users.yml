@@ -1,9 +1,23 @@
 ---
-- name: Adding extra MySQL users
+- name: Remove users before re-configuration users
+  mysql_user:
+    name: '{{ item.name }}'
+    host: '{{ item.host }}'
+    state: absent
+  loop: '{{ MYSQL_CONFIG_USERS }}'
+  when: item.name != None and item.name != ''
+  ignore_errors: true
+
+- name: Create and replace extra users
+  shell: |
+    mysql -e "CREATE USER '{{ item.name }}'@'{{ item.host }}' IDENTIFIED WITH caching_sha2_password BY '{{ item.password }}';"
+  when: item.name != None and item.name != ''
+  loop: "{{ MYSQL_CONFIG_USERS }}"
+
+- name: Adding users extra config
   mysql_user:
     name: "{{ item.name }}"
     host: "{{ item.host | default(MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS) }}"
-    plugin_auth_string: "{{ item.password }}"
     priv: "{{ item.priv if item.priv is defined else (item.db + '.*:ALL' if item.db is defined else '') }}"
     state: "{{ item.state | default('present') }}"
     append_privs: "{{ item.append_privs | default('no') }}"
