@@ -1,16 +1,7 @@
 ---
-- name: Remove users before re-configuration users
-  mysql_user:
-    name: '{{ item.name }}'
-    host: '{{ item.host }}'
-    state: absent
-  loop: '{{ MYSQL_CONFIG_USERS }}'
-  when: item.name != None and item.name != ''
-  ignore_errors: true
-
 - name: Create and replace extra users
   shell: |
-    mysql -e "CREATE USER '{{ item.name }}'@'{{ item.host }}' IDENTIFIED WITH caching_sha2_password BY '{{ item.password }}';"
+    mysql -e "CREATE USER IF NOT EXISTS '{{ item.name }}'@'{{ item.host }}' IDENTIFIED BY '{{ item.password }}';"
   when: item.name != None and item.name != ''
   loop: "{{ MYSQL_CONFIG_USERS }}"
 
