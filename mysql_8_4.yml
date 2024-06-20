@@ -6,5 +6,4 @@
   become: True
   gather_facts: True
   roles:
-    # The geerlingguy role does not allow to install a custom MySQL repository, reason why we use a helper role to install MySQL 8.4
     - role: mysql_8_4

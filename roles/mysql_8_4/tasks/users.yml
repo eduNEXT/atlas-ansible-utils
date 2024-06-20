@@ -1,4 +1,10 @@
 ---
+# Users are created manually because the mysql-users module in Ansible is still unable to
+# create users correctly using the caching_sha2_password authentication plugin.
+# As of now (20/06/2024), there is no release with the module fix.
+# References
+# https://github.com/ansible-collections/community.mysql/issues/621
+# https://github.com/ansible-collections/community.mysql/pull/631
 - name: Create and replace extra users
   shell: |
     mysql -e "CREATE USER IF NOT EXISTS '{{ item.name }}'@'{{ item.host }}' IDENTIFIED BY '{{ item.password }}';"
