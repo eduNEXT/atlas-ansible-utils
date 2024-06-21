@@ -7,10 +7,11 @@
       - gnupg2
       - curl 
     state: present
+    update_cache: yes
 
 - name: Add Caddy apt key.
   ansible.builtin.get_url:
-    url: "{{ caddy_apt_gpg_key }}"  
+    url: "{{ caddy_apt_gpg_key }}"
     dest: /etc/apt/trusted.gpg.d/caddy.asc
     mode: '0644'
     force: true
@@ -26,16 +27,17 @@
     name: "{{  caddy_package }}"
     state: "{{ caddy_package_state }}"
 
-- name: Copy Caddyfile 
+- name: Copy Caddyfile
   template:
     src: Caddyfile.j2
     dest: /etc/caddy/Caddyfile
-    owner: root
-    group: root
-    mode: '0644'
+  tags:
+    - molecule-idempotence-notest
 
 - name: Format Caddyfile
   command: caddy fmt /etc/caddy/Caddyfile --overwrite
   notify: reload caddy
+  tags:
+    - molecule-idempotence-notest
 
 

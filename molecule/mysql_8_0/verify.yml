@@ -8,4 +8,4 @@
   - name: Verify MySQL installation
     register: mysql
     shell: |
-      mysql -u "user" --password=password -e "SELECT 1"
+      mysql -e "SELECT 1"

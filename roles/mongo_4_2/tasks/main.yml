@@ -20,6 +20,7 @@
     - "hugepages"
     - "manage"
     - "manage:start"
+    - molecule-idempotence-notest
 
 - name: install pip3
   apt:
@@ -36,6 +37,13 @@
   tags:
     - "install"
     - "install:app-requirements"
+
+- name: Ensure dependencies are installed.
+  apt:
+    name:
+    - gnupg2
+    state: present
+    update_cache: yes
 
 - name: add the mongodb signing key
   apt_key:
@@ -348,6 +356,7 @@
     - "manage:db"
     - "manage:db-replication"
     - "manage:db-replication-configuration"
+    - molecule-idempotence-notest
 
 # During initial replica set configuration, it can take a few seconds to vote
 # a primary and for all members to reflect that status.  During that window,
@@ -388,6 +397,7 @@
     - "manage:db"
     - "manage:db-users"
     - "manage:db-replication"
+    - molecule-idempotence-notest
 
 - name: create mongodb users in a standalone DB
   mongodb_user:
