@@ -5,7 +5,7 @@
 # References
 # https://github.com/ansible-collections/community.mysql/issues/621
 # https://github.com/ansible-collections/community.mysql/pull/631
-- name: Create and replace extra users
+- name: Create or update extra users
   shell: |
     mysql -e "CREATE USER IF NOT EXISTS '{{ item.name }}'@'{{ item.host }}' IDENTIFIED BY '{{ item.password }}';"
   when: item.name != None and item.name != ''
@@ -20,4 +20,4 @@
     append_privs: "{{ item.append_privs | default('no') }}"
     encrypted: "{{ item.encrypted | default('no') }}"
   when: item.name != None and item.name != ''
-  with_items: "{{ MYSQL_CONFIG_USERS }}"
+  loop: "{{ MYSQL_CONFIG_USERS }}"
