@@ -21,6 +21,13 @@
 #
 #
 
+- name: Ensure dependencies are installed.
+  apt:
+    name:
+    - gnupg2
+    state: present
+    update_cache: yes
+
 - name: add the redis repo signing key
   apt_key:
     url: "https://packages.redis.io/gpg"

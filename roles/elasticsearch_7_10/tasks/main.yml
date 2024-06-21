@@ -27,6 +27,13 @@
 #    - elasticsearch
 #
 
+- name: Ensure dependencies are installed.
+  apt:
+    name:
+    - gnupg2
+    state: present
+    update_cache: yes
+
 - name: Install Elasticsearch repo key
   apt_key:
     url: "{{ elasticsearch_apt_key_url }}"

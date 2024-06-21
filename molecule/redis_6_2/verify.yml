@@ -6,6 +6,5 @@
   gather_facts: false
   tasks:
   - name: Verify Redis installation
-    register: redis-cli
     shell: |
       redis-cli --raw incr ping
