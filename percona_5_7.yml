@@ -3,8 +3,8 @@
 
 - name: Percona cluster provision
   hosts: percona_cluster
-  become: True
-  gather_facts: True
+  become: true
+  gather_facts: true
   roles:
     - common
     - role: mount_ebs

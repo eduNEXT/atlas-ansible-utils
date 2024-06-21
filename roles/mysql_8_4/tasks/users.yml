@@ -6,13 +6,13 @@
 # https://github.com/ansible-collections/community.mysql/issues/621
 # https://github.com/ansible-collections/community.mysql/pull/631
 - name: Create or update extra users
-  shell: |
+  ansible.builtin.shell: |
     mysql -e "CREATE USER IF NOT EXISTS '{{ item.name }}'@'{{ item.host }}' IDENTIFIED BY '{{ item.password }}';"
   when: item.name != None and item.name != ''
   loop: "{{ MYSQL_CONFIG_USERS }}"
 
 - name: Adding users extra config
-  mysql_user:
+  community.mysql.mysql_user:
     name: "{{ item.name }}"
     host: "{{ item.host | default(MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS) }}"
     priv: "{{ item.priv if item.priv is defined else (item.db + '.*:ALL' if item.db is defined else '*.*:ALL') }}"

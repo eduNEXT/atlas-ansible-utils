@@ -1,9 +1,8 @@
 ---
-
 # S3 option
-- include: aws.yml
+- ansible.builtin.include: aws.yml
   when: STORAGE_BACKUPS_TYPE == 'aws'
 
 # Azure option
-- include: azure.yml
+- ansible.builtin.include: azure.yml
   when: STORAGE_BACKUPS_TYPE == 'azure'

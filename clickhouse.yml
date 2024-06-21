@@ -1,8 +1,9 @@
+---
 # Manages a clickhouse.
 
 - name: Deploy Clickhouse
   hosts: clickhouse_servers
-  become: True
-  gather_facts: True
+  become: true
+  gather_facts: true
   roles:
     - role: clickhouse

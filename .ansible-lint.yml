@@ -1,0 +1,11 @@
+---
+skip_list:
+  - var-naming
+
+kinds:
+  - yaml: "**/*.yaml"
+
+exclude_paths:
+  - molecule
+  - .github/
+  - catalog-info.yaml

@@ -22,53 +22,52 @@
 #
 
 - name: Ensure dependencies are installed.
-  apt:
+  ansible.builtin.apt:
     name:
-    - gnupg2
+      - gnupg2
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: add the redis repo signing key
-  apt_key:
-    url: "https://packages.redis.io/gpg"
+- name: Add the redis repo signing key
+  ansible.builtin.apt_key:
+    url: https://packages.redis.io/gpg
     state: present
   retries: 3
   tags:
-    - "install"
-    - "install:app-requirements"
+    - install
+    - install:app-requirements
 
-- name: add the redis repo to the sources list
-  apt_repository:
+- name: Add the redis repo to the sources list
+  ansible.builtin.apt_repository:
     repo: "{{ REDIS_REPO }}"
     state: present
   tags:
-    - "install"
-    - "install:app-requirements"
+    - install
+    - install:app-requirements
 
 - name: Install redis packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ redis_debian_pkgs }}"
-    install_recommends: yes
+    install_recommends: true
     state: present
-    update_cache: yes
+    update_cache: true
   notify:
     - reload redis
 
 - name: Pin redis package version
   loop: "{{ redis_debian_pkgs }}"
-  dpkg_selections:
+  ansible.builtin.dpkg_selections:
     # Dpkg selection just wants the package name, not the package and version
     # This turns "redis=6:6.2.6-3rl1~focal1" into just "redis"
     name: "{{ item.split('=')[0] }}"
     selection: hold
 
 - name: Update redis configuration
-  template:
-    src: "etc/redis/redis.conf.j2"
-    dest: "/etc/redis/redis.conf"
+  ansible.builtin.template:
+    src: etc/redis/redis.conf.j2
+    dest: /etc/redis/redis.conf
     owner: root
     group: "{{ redis_group }}"
     mode: "0640"
   notify:
     - reload redis
-

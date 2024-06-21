@@ -1,44 +1,43 @@
 ---
 - name: Check if azcopy is installed
-  command: azcopy --version
+  ansible.builtin.command: azcopy --version
   register: azcopy_version
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Download and install azcopy
+  when: azcopy_version.rc != 0
+
   block:
     - name: Download the latest version of azcopy v10
-      get_url:
+      ansible.builtin.get_url:
         url: https://aka.ms/downloadazcopy-v10-linux
         dest: /tmp/azcopy.tar.gz
-        mode: 0755
+        mode: "0755"
 
     - name: Extract the azcopy archive
-      unarchive:
+      ansible.builtin.unarchive:
         src: /tmp/azcopy.tar.gz
         dest: /tmp
-        remote_src: yes
+        remote_src: true
 
     - name: Find the azcopy file in the extracted directory
-      find:
+      ansible.builtin.find:
         paths: /tmp
-        patterns: 'azcopy_linux_amd64_*, azcopy'
+        patterns: azcopy_linux_amd64_*, azcopy
         file_type: any
       register: azcopy_file
 
     - name: Copy the azcopy file to /tmp/azcopy
-      command: "sudo cp -r {{ item.path }} /tmp/azcopy"
+      ansible.builtin.command: sudo cp -r {{ item.path }} /tmp/azcopy
       loop: "{{ azcopy_file.files }}"
       loop_control:
         label: "{{ item.path }}"
 
     - name: Move the azcopy file to the /usr/bin/ directory
-      command: "sudo mv /tmp/azcopy/azcopy /usr/bin/"
-
+      ansible.builtin.command: sudo mv /tmp/azcopy/azcopy /usr/bin/
     - name: Delete azcopy temporary files
-      shell: "sudo rm -rf /tmp/azcopy*"
-  when: azcopy_version.rc != 0
-
+      ansible.builtin.shell: sudo rm -rf /tmp/azcopy*
 - name: Upload files to azure storage
-  shell: >
-   {{ STORAGE_BACKUPS_AZURE_COMMAND }}
+  ansible.builtin.shell: >
+    {{ STORAGE_BACKUPS_AZURE_COMMAND }}
   with_items: "{{ STORAGE_BACKUPS_FILES_TO_UPLOAD }}"

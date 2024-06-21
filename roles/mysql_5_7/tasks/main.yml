@@ -1,54 +1,54 @@
 ---
 - name: Fail if trying to install on an unsupported distribution
-  fail:
+  ansible.builtin.fail:
     msg: MySQL must be installed in a supported distribution
   when: ansible_distribution_release not in MYSQL_5_7_SUPPORTED_DISTRIBUTIONS
 
 - name: Install mysql dependencies
-  apt:
+  ansible.builtin.apt:
     name: "{{ mysql_5_7_debian_pkgs }}"
-    install_recommends: yes
-    update_cache: yes
+    install_recommends: true
+    update_cache: true
     state: present
 
-- name: add the mysql signing key
-  apt_key:
+- name: Add the mysql signing key
+  ansible.builtin.apt_key:
     keyserver: "{{ MYSQL_5_7_APT_KEYSERVER }}"
     id: "{{ MYSQL_5_7_APT_KEY }}"
 
-- name: add the mysql-5.7 repo to the sources list
-  apt_repository:
+- name: Add the mysql-5.7 repo to the sources list
+  ansible.builtin.apt_repository:
     repo: "{{ MYSQL_5_7_REPO }}"
     state: present
 
 # Installing mysql-5.7-client, mysql-5.7-community-server
 # and mysql-5.7-server in separate tasks to resolve dependencies
-- name: install mysql-5.7-client
-  apt:
+- name: Install mysql-5.7-client
+  ansible.builtin.apt:
     name: "{{ mysql_client_5_7_pkg }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: install mysql-5.7-community-server
-  apt:
+- name: Install mysql-5.7-community-server
+  ansible.builtin.apt:
     name: "{{ mysql_community_server_5_7_pkg }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: install mysql-5.7-server
-  apt:
+- name: Install mysql-5.7-server
+  ansible.builtin.apt:
     name: "{{ mysql_server_5_7_pkg }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: restart mysql
-  command: service mysql restart
+- name: Restart mysql
+  ansible.builtin.command: service mysql restart
   tags:
-  - molecule-idempotence-notest
+    - molecule-idempotence-notest
 
 - name: Ensure Anonymous user(s) does not exist
-  mysql_user:
-    name: ''
+  community.mysql.mysql_user:
+    name: ""
     host: "{{ item }}"
     state: absent
     login_unix_socket: "{{ mysql_5_7_socket }}"
@@ -57,8 +57,7 @@
     - "{{ ansible_hostname }}"
 
 - name: Alter user root to use mysql_native_password
-  shell:
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password;set password=password('')"
+  ansible.builtin.shell: mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password;set password=password('')"
   become: true
   tags:
-  - molecule-idempotence-notest
+    - molecule-idempotence-notest

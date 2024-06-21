@@ -1,8 +1,9 @@
+---
 # Description: Playbook to launch Mongo backups
 - name: Launch backups
   hosts: mongo_servers
-  become: True
-  gather_facts: True
+  become: true
+  gather_facts: true
   roles:
     - role: mongo_backup
       tags:
