@@ -15,7 +15,7 @@
   mysql_user:
     name: "{{ item.name }}"
     host: "{{ item.host | default(MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS) }}"
-    priv: "{{ item.priv if item.priv is defined else (item.db + '.*:ALL' if item.db is defined else '') }}"
+    priv: "{{ item.priv if item.priv is defined else (item.db + '.*:ALL' if item.db is defined else '*.*:ALL') }}"
     state: "{{ item.state | default('present') }}"
     append_privs: "{{ item.append_privs | default('no') }}"
     encrypted: "{{ item.encrypted | default('no') }}"
