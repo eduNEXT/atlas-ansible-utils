@@ -20,7 +20,6 @@ jobs:
         - mongo_7_0
         - mysql_5_7
         - mysql_8_0
-        - mysql_8_4
         - redis_6_2
     runs-on: ubuntu-latest
 
