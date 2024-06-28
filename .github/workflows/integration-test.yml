@@ -7,20 +7,35 @@ on:
       - main
 
 jobs:
+
+  load-roles:
+    runs-on: ubuntu-latest
+    outputs:
+      roles: ${{ steps.changed_roles.outputs.roles }}
+      scenarios: ${{ steps.scenarios.outputs.scenarios}}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '2'
+
+      - name: Find changed roles
+        id: changed_roles
+        run: |
+          ROLES=$(git diff --name-only origin/main origin${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1])
+          echo "::set-output name=roles::$ROLES"
+
+      - name: Find available scenarios
+        id: scenarios
+        run: |
+          SCENARIOS=$(ls molecule | jq -R -s -c 'split("\n")[:-1]')
+          echo "::set-output name=scenarios::$SCENARIOS"
+
   molecule:
+    needs: load-roles
     strategy:
       fail-fast: false
       matrix:
-        environment:
-        - caddy
-        - clickhouse
-        - elasticsearch_7_10
-        - mongo_4_2
-        - mongo_4_4
-        - mongo_7_0
-        - mysql_5_7
-        - mysql_8_0
-        - redis_6_2
+        environment: ${{ fromJson(needs.load-roles.outputs.roles) }}
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +51,7 @@ jobs:
         run: pip3 install molecule[docker] yamllint ansible-lint
 
       - name: Run molecule tests
+        if: ${{ contains(fromJson(needs.load-roles.outputs.roles), matrix.environment) }}
         run: molecule test -s ${{ matrix.environment }}
         env:
           PY_COLORS: '1'
