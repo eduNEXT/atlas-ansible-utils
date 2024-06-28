@@ -60,7 +60,7 @@ path.logs: {{ elasticsearch_log_dir }}
 #
 #http.port: 9200
 #
-network.host: {{ ansible_host }}
+network.host: {{ ELASTICSEARCH_BIND_IP }}
 # For more information, consult the network module documentation.
 #
 # --------------------------------- Discovery ----------------------------------
@@ -72,7 +72,7 @@ network.host: {{ ansible_host }}
 {% if ELASTICSEARCH_CLUSTER_MEMBERS|length > 0 -%}
 discovery.seed_hosts: ['{{ELASTICSEARCH_CLUSTER_MEMBERS|join("\',\'") }}']
 {% else -%}
-discovery.seed_hosts: ['{{ ansible_host }}']
+discovery.seed_hosts: ['{{ ELASTICSEARCH_BIND_IP }}']
 {% endif -%}
 #
 # Bootstrap the cluster using an initial set of master-eligible nodes:
