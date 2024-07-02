@@ -1,0 +1,84 @@
+---
+mysql_8_4_debian_pkgs:
+  - python3-mysqldb
+  - gpg
+
+mysql_server_8_4_pkg: "mysql-server=8.4.*"
+mysql_client_8_4_pkg: "mysql-client=8.4.*"
+mysql_community_server_8_4_pkg: "mysql-server=8.4.*"
+
+mysql_8_4_socket: /var/run/mysqld/mysqld.sock
+
+MYSQL_8_4_APT_KEYSERVER: "keyserver.ubuntu.com"
+MYSQL_8_4_APT_KEY: "A8D3785C"
+MYSQL_8_4_REPO: "deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts"
+
+MYSQL_8_4_SUPPORTED_DISTRIBUTIONS:
+  - "jammy"
+
+# List of dictionaries as described in the mount_ebs role's default
+# for the volumes.
+# Useful if you want to store your MySQL data on separate
+# disks from the root volume.
+MYSQL_VOLUMES: []
+
+# Mysql DB's in the form:
+# MYSQL_CONFIG_DATABASES:
+# - name: mydb
+#   collation: utf8_general_ci
+#   encoding: utf8
+#   state: present
+MYSQL_CONFIG_DATABASES: []
+# MYSQL_CONFIG_USERS:
+# - name: myuser
+#   host: '%'
+#   password: 'strong_pass'
+#   priv: 'mydb.*:ALL'
+#   state: present
+#   append_privs: no
+MYSQL_CONFIG_USERS: []
+
+MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS: "%"
+
+MYSQL_CONFIG_BIND_ADDRESS: "0.0.0.0"
+MYSQL_CONFIG_PORT: 3306
+
+MYSQL_CONFIG_SERVER_ID: 1
+
+# In this path we store the MySQL configuration we create via templates
+MYSQL_CONFIG_EXTRA_CONFIG_PATH: "/etc/mysql/mysql.conf.d"
+
+# Using default MySQL 8.4 settings
+# For more information check the links below:
+# 8.4
+# - https://dev.mysql.com/doc/refman/8.4/en/server-system-variables.html
+# - https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html
+
+# Config for MySQL 8.4
+# This variables are only compatible with MySQL 8.4
+# More info: https://dev.mysql.com/doc/refman/8.4/en/added-deprecated-removed.html
+MYSQL_CONFIG_EXPIRE_LOGS_SECONDS: 432000 # 5 days
+MYSQL_CONFIG_INNODB_LOG_CAPACITY: 48M
+
+MYSQL_CONFIG_CHARACTER_SET_SERVER: "utf8mb4"
+MYSQL_CONFIG_COLLATION_SERVER: "utf8mb4_unicode_ci"
+MYSQL_CONFIG_KEY_BUFFER_SIZE: 8M
+MYSQL_CONFIG_MAX_CONNECTIONS: 1200
+MYSQL_CONFIG_OPEN_FILES_LIMIT: 5000
+MYSQL_CONFIG_TABLE_OPEN_CACHE: 2000
+MYSQL_CONFIG_MAX_ALLOWED_PACKET: 16M
+MYSQL_CONFIG_INNODB_BUFFER_POOL_SIZE: 128M
+MYSQL_CONFIG_INNODB_IO_CAPACITY: 200
+MYSQL_CONFIG_INNODB_IO_CAPACITY_MAX: 1000
+MYSQL_CONFIG_INNODB_LOG_FILE_SIZE: 48M
+MYSQL_CONFIG_INNODB_LOG_BUFFER_SIZE: 16M
+MYSQL_CONFIG_INNODB_READ_IO_THREADS: 4
+MYSQL_CONFIG_INNODB_WRITE_IO_THREADS: 4
+MYSQL_CONFIG_INNODB_FLUSH_LOG_AT_TRX_COMMIT: 1
+
+MYSQL_CONFIG_ENABLE_SLOW_QUERY_LOGS: false
+MYSQL_CONFIG_READ_ONLY: false
+
+# Replication
+MYSQL_CONFIG_REPL_ENABLE_GTID_MODE: false
+MYSQL_CONFIG_REPL_DISABLE_MYISAM: false
