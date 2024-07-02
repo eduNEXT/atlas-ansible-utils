@@ -240,7 +240,7 @@ Upon completion of the execution, you should observe both the existing databases
 
 ## Molecule tests
 
-Integration testing is performed using [molecule][https://ansible.readthedocs.io/projects/molecule/].
+Integration testing is performed using [molecule](https://ansible.readthedocs.io/projects/molecule/).
 
 Molecule tests consist of different scenarios which are implemented using ansible roles, those are run on Docker and
 can be customized per role.
@@ -287,4 +287,4 @@ molecule converge -s scenario_name
 molecule login -s scenario_name
 ```
 
-See [molecule docs][https://ansible.readthedocs.io/projects/molecule/] for more information.
+See [molecule documentation](https://ansible.readthedocs.io/projects/molecule/) for more information.
