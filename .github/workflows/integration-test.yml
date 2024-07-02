@@ -21,7 +21,7 @@ jobs:
       - name: Find changed roles
         id: changed_roles
         run: |
-          ROLES=$(git diff --name-only origin/main origin${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1])
+          ROLES=$(git diff --name-only origin/main origin${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
           echo "::set-output name=roles::$ROLES"
 
       - name: Find available scenarios
