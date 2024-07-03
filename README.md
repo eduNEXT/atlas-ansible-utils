@@ -267,7 +267,7 @@ A test consist of the following phases:
 You can run a whole scenario by running:
 
 ```shell
-molecule run -s scenario_name
+molecule test -s scenario_name
 ```
 
 You can also run the steps independently using the following commands:

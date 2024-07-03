@@ -27,5 +27,7 @@ provisioner:
       - name: user
         host: '%'
         password: password
+        state: present
+        append_privs: no
 verifier:
   name: ansible

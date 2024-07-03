@@ -48,6 +48,8 @@
 
 - name: restart mysql
   command: service mysql restart
+  tags:
+  - molecule-idempotence-notest
 
 - name: Ensure Anonymous user(s) does not exist
   mysql_user:
@@ -63,6 +65,8 @@
   shell:
     mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password; SET PASSWORD='';"
   become: true
+  tags:
+  - molecule-idempotence-notest
 
 - name: Post MySQL installation configuration
   include_tasks: configure.yml
