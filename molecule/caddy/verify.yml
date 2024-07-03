@@ -1,0 +1,11 @@
+---
+
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Verify Caddy installation
+    register: caddy
+    shell: |
+      caddy version

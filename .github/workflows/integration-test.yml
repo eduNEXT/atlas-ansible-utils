@@ -1,0 +1,58 @@
+name: Integration Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  load-roles:
+    runs-on: ubuntu-latest
+    outputs:
+      roles: ${{ steps.changed_roles.outputs.roles }}
+      scenarios: ${{ steps.scenarios.outputs.scenarios}}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Find changed roles
+        id: changed_roles
+        run: |
+          ROLES=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
+          echo "::set-output name=roles::$ROLES"
+
+      - name: Find available scenarios
+        id: scenarios
+        run: |
+          SCENARIOS=$(ls molecule | jq -R -s -c 'split("\n")[:-1]')
+          echo "::set-output name=scenarios::$SCENARIOS"
+
+  molecule:
+    needs: load-roles
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{ fromJson(needs.load-roles.outputs.roles) }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      - name: Install test dependencies
+        run: pip3 install molecule[docker] yamllint ansible-lint
+
+      - name: Run molecule tests
+        if: ${{ contains(fromJson(needs.load-roles.outputs.scenarios), matrix.environment) }}
+        run: molecule test -s ${{ matrix.environment }}
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLORS: '1'

@@ -20,3 +20,4 @@ ELASTICSEARCH_VERSION: "7.10.2"
 # Search variables
 # This will set indices.query.bool.max_clause_count search configuration
 ELASTICSEARCH_QUERY_BOOL_MAX_CLAUSE_COUNT: 1024
+ELASTICSEARCH_BIND_IP: 0.0.0.0

@@ -3,6 +3,7 @@
 mysql_5_7_debian_pkgs:
   - python3-mysqldb
   - gpg
+  - dirmngr
 
 mysql_server_5_7_pkg: "mysql-server=5.7.*"
 mysql_client_5_7_pkg: "mysql-client=5.7.*"

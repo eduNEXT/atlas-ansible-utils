@@ -4,9 +4,11 @@
     name: "{{ item.name }}"
     host: "{{ item.host | default(MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS) }}"
     password: "{{ item.password }}"
-    priv: "{{ item.priv if item.priv is defined else (item.db + '.*:ALL' if item.db is defined else '') }}"
+    priv: "{{ item.priv }}"
     state: "{{ item.state | default('present') }}"
     append_privs: "{{ item.append_privs | default('no') }}"
     encrypted: "{{ item.encrypted | default('no') }}"
   when: item.name != None and item.name != ''
   with_items: "{{ MYSQL_CONFIG_USERS }}"
+  tags:
+    - molecule-idempotence-notest

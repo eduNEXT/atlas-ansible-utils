@@ -1,0 +1,11 @@
+---
+
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Verify MySQL installation
+    register: mysql
+    shell: |
+      mysql -e "SELECT 1"

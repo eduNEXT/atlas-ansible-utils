@@ -171,7 +171,6 @@ For now this repo supports the playbooks for:
 - Caddy
 
 ---
-
 ## Extract and Restore databases:
 
 The procedure involves extracting specific databases, creating backups of each, and subsequently restoring them into a new database. A list of databases to process will be compiled, and for each, a backup will be created followed by a restoration. The outcome will be a new database named after the original with an appended suffix. For example, if the original database is named `edxapp`, the new database will be called `edxapp_clone`, containing the data from the original database.
@@ -238,3 +237,54 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
    ```
 
 Upon completion of the execution, you should observe both the existing databases and the new databases suffixed with `_clone` in your database instance, as per the default configuration.
+
+## Molecule tests
+
+Integration testing is performed using [molecule](https://ansible.readthedocs.io/projects/molecule/).
+
+Molecule tests consist of different scenarios which are implemented using ansible roles, those are run on Docker and
+can be customized per role.
+
+### Getting started
+
+Install molecule via:
+
+```shell
+pip install molecule[docker] ansible-lint
+```
+
+### Run tests
+
+A test consist of the following phases:
+
+- **create**: Create a docker instance for the scenario to test. See `molecule/**/molecule.yml` for examples.
+- **converge**: Create a docker instance for the scenario to test and runs the role specified on `molecule/**/converge.yml`
+- **verify**: After the `converge` phase, you can run the `verify` command to check wheter your role was succesfully run.
+  See `molecule/**/verify.yml` for examples.
+- **idempotence**: After the `converge` phase, you can run the `idempotence` command to check if your role is idempotent.
+- **destroy**: Destroys the created docker instance for the scenario.
+
+You can run a whole scenario by running:
+
+```shell
+molecule test -s scenario_name
+```
+
+You can also run the steps independently using the following commands:
+
+```shell
+molecule create -s scenario_name
+molecule converge -s scenario_name
+molecule verify -s scenario_name
+molecule idempotence -s scenario_name
+molecule destroy -s scenario_name
+```
+
+To debug molecule tests you can run the converge phase and login to the docker instance:
+
+```shell
+molecule converge -s scenario_name
+molecule login -s scenario_name
+```
+
+See [molecule documentation](https://ansible.readthedocs.io/projects/molecule/) for more information.
