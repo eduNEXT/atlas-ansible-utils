@@ -19,7 +19,7 @@
     state: present
 
 - name: Install ClickHouse
-  apt:
+  ansible.builtin.apt:
     name: "{{ CLICKHOUSE_PACKAGES | map('regex_replace', '$', '=' + CLICKHOUSE_VERSION) | list }}"
     state: present
     update_cache: true

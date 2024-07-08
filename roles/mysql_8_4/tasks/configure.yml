@@ -19,7 +19,7 @@
   ansible.builtin.file:
     path: /etc/systemd/system/mysql.service.d
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Update mysql systemd configuration
   ansible.builtin.template:

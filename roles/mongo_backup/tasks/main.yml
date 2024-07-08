@@ -3,7 +3,11 @@
   ansible.builtin.file:
     state: absent
     path: "{{ mongo_artifact_path }}/"
-  when: MONGO_BACKUP_PRE_CLEAN_ROOT and mongo_artifact_path is defined and mongo_artifact_path != "" and MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+  when: |
+    MONGO_BACKUP_PRE_CLEAN_ROOT
+    and mongo_artifact_path is defined
+    and mongo_artifact_path != ""
+    and MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
 
 - name: Launch Mongo Backups
   ansible.builtin.include_tasks: backup.yml
@@ -11,4 +15,4 @@
   ansible.builtin.file:
     state: absent
     path: "{{ mongo_artifact_path }}/"
-  when: mongo_artifact_path is defined and mongo_artifact_path != "" and MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+  when: mongo_artifact_path is defined and mongo_artifact_path != ""and MONGO_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""

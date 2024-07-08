@@ -1,13 +1,13 @@
 ---
-CLICKHOUSE_VERSION: "24.3.5.46"
+CLICKHOUSE_VERSION: 24.3.5.46
 
 CLICKHOUSE_VOLUMES: []
 CLICKHOUSE_DEFAULT_USER_PASSWORD: password
 
 CLICKHOUSE_PACKAGES:
-- clickhouse-client
-- clickhouse-server
-- clickhouse-common-static
+  - clickhouse-client
+  - clickhouse-server
+  - clickhouse-common-static
 
 CLICKHOUSE_USERS:
   - name: prod

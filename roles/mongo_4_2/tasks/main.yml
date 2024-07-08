@@ -96,7 +96,7 @@
     state: directory
     owner: "{{ mongo_user }}"
     group: "{{ mongo_user }}"
-    mode: '0755'
+    mode: "0755"
   with_items:
     - "{{ mongo_data_dir }}"
     - "{{ mongo_dbpath }}"
@@ -256,7 +256,7 @@
     - backup:mongo
     - install
 
-- name: Format mongo backup volume
+- name: Format mongo backup volume # noqa ignore-errors
   community.general.filesystem:
     dev: "{{ MONGO_BACKUP_EBS_VOLUME_DEVICE }}"
     fstype: ext4

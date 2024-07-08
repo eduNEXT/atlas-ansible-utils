@@ -23,7 +23,8 @@
 
 - name: Validate free storage
   ansible.builtin.fail:
-    msg: "The expected free space on the disk containing the {{ AVAILABLE_STORAGE_PATH_TO_CHECK }} path is less than
-      {{ AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE }}%.
-      Expected free space after restore: {{ disk_free_percentage }}%"
+    msg: |
+      The expected free space on the disk containing the {{ AVAILABLE_STORAGE_PATH_TO_CHECK }}
+      path is less than {{ AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE }}%.
+      Expected free space after restore: {{ disk_free_percentage }}%
   when: disk_free_after_restore < disk_free_required

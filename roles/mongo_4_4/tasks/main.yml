@@ -69,7 +69,7 @@
   ansible.builtin.get_url:
     url: http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
     dest: /tmp/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-    mode: '0755'
+    mode: "0755"
   register: wget_result
   when: ansible_distribution_release == 'jammy'
 
@@ -99,7 +99,7 @@
     state: directory
     owner: "{{ mongo_user }}"
     group: "{{ mongo_user }}"
-    mode: '0755'
+    mode: "0755"
   with_items:
     - "{{ mongo_data_dir }}"
     - "{{ mongo_dbpath }}"

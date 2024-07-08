@@ -1,7 +1,8 @@
 ---
 - name: Check if the suffix for database cloning is non-empty
   ansible.builtin.fail:
-    msg: The variable MONGO_CLONE_RESTORE_SUFFIX must be defined and contain a meaningful suffix so that the cloned databases names are not the same as the source
+    msg: |
+      The variable MONGO_CLONE_RESTORE_SUFFIX must be defined and contain a meaningful suffix so that the cloned databases names are not the same as the source
       databases names.
   when: MONGO_CLONE_RESTORE_SUFFIX is not defined or MONGO_CLONE_RESTORE_SUFFIX | trim == ''
 

@@ -5,7 +5,7 @@
   ansible.builtin.file:
     path: "{{ MONGO_BACKUP_LOCATION }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 # To clone the databases, we use the commands recommended by MongoDB:
 # https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
