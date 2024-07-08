@@ -14,5 +14,7 @@ quality: ## Lint based in ansible.
 
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: piptools ## Upgrade requirements with pip-tools.
-	pip-compile --upgrade -o requirements/pip-tools.txt requirements/pip-tools.in
-	pip-compile --upgrade -o requirements/base.txt requirements/base.in
+	pip-compile --upgrade requirements/pip-tools.in
+	pip-compile --upgrade requirements/base.in
+	pip-compile --upgrade requirements/dev.in
+

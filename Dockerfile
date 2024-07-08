@@ -1,9 +1,13 @@
-FROM docker.io/ubuntu:20.04
+FROM docker.io/ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && \
   apt upgrade -y && \
-  # python 3.8
-  apt install -y git python3 python3-pip make python-is-python3 && \
+  apt install -y software-properties-common && \
+  add-apt-repository ppa:deadsnakes/ppa
+
+RUN apt install -y git python3.11 python3-pip python3.11-distutils make python-is-python3 && \
   rm -rf /var/lib/apt/lists/*
 
 ARG APP_USER_ID=1000

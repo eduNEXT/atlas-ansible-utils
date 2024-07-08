@@ -45,10 +45,10 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.8'
+          python-version: '3.11'
 
       - name: Install test dependencies
-        run: pip3 install molecule[docker] yamllint ansible-lint
+        run: pip3 install -r requirements/dev.txt
 
       - name: Run molecule tests
         if: ${{ contains(fromJson(needs.load-roles.outputs.scenarios), matrix.environment) }}
