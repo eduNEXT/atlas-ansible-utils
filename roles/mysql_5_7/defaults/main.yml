@@ -10,7 +10,7 @@ mysql_client_5_7_pkg: mysql-client=5.7.*
 mysql_community_server_5_7_pkg: mysql-server=5.7.*
 
 mysql_5_7_socket: /var/run/mysqld/mysqld.sock
-
+mysql_config_file: /etc/mysql/my.cnf
 MYSQL_5_7_APT_KEYSERVER: keyserver.ubuntu.com
 MYSQL_5_7_APT_KEY: A8D3785C
 MYSQL_5_7_REPO: deb http://repo.mysql.com/apt//ubuntu/ bionic mysql-5.7

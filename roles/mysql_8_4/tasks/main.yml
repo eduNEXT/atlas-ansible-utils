@@ -4,6 +4,11 @@
     msg: MySQL must be installed in a supported distribution
   when: ansible_distribution_release not in MYSQL_8_4_SUPPORTED_DISTRIBUTIONS
 
+- name: Check if MySQL is already installed.
+  ansible.builtin.stat:
+    path: "{{ mysql_config_file }}"
+  register: mysql_installed
+
 - name: Install mysql dependencies
   ansible.builtin.apt:
     name: "{{ mysql_8_4_debian_pkgs }}"
@@ -46,10 +51,11 @@
     state: present
     update_cache: true
 
-- name: Restart mysql
+- name: Ensure MySQL is stopped after initial install.
   ansible.builtin.service:
     name: mysql
     state: restarted
+  when: not mysql_installed.stat.exists
 
 - name: Ensure Anonymous user(s) does not exist
   community.mysql.mysql_user:
