@@ -12,7 +12,7 @@ jobs:
       previous_tag: ${{ steps.tag_version.outputs.previous_tag }}
       bump_commit_sha: ${{ steps.bumpversion.outputs.commit_hash }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get next version
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.0
@@ -22,7 +22,7 @@ jobs:
           default_prerelease_bump: false
           dry_run: true
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Update Changelog
@@ -47,7 +47,7 @@ jobs:
       tag: ${{ steps.tag_version.outputs.new_tag }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Create tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.0
@@ -69,16 +69,16 @@ jobs:
     if: needs.bumpversion.outputs.version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: ednxops/${{ env.IMAGE_NAME }}:${{ needs.bumpversion.outputs.version }}

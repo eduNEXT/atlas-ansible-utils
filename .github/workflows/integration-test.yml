@@ -22,13 +22,13 @@ jobs:
         id: changed_roles
         run: |
           ROLES=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
-          echo "::set-output name=roles::$ROLES"
+          echo "name=roles::$ROLES" >> $GITHUB_OUTPUT
 
       - name: Find available scenarios
         id: scenarios
         run: |
           SCENARIOS=$(ls molecule | jq -R -s -c 'split("\n")[:-1]')
-          echo "::set-output name=scenarios::$SCENARIOS"
+          echo "name=scenarios::$SCENARIOS" >> $GITHUB_OUTPUT
 
   molecule:
     needs: load-roles
@@ -40,15 +40,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.11'
 
       - name: Install test dependencies
-        run: pip3 install molecule[docker] yamllint ansible-lint
+        run: pip3 install -r requirements/dev.txt
 
       - name: Run molecule tests
         if: ${{ contains(fromJson(needs.load-roles.outputs.scenarios), matrix.environment) }}
