@@ -1,3 +1,4 @@
+---
 # Manages a mongo cluster.
 # To set up a new mongo cluster, make sure you've configured MONGO_RS_CONFIG
 # as used by mongo_replica_set in the mongo_7_0 role.
@@ -14,7 +15,7 @@
 
 - name: Deploy MongoDB
   hosts: mongo_servers
-  become: True
-  gather_facts: True
+  become: true
+  gather_facts: true
   roles:
     - role: mongo_7_0

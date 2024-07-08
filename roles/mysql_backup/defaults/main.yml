@@ -1,11 +1,11 @@
 ---
 
-MYSQL_BACKUP_USER: "root"
-MYSQL_BACKUP_PASSWORD: "mysql_password"
+MYSQL_BACKUP_USER: root
+MYSQL_BACKUP_PASSWORD: mysql_password
 MYSQL_BACKUP_ALL_DATABASES: true
 MYSQL_BACKUP_DATABASES:
-- edxapp
-MYSQL_BACKUP_ROOT: "/var/edunext_tmp/mysql"
+  - edxapp
+MYSQL_BACKUP_ROOT: /var/edunext_tmp/mysql
 MYSQL_BACKUP_DATE: "{{ ansible_date_time.date }}"
 MYSQL_BACKUP_LOCATION: "{{ MYSQL_BACKUP_ROOT }}/{{ MYSQL_BACKUP_DATE }}.d"
 mysql_artifact_path: "{{ MYSQL_BACKUP_ROOT }}"
@@ -14,9 +14,9 @@ MYSQL_BACKUP_PRE_CLEAN_ROOT: false
 # MySQL backup storage options
 
 MYSQL_BACKUP_STORAGE_OPTIONS:
-  EXTERNAL_STORAGE_TYPE: "aws"
+  EXTERNAL_STORAGE_TYPE: aws
   EXTERNAL_STORAGE_OPTIONS:
-    S3_BUCKET_NAME: "s3_bucket_name"
-    S3_BUCKET_PATH: "mysql"
-    AWS_ACCESS_KEY_ID: "s3_access_key"
-    AWS_SECRET_ACCESS_KEY: "s3_secret_key"
+    S3_BUCKET_NAME: s3_bucket_name
+    S3_BUCKET_PATH: mysql
+    AWS_ACCESS_KEY_ID: s3_access_key
+    AWS_SECRET_ACCESS_KEY: s3_secret_key

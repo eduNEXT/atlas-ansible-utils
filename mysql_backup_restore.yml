@@ -1,9 +1,10 @@
+---
 # Description: Playbook to clone MySQL databases by extracting backups and restore them with
 # changed database names in the same MySQL instance.
 - name: Launch MySQL backup and restore
   hosts: mysql_servers
-  become: True
-  gather_facts: True
+  become: true
+  gather_facts: true
   roles:
     - role: mysql_clone
       tags:

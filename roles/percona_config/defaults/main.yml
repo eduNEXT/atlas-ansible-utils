@@ -14,7 +14,6 @@ PERCONA_CONFIG_DATABASES: []
 #   state: present
 #   append_privs: no
 PERCONA_CONFIG_USERS: []
-
-PERCONA_CONFIG_SOCKET: "/var/run/mysqld/mysqld.sock"
+PERCONA_CONFIG_SOCKET: /var/run/mysqld/mysqld.sock
 
 PERCONA_CONFIG_DEFAULT_ALLOWED_HOSTS: "%"

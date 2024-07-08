@@ -1,7 +1,8 @@
+---
 # To clone the databases, we use the commands recommended by MongoDB:
 # https://www.mongodb.com/docs/database-tools/mongorestore/#copy-clone-a-database
 - name: Restore database
-  shell: >
+  ansible.builtin.shell: >
     mongorestore
     --authenticationDatabase admin
     -u {{ MONGO_RESTORE_USER  }} -p '{{ MONGO_RESTORE_PASSWORD }}'
@@ -12,8 +13,7 @@
     --nsFrom={{ MONGO_RESTORE_ORIGINAL_DATABASE_NAME }}.*
     --nsTo={{ MONGO_RESTORE_TARGET_DATABASE_NAME }}.*
     {% endif %}
-
 - name: Clean artifact path
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ MONGO_RESTORE_BACKUP_ROOT }}"

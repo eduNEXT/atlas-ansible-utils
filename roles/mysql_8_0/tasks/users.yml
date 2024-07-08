@@ -1,6 +1,6 @@
 ---
 - name: Adding extra MySQL users
-  mysql_user:
+  community.mysql.mysql_user:
     name: "{{ item.name }}"
     host: "{{ item.host | default(MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS) }}"
     password: "{{ item.password }}"

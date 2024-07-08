@@ -1,25 +1,25 @@
 ---
 - name: Update mysql configuration
-  template:
+  ansible.builtin.template:
     src: mysqld.cnf.j2
     dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/mysqld.cnf"
   notify:
     - restart mysql
 
 - name: Put replication configuration file
-  template:
+  ansible.builtin.template:
     src: replication.cnf.j2
     dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/replication.cnf"
   notify:
-   - restart mysql
+    - restart mysql
 
 - name: Creating MySQL systemd custom dir
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/mysql.service.d
     state: directory
 
 - name: Update mysql systemd configuration
-  template:
+  ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/mysql.service.d/override.conf
   notify:

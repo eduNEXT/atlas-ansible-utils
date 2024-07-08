@@ -4,25 +4,24 @@ mysql_8_4_debian_pkgs:
   - gpg
   - dirmngr
 
-mysql_server_8_4_pkg: "mysql-server=8.4.*"
-mysql_client_8_4_pkg: "mysql-client=8.4.*"
-mysql_community_server_8_4_pkg: "mysql-server=8.4.*"
+mysql_server_8_4_pkg: mysql-server=8.4.*
+mysql_client_8_4_pkg: mysql-client=8.4.*
+mysql_community_server_8_4_pkg: mysql-server=8.4.*
 
 mysql_8_4_socket: /var/run/mysqld/mysqld.sock
 
-MYSQL_8_4_APT_KEYSERVER: "keyserver.ubuntu.com"
-MYSQL_8_4_APT_KEY: "A8D3785C"
-MYSQL_8_4_REPO: "deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts"
+MYSQL_8_4_APT_KEYSERVER: keyserver.ubuntu.com
+MYSQL_8_4_APT_KEY: A8D3785C
+MYSQL_8_4_REPO: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
 
 MYSQL_8_4_SUPPORTED_DISTRIBUTIONS:
-  - "jammy"
+  - jammy
 
 # List of dictionaries as described in the mount_ebs role's default
 # for the volumes.
 # Useful if you want to store your MySQL data on separate
 # disks from the root volume.
 MYSQL_VOLUMES: []
-
 # Mysql DB's in the form:
 # MYSQL_CONFIG_DATABASES:
 # - name: mydb
@@ -38,16 +37,15 @@ MYSQL_CONFIG_DATABASES: []
 #   state: present
 #   append_privs: no
 MYSQL_CONFIG_USERS: []
-
 MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS: "%"
 
-MYSQL_CONFIG_BIND_ADDRESS: "0.0.0.0"
+MYSQL_CONFIG_BIND_ADDRESS: 0.0.0.0
 MYSQL_CONFIG_PORT: 3306
 
 MYSQL_CONFIG_SERVER_ID: 1
 
 # In this path we store the MySQL configuration we create via templates
-MYSQL_CONFIG_EXTRA_CONFIG_PATH: "/etc/mysql/mysql.conf.d"
+MYSQL_CONFIG_EXTRA_CONFIG_PATH: /etc/mysql/mysql.conf.d
 
 # Using default MySQL 8.4 settings
 # For more information check the links below:
@@ -61,8 +59,8 @@ MYSQL_CONFIG_EXTRA_CONFIG_PATH: "/etc/mysql/mysql.conf.d"
 MYSQL_CONFIG_EXPIRE_LOGS_SECONDS: 432000 # 5 days
 MYSQL_CONFIG_INNODB_LOG_CAPACITY: 48M
 
-MYSQL_CONFIG_CHARACTER_SET_SERVER: "utf8mb4"
-MYSQL_CONFIG_COLLATION_SERVER: "utf8mb4_unicode_ci"
+MYSQL_CONFIG_CHARACTER_SET_SERVER: utf8mb4
+MYSQL_CONFIG_COLLATION_SERVER: utf8mb4_unicode_ci
 MYSQL_CONFIG_KEY_BUFFER_SIZE: 8M
 MYSQL_CONFIG_MAX_CONNECTIONS: 1200
 MYSQL_CONFIG_OPEN_FILES_LIMIT: 5000

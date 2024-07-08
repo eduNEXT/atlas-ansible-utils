@@ -5,26 +5,25 @@ mysql_8_0_debian_pkgs:
   - gpg
   - dirmngr
 
-mysql_server_8_0_pkg: "mysql-server=8.0.*"
-mysql_client_8_0_pkg: "mysql-client=8.0.*"
-mysql_community_server_8_0_pkg: "mysql-server=8.0.*"
+mysql_server_8_0_pkg: mysql-server=8.0.*
+mysql_client_8_0_pkg: mysql-client=8.0.*
+mysql_community_server_8_0_pkg: mysql-server=8.0.*
 
 mysql_8_0_socket: /var/run/mysqld/mysqld.sock
 
-MYSQL_8_0_APT_KEYSERVER: "keyserver.ubuntu.com"
-MYSQL_8_0_APT_KEY: "A8D3785C"
-MYSQL_8_0_REPO: "deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.0"
+MYSQL_8_0_APT_KEYSERVER: keyserver.ubuntu.com
+MYSQL_8_0_APT_KEY: A8D3785C
+MYSQL_8_0_REPO: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.0
 
 MYSQL_8_0_SUPPORTED_DISTRIBUTIONS:
-  - 'focal'
-  - 'jammy'
+  - focal
+  - jammy
 
 # List of dictionaries as described in the mount_ebs role's default
 # for the volumes.
 # Useful if you want to store your MySQL data on separate
 # disks from the root volume.
 MYSQL_VOLUMES: []
-
 # Mysql DB's in the form:
 # MYSQL_CONFIG_DATABASES:
 # - name: mydb
@@ -40,16 +39,15 @@ MYSQL_CONFIG_DATABASES: []
 #   state: present
 #   append_privs: no
 MYSQL_CONFIG_USERS: []
-
 MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS: "%"
 
-MYSQL_CONFIG_BIND_ADDRESS: '0.0.0.0'
+MYSQL_CONFIG_BIND_ADDRESS: 0.0.0.0
 MYSQL_CONFIG_PORT: 3306
 
 MYSQL_CONFIG_SERVER_ID: 1
 
 # In this path we store the MySQL configuration we create via templates
-MYSQL_CONFIG_EXTRA_CONFIG_PATH: "/etc/mysql/mysql.conf.d"
+MYSQL_CONFIG_EXTRA_CONFIG_PATH: /etc/mysql/mysql.conf.d
 
 # Using default MySQL 8.0 settings
 # For more information check the links below:
@@ -57,15 +55,14 @@ MYSQL_CONFIG_EXTRA_CONFIG_PATH: "/etc/mysql/mysql.conf.d"
 # - https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html
 # - https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html
 
-
 # Config for MySQL 8.0
 # This variables are only compatible with MySQL 8.0
 # More info: https://dev.mysql.com/doc/refman/8.0/en/added-deprecated-removed.html
 MYSQL_CONFIG_EXPIRE_LOGS_SECONDS: 432000 # 5 days
 MYSQL_CONFIG_INNODB_LOG_CAPACITY: 48M
 
-MYSQL_CONFIG_CHARACTER_SET_SERVER: "utf8mb4"
-MYSQL_CONFIG_COLLATION_SERVER: "utf8mb4_unicode_ci"
+MYSQL_CONFIG_CHARACTER_SET_SERVER: utf8mb4
+MYSQL_CONFIG_COLLATION_SERVER: utf8mb4_unicode_ci
 MYSQL_CONFIG_KEY_BUFFER_SIZE: 8M
 MYSQL_CONFIG_MAX_CONNECTIONS: 1200
 MYSQL_CONFIG_OPEN_FILES_LIMIT: 5000

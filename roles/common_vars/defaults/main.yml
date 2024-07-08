@@ -1,3 +1,4 @@
+---
 # Override these variables
 # to change the base directory
 # where edX components installed
@@ -10,9 +11,9 @@ COMMON_LOG_DIR: "{{ COMMON_DATA_DIR }}/log"
 COMMON_BIN_DIR: "{{ COMMON_BASE_DIR }}/bin"
 COMMON_CFG_DIR: "{{ COMMON_BASE_DIR }}/etc"
 
-COMMON_PIP_VERBOSITY: ''
-COMMON_PYPI_MIRROR_URL: 'https://pypi.python.org/simple'
-COMMON_NPM_MIRROR_URL: 'https://registry.npmjs.org'
+COMMON_PIP_VERBOSITY: ""
+COMMON_PYPI_MIRROR_URL: https://pypi.python.org/simple
+COMMON_NPM_MIRROR_URL: https://registry.npmjs.org
 
 common_directories:
   - path: "{{ COMMON_DATA_DIR }}"
@@ -22,8 +23,8 @@ common_directories:
   - path: "{{ COMMON_LOG_DIR }}"
     owner: "{{ common_log_user }}"
     group: "{{ common_log_user }}"
-  - path: "/etc/logrotate.d/hourly"
-  - path: "/etc/rsyslog.d/50-default.conf"
+  - path: /etc/logrotate.d/hourly
+  - path: /etc/rsyslog.d/50-default.conf
     state: absent
 
 common_web_user: www-data

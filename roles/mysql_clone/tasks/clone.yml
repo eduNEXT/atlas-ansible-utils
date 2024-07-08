@@ -1,11 +1,12 @@
 ---
 - name: Check if the suffix for database cloning is non-empty
-  fail:
-    msg: "The variable MYSQL_CLONE_RESTORE_SUFFIX must be defined and contain a meaningful suffix so that the cloned databases names are not the same as the source databases names."
+  ansible.builtin.fail:
+    msg: The variable MYSQL_CLONE_RESTORE_SUFFIX must be defined and contain a meaningful suffix so that the cloned databases names are not the same as the source
+      databases names.
   when: MYSQL_CLONE_RESTORE_SUFFIX is not defined or MYSQL_CLONE_RESTORE_SUFFIX | trim == ''
 
 - name: Extract MySQL backup from database {{ item }}
-  include_role:
+  ansible.builtin.include_role:
     name: mysql_backup
   vars:
     MYSQL_BACKUP_ALL_DATABASES: false
@@ -13,28 +14,28 @@
     MYSQL_BACKUP_USER: "{{ MYSQL_CLONE_USER }}"
     MYSQL_BACKUP_PASSWORD: "{{ MYSQL_CLONE_PASSWORD }}"
     MYSQL_BACKUP_DATABASES:
-    - "{{ item }}"
+      - "{{ item }}"
     MYSQL_BACKUP_ROOT: "{{ MYSQL_CLONE_ROOT }}"
     MYSQL_BACKUP_STORAGE_OPTIONS:
       EXTERNAL_STORAGE_TYPE: ""
       EXTERNAL_STORAGE_OPTIONS: {}
 
 - name: Generate new database name with suffix
-  set_fact:
+  ansible.builtin.set_fact:
     new_clone_db_name: "{{ item + MYSQL_CLONE_RESTORE_SUFFIX }}"
 
 - name: Drop database if exists
-  mysql_db:
+  community.mysql.mysql_db:
     name: "{{ new_clone_db_name }}"
-    state: "absent"
+    state: absent
 
 - name: Create new database
-  mysql_db:
+  community.mysql.mysql_db:
     name: "{{ new_clone_db_name }}"
-    state: "present"
+    state: present
 
 - name: Restore MySQL backup on database {{ new_clone_db_name }}
-  include_role:
+  ansible.builtin.include_role:
     name: mysql_restore
   vars:
     MYSQL_RESTORE_BACKUP_ROOT: "{{ MYSQL_CLONE_ROOT }}"

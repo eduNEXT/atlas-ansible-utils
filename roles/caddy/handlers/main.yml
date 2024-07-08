@@ -1,7 +1,10 @@
 ---
 # handlers file for caddy
-- name: restart caddy
-  service: "name=caddy state=restarted"
-
-- name: reload caddy
-  service: "name=caddy state=reloaded"
+- name: Restart caddy
+  ansible.builtin.service:
+    name: caddy
+    state: restarted
+- name: Reload caddy
+  ansible.builtin.service:
+    name: caddy
+    state: reloaded

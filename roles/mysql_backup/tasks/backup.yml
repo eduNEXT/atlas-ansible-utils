@@ -2,17 +2,17 @@
 # It is compatible with the S3 API and Azure Blob Storage.
 ---
 - name: Create backup directory
-  file:
+  ansible.builtin.file:
     path: "{{ MYSQL_BACKUP_LOCATION }}"
     state: directory
 
 - name: Convert MySQL backups databases to list to provide backwards compatibility
-  set_fact:
+  ansible.builtin.set_fact:
     MYSQL_BACKUP_DATABASES: "{{ MYSQL_BACKUP_DATABASES | split }}"
   when: MYSQL_BACKUP_DATABASES is string
 
 - name: Create MySQL database backup
-  shell: >
+  ansible.builtin.shell: >
     mysqldump -u {{ MYSQL_BACKUP_USER }} -p{{ MYSQL_BACKUP_PASSWORD }}
     --opt --single-transaction --add-drop-database --no-tablespaces
     {% if MYSQL_BACKUP_ALL_DATABASES %}
@@ -27,17 +27,17 @@
     chdir: "{{ MYSQL_BACKUP_LOCATION }}"
 
 - name: Compress mysql backup file
-  shell: "gzip {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql"
+  ansible.builtin.command: gzip {{ MYSQL_BACKUP_LOCATION }}/{{ MYSQL_BACKUP_DATE }}_mysql.sql
   args:
-    chdir: "{{ MYSQL_BACKUP_LOCATION}}"
+    chdir: "{{ MYSQL_BACKUP_LOCATION }}"
 
 - name: Give the server time to recover
-  pause:
+  ansible.builtin.pause:
     minutes: 1
     prompt: Pausing to give the server time to recover
 
 - name: Upload the backup to a remote storage
-  include_role:
+  ansible.builtin.include_role:
     name: storage_backups
   vars:
     STORAGE_BACKUPS_OPTIONS: "{{ MYSQL_BACKUP_STORAGE_OPTIONS }}"

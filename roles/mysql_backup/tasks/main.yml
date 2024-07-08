@@ -1,16 +1,14 @@
+---
 - name: Clean the backup root path before starting the routine
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ mysql_artifact_path }}/"
-  when: MYSQL_BACKUP_PRE_CLEAN_ROOT and mysql_artifact_path is defined and mysql_artifact_path != "" and
-        MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+  when: MYSQL_BACKUP_PRE_CLEAN_ROOT and mysql_artifact_path is defined and mysql_artifact_path != "" and MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
 
 - name: Launch MySQL Backups
-  include_tasks: backup.yml
-
+  ansible.builtin.include_tasks: backup.yml
 - name: Clean artifact path
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ mysql_artifact_path }}/"
-  when: mysql_artifact_path is defined and mysql_artifact_path != "" and
-        MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+  when: mysql_artifact_path is defined and mysql_artifact_path != "" and MYSQL_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""

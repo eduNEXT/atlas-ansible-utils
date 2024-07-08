@@ -14,7 +14,7 @@
 # Overview:
 # 
 #
-- name: reload redis
-  service:
+- name: Reload redis
+  ansible.builtin.service:
     name: redis-server
     state: restarted
