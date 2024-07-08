@@ -14,7 +14,7 @@ jobs:
       roles: ${{ steps.changed_roles.outputs.roles }}
       scenarios: ${{ steps.scenarios.outputs.scenarios}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -29,6 +29,24 @@ jobs:
         run: |
           SCENARIOS=$(ls molecule | jq -R -s -c 'split("\n")[:-1]')
           echo "name=scenarios::$SCENARIOS" >> $GITHUB_OUTPUT
+
+  linter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: pip3 install -r requirements/dev.txt
+
+      - name: Run linter
+        run: ansible-lint -c .ansible-lint.yml
 
   molecule:
     needs: load-roles
