@@ -42,9 +42,9 @@
     update_cache: true
 
 - name: Restart mysql
-  ansible.builtin.command: service mysql restart
-  tags:
-    - molecule-idempotence-notest
+  ansible.builtin.service:
+    name: mysql
+    state: restarted
 
 - name: Ensure Anonymous user(s) does not exist
   community.mysql.mysql_user:

@@ -40,6 +40,6 @@
 - name: Format Caddyfile
   changed_when: caddyfile.changed
   ansible.builtin.command: caddy fmt /etc/caddy/Caddyfile --overwrite
-  notify: reload caddy
+  notify: Reload caddy
   tags:
     - molecule-idempotence-notest
