@@ -29,13 +29,16 @@
     state: "{{ caddy_package_state }}"
 
 - name: Copy Caddyfile
+  register: caddyfile
   ansible.builtin.template:
     src: Caddyfile.j2
     dest: /etc/caddy/Caddyfile
+    mode: preserve
   tags:
     - molecule-idempotence-notest
 
 - name: Format Caddyfile
+  changed_when: caddyfile.changed
   ansible.builtin.command: caddy fmt /etc/caddy/Caddyfile --overwrite
   notify: reload caddy
   tags:

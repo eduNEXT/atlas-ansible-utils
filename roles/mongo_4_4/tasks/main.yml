@@ -69,6 +69,7 @@
   ansible.builtin.get_url:
     url: http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
     dest: /tmp/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+    mode: '0755'
   register: wget_result
   when: ansible_distribution_release == 'jammy'
 
@@ -98,6 +99,7 @@
     state: directory
     owner: "{{ mongo_user }}"
     group: "{{ mongo_user }}"
+    mode: '0755'
   with_items:
     - "{{ mongo_data_dir }}"
     - "{{ mongo_dbpath }}"
@@ -185,6 +187,7 @@
     src: mongod.conf.j2
     dest: /etc/mongod.conf
     backup: true
+    mode: preserve
   register: update_mongod_conf
   tags:
     - install
@@ -197,6 +200,7 @@
   ansible.builtin.template:
     src: mongo_logrotate.j2
     dest: /etc/logrotate.d/hourly/mongo
+    mode: preserve
   tags:
     - install
     - install:app-configuration
@@ -257,6 +261,7 @@
     src: mongod.conf.j2
     dest: /etc/mongod.conf
     backup: true
+    mode: preserve
   when: initialize_replica_set
   tags:
     - manage

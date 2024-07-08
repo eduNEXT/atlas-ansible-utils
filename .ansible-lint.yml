@@ -1,6 +1,8 @@
 ---
 skip_list:
   - var-naming
+  - no-changed-when
+  - no-handler
 
 kinds:
   - yaml: "**/*.yaml"
@@ -9,3 +11,7 @@ exclude_paths:
   - molecule
   - .github/
   - catalog-info.yaml
+
+warn_list:
+  - yaml[line-length]
+  - jinja

@@ -61,8 +61,8 @@
     - install:base
   register: elasticsearch_reinstall
 
-# Prevent elasticsearch from being upgraded.
-- ansible.builtin.dpkg_selections:
+- name: Prevent elasticsearch from being upgraded
+  ansible.builtin.dpkg_selections:
     name: elasticsearch
     selection: hold
 
@@ -72,6 +72,7 @@
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
+    mode: '0755' # Only allow the owner to write to the file
   with_items:
     - "{{ elasticsearch_data_dir }}"
     - "{{ elasticsearch_log_dir }}"
@@ -84,6 +85,7 @@
   ansible.builtin.template:
     src: etc/default/elasticsearch.j2
     dest: /etc/default/elasticsearch
+    mode: preserve
   tags:
     - install
     - install:configuration

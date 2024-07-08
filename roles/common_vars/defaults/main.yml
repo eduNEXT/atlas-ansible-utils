@@ -4,8 +4,8 @@
 # where edX components installed
 
 COMMON_BASE_DIR: /edx
-COMMON_DATA_DIR: "{{ COMMON_BASE_DIR}}/var"
-COMMON_APP_DIR: "{{ COMMON_BASE_DIR}}/app"
+COMMON_DATA_DIR: "{{ COMMON_BASE_DIR }}/var"
+COMMON_APP_DIR: "{{ COMMON_BASE_DIR }}/app"
 COMMON_LOG_DIR: "{{ COMMON_DATA_DIR }}/log"
 
 COMMON_BIN_DIR: "{{ COMMON_BASE_DIR }}/bin"

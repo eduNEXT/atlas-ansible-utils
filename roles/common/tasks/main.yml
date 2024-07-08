@@ -24,6 +24,7 @@
   ansible.builtin.template:
     src: hosts.j2
     dest: /etc/hosts
+    mode: preserve
   when: COMMON_HOSTNAME|length > 0
   register: etc_hosts
 
@@ -31,6 +32,7 @@
   ansible.builtin.template:
     src: hostname.j2
     dest: /etc/hostname
+    mode: preserve
   when: COMMON_HOSTNAME|length > 0
   register: etc_hostname
 

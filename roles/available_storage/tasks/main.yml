@@ -1,10 +1,12 @@
 ---
 - name: Get disk information for the path we are checking
-  ansible.builtin.shell: df -m "{{ AVAILABLE_STORAGE_PATH_TO_CHECK }}" | awk 'NR==2 {print $2","$3}'
+  ansible.builtin.shell: set -o pipefail && df -m "{{ AVAILABLE_STORAGE_PATH_TO_CHECK }}" | awk 'NR==2 {print $2","$3}'
+  changed_when: true
   register: disk_info
 
 - name: Get the space consumed by the checked path
-  ansible.builtin.shell: du -sh -m "{{ AVAILABLE_STORAGE_PATH_TO_CHECK }}" | awk '{ print $1 }'
+  ansible.builtin.shell: set -o pipefail && du -sh -m "{{ AVAILABLE_STORAGE_PATH_TO_CHECK }}" | awk '{ print $1 }'
+  changed_when: true
   register: path_consumed_space
 
 - name: Extract values
@@ -21,6 +23,7 @@
 
 - name: Validate free storage
   ansible.builtin.fail:
-    msg: "The expected free space on the disk containing the {{ AVAILABLE_STORAGE_PATH_TO_CHECK }} path is less than {{ AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE }}%.
+    msg: "The expected free space on the disk containing the {{ AVAILABLE_STORAGE_PATH_TO_CHECK }} path is less than
+      {{ AVAILABLE_STORAGE_THRESHOLD_PERCENTAGE }}%.
       Expected free space after restore: {{ disk_free_percentage }}%"
   when: disk_free_after_restore < disk_free_required

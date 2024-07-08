@@ -9,7 +9,7 @@
 #
 ##
 # Defaults for role redis
-# 
+#
 REDIS_PASSWORD:
 REDIS_BIND_IP: 127.0.0.1
 REDIS_PERSISTENCE_DIR: /var/lib/redis

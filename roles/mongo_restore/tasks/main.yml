@@ -5,7 +5,7 @@
   ansible.builtin.shell: >
     mongorestore
     --authenticationDatabase admin
-    -u {{ MONGO_RESTORE_USER  }} -p '{{ MONGO_RESTORE_PASSWORD }}'
+    -u {{ MONGO_RESTORE_USER }} -p '{{ MONGO_RESTORE_PASSWORD }}'
     --gzip
     --archive={{ MONGO_RESTORE_BACKUP_LOCATION }}/{{ MONGO_RESTORE_BACKUP_DATE }}_mongo.gz
     --numParallelCollections={{ MONGO_RESTORE_NUM_PARALLEL_COLLECTIONS }} --drop

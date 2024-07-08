@@ -12,10 +12,10 @@ caddy_apt_gpg_key: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
 # Caddy options
 caddy_sites: []
 caddy_extra_rules:
-# Set the backend servers targets for reverse proxy in the format specified in 
+# Set the backend servers targets for reverse proxy in the format specified in
 # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#to
 caddy_backend_target:
   - localhost:8080
-# To configure this variable, please refer to 
+# To configure this variable, please refer to
 # https://caddyserver.com/docs/caddyfile/options
 caddy_global_options:

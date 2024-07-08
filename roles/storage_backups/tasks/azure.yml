@@ -12,7 +12,7 @@
       ansible.builtin.get_url:
         url: https://aka.ms/downloadazcopy-v10-linux
         dest: /tmp/azcopy.tar.gz
-        mode: "0755"
+        mode: '0755'
 
     - name: Extract the azcopy archive
       ansible.builtin.unarchive:

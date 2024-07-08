@@ -96,6 +96,7 @@
     state: directory
     owner: "{{ mongo_user }}"
     group: "{{ mongo_user }}"
+    mode: '0755'
   with_items:
     - "{{ mongo_data_dir }}"
     - "{{ mongo_dbpath }}"
@@ -183,6 +184,7 @@
     src: mongod.conf.j2
     dest: /etc/mongod.conf
     backup: true
+    mode: preserve
   register: update_mongod_conf
   tags:
     - install
@@ -205,6 +207,7 @@
   ansible.builtin.template:
     src: mongo_logrotate.j2
     dest: /etc/logrotate.d/hourly/mongo
+    mode: preserve
   tags:
     - backup:mongo
     - install
@@ -319,6 +322,7 @@
   ansible.builtin.template:
     src: mongod.conf.j2
     dest: /etc/mongod.conf
+    mode: preserve
     backup: true
   when: initialize_replica_set
   tags:

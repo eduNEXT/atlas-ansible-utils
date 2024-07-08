@@ -3,6 +3,7 @@
   ansible.builtin.template:
     src: mysqld.cnf.j2
     dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/mysqld.cnf"
+    mode: preserve
   notify:
     - restart mysql
 
@@ -10,6 +11,7 @@
   ansible.builtin.template:
     src: replication.cnf.j2
     dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/replication.cnf"
+    mode: preserve
   notify:
     - restart mysql
 
@@ -17,10 +19,12 @@
   ansible.builtin.file:
     path: /etc/systemd/system/mysql.service.d
     state: directory
+    mode: '0755'
 
 - name: Update mysql systemd configuration
   ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/mysql.service.d/override.conf
+    mode: preserve
   notify:
     - restart mysql

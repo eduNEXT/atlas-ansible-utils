@@ -12,12 +12,14 @@
   tags:
     - molecule-idempotence-notest
   ansible.builtin.shell: |
+    set -o pipefail
     GNUPGHOME=$(mktemp -d)
     GNUPGHOME="$GNUPGHOME" gpg --no-default-keyring --keyring /usr/share/keyrings/clickhouse-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8919F6BD2B48D754
     rm -r "$GNUPGHOME"
     chmod +r /usr/share/keyrings/clickhouse-keyring.gpg
     echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee \
     /etc/apt/sources.list.d/clickhouse.list
+
 - name: Update APT cache
   ansible.builtin.apt:
     update_cache: true
@@ -35,12 +37,14 @@
   ansible.builtin.template:
     src: host.xml.j2
     dest: /etc/clickhouse-server/config.d/host.xml
+    mode: preserve
 
 # - name: Grant default user permissions to create users and groups
 - name: Edit /etc/clickhouse-server/users.xml
   ansible.builtin.template:
     src: users.xml.j2
     dest: /etc/clickhouse-server/users.xml
+    mode: preserve
 
 - name: Start clickhouse service
   ansible.builtin.service:
