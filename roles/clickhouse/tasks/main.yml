@@ -1,5 +1,5 @@
 ---
-- name: Install clickhouse
+- name: Install ClickHouse dependencies
   ansible.builtin.apt:
     name:
       - apt-transport-https
@@ -8,30 +8,22 @@
     state: present
     update_cache: true
 
-- name: Add clickhouse repository
-  tags:
-    - molecule-idempotence-notest
-  ansible.builtin.shell: |
-    set -o pipefail
-    GNUPGHOME=$(mktemp -d)
-    GNUPGHOME="$GNUPGHOME" gpg --no-default-keyring --keyring /usr/share/keyrings/clickhouse-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8919F6BD2B48D754
-    rm -r "$GNUPGHOME"
-    chmod +r /usr/share/keyrings/clickhouse-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main" | sudo tee \
-    /etc/apt/sources.list.d/clickhouse.list
+- name: Add the ClickHouse signing key
+  ansible.builtin.apt_key:
+    keyserver: "{{ CLICKHOUSE_KEY_SERVER }}"
+    id: "{{ CLICKHOUSE_APT_KEY }}"
 
-- name: Update APT cache
-  ansible.builtin.apt:
-    update_cache: true
+- name: Add the ClickHouse repo to the sources list
+  ansible.builtin.apt_repository:
+    repo: "{{ CLICKHOUSE_REPO }}"
+    state: present
 
-- name: Install clickhouse
-  ansible.builtin.apt:
+- name: Install ClickHouse
+  apt:
+    name: "{{ CLICKHOUSE_PACKAGES | map('regex_replace', '$', '=' + CLICKHOUSE_VERSION) | list }}"
     state: present
     update_cache: true
-    name:
-      - clickhouse-common-static={{ CLICKHOUSE_VERSION }}
-      - clickhouse-server={{ CLICKHOUSE_VERSION }}
-      - clickhouse-client={{ CLICKHOUSE_VERSION }}
+  become: true
 
 - name: Create /etc/clickhouse-server/config.d/host.xml
   ansible.builtin.template:
