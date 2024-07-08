@@ -52,7 +52,7 @@
     state: present
     update_cache: true
   notify:
-    - reload redis
+    - Reload redis
 
 - name: Pin redis package version
   loop: "{{ redis_debian_pkgs }}"
@@ -70,4 +70,4 @@
     group: "{{ redis_group }}"
     mode: "0640"
   notify:
-    - reload redis
+    - Reload redis

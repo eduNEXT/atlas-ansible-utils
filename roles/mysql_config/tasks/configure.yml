@@ -5,7 +5,7 @@
     dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/mysqld.cnf"
     mode: preserve
   notify:
-    - restart mysql
+    - Restart mysql
 
 - name: Put replication configuration file
   ansible.builtin.template:
@@ -13,7 +13,7 @@
     dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/replication.cnf"
     mode: preserve
   notify:
-    - restart mysql
+    - Restart mysql
 
 - name: Creating MySQL systemd custom dir
   ansible.builtin.file:
@@ -27,4 +27,4 @@
     dest: /etc/systemd/system/mysql.service.d/override.conf
     mode: preserve
   notify:
-    - restart mysql
+    - Restart mysql
