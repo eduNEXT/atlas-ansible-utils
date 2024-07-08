@@ -22,13 +22,13 @@ jobs:
         id: changed_roles
         run: |
           ROLES=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
-          echo "name=roles::$ROLES" >> $GITHUB_OUTPUT
+          echo "roles=$ROLES" >> $GITHUB_OUTPUT
 
       - name: Find available scenarios
         id: scenarios
         run: |
           SCENARIOS=$(ls molecule | jq -R -s -c 'split("\n")[:-1]')
-          echo "name=scenarios::$SCENARIOS" >> $GITHUB_OUTPUT
+          echo "scenarios=$SCENARIOS" >> $GITHUB_OUTPUT
 
   linter:
     runs-on: ubuntu-latest
