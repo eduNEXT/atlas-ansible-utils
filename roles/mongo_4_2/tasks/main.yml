@@ -6,21 +6,11 @@
     owner: root
     group: root
     mode: "0644"
+  notify: Enable/start disable transparent huge pages service
   tags:
     - hugepages
     - install
     - install:configuration
-
-- name: Enable/start disable transparent huge pages service (http://docs.mongodb.org/manual/tutorial/transparent-huge-pages/)
-  ansible.builtin.service:
-    name: disable-transparent-hugepages
-    enabled: true
-    state: started
-  tags:
-    - hugepages
-    - manage
-    - manage:start
-    - molecule-idempotence-notest
 
 - name: Install pip3
   ansible.builtin.apt:
