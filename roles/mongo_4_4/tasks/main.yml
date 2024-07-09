@@ -66,8 +66,6 @@
 - name: Install libssl1.1
   ansible.builtin.command: dpkg -i /tmp/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
   when: ansible_distribution_release == 'jammy' and wget_result.changed
-  tags:
-    - molecule-idempotence-notest
 
 - name: Install mongo server and recommends
   ansible.builtin.apt:
