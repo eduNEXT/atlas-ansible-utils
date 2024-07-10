@@ -1,13 +1,8 @@
 ---
-- name: Restart caddy
-  ansible.builtin.service:
-    name: caddy
-    state: restarted
+- name: Format Caddyfile
+  ansible.builtin.shell: cat /etc/caddy/base | caddy fmt - > /etc/caddy/Caddyfile
 
 - name: Reload caddy
   ansible.builtin.service:
     name: caddy
     state: reloaded
-
-- name: Format Caddyfile
-  command: caddy fmt /etc/caddy/Caddyfile --overwrite

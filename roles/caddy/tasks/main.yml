@@ -32,8 +32,8 @@
   register: caddyfile
   ansible.builtin.template:
     src: Caddyfile.j2
-    dest: /etc/caddy/Caddyfile
+    dest: /etc/caddy/base
     mode: preserve
   notify:
-  - Reload caddy
-  - Format Caddyfile
+    - Format Caddyfile
+    - Reload caddy
