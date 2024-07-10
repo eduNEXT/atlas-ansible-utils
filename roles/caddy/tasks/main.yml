@@ -34,4 +34,6 @@
     src: Caddyfile.j2
     dest: /etc/caddy/Caddyfile
     mode: preserve
-  notify: Reload caddy
+  notify:
+  - Reload caddy
+  - Format Caddyfile

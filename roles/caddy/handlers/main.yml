@@ -1,10 +1,13 @@
 ---
-# handlers file for caddy
 - name: Restart caddy
   ansible.builtin.service:
     name: caddy
     state: restarted
+
 - name: Reload caddy
   ansible.builtin.service:
     name: caddy
     state: reloaded
+
+- name: Format Caddyfile
+  command: caddy fmt /etc/caddy/Caddyfile --overwrite
