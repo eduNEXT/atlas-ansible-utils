@@ -1,8 +1,8 @@
 ---
 - name: Format Caddyfile
-  ansible.builtin.shell: |
-    set -o pipefail
-    cat /etc/caddy/base | caddy fmt - > /etc/caddy/Caddyfile
+  ansible.builtin.shell:
+    cmd: set -o pipefail && cat /etc/caddy/base | caddy fmt - > /etc/caddy/Caddyfile
+    executable: /bin/bash
 
 - name: Reload caddy
   ansible.builtin.service:
