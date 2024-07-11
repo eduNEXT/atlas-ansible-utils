@@ -54,6 +54,14 @@
 
 - name: Regather facts to get UUIDs of freshly formatted disks
   ansible.builtin.setup: ""
+
+# This can fail if one volume is mounted on a child directory as another volume
+# and it attempts to unmount the parent first.  This is generally fixable by rerunning.
+# Order is super dependent here, but we're iterating ansible_mounts (in order to identify
+# all current mounts in the system) not volumes, which would be reversible.
+# Possibly fixable by saving this list of unmounts off and comparing it to volumes, but this
+# task rarely runs, since on server setup, the disks are unmounted, and in we won't
+# be unmounting disks unless you set UNMOUNT_DISKS to true.
 - name: Unmount disks mounted to the wrong place
   ansible.posix.mount:
     name: "{{ item.mount }}"
