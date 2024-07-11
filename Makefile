@@ -9,8 +9,15 @@ requirements: ## install  environment requirements
 	pip install -r requirements/base.txt
 	ansible-galaxy install -r requirements.yml
 
+dev-requirements: ## install development requirements
+	pip install -r requirements/dev.txt
+	ansible-galaxy install -r requirements.yml
+
 quality: ## Lint based in ansible.
-	ansible-lint
+	ansible-lint -c .ansible-lint.yml
+
+format:
+	ansible-lint -c .ansible-lint.yml --fix
 
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: piptools ## Upgrade requirements with pip-tools.

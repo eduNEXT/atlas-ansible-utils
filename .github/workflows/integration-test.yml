@@ -14,7 +14,7 @@ jobs:
       roles: ${{ steps.changed_roles.outputs.roles }}
       scenarios: ${{ steps.scenarios.outputs.scenarios}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -22,13 +22,31 @@ jobs:
         id: changed_roles
         run: |
           ROLES=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
-          echo "name=roles::$ROLES" >> $GITHUB_OUTPUT
+          echo "roles=$ROLES" >> $GITHUB_OUTPUT
 
       - name: Find available scenarios
         id: scenarios
         run: |
           SCENARIOS=$(ls molecule | jq -R -s -c 'split("\n")[:-1]')
-          echo "name=scenarios::$SCENARIOS" >> $GITHUB_OUTPUT
+          echo "scenarios=$SCENARIOS" >> $GITHUB_OUTPUT
+
+  linter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: make dev-requirements
+
+      - name: Run linter
+        run: make quality
 
   molecule:
     needs: load-roles
@@ -48,7 +66,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install test dependencies
-        run: pip3 install -r requirements/dev.txt
+        run: make dev-requirements
 
       - name: Run molecule tests
         if: ${{ contains(fromJson(needs.load-roles.outputs.scenarios), matrix.environment) }}

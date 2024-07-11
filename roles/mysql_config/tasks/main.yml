@@ -1,6 +1,7 @@
 ---
 - name: Post MySQL installation configuration
-  include_tasks: configure.yml
-
-- include_tasks: databases.yml
-- include_tasks: users.yml
+  ansible.builtin.include_tasks: configure.yml
+- name: Create databases
+  ansible.builtin.include_tasks: databases.yml
+- name: Create users
+  ansible.builtin.include_tasks: users.yml

@@ -1,9 +1,12 @@
 ---
-
 # S3 option
-- include: aws.yml
+- name: AWS backups
+  ansible.builtin.import_tasks:
+    file: aws.yml
   when: STORAGE_BACKUPS_TYPE == 'aws'
 
 # Azure option
-- include: azure.yml
+- name: Azure backups
+  ansible.builtin.import_tasks:
+    file: azure.yml
   when: STORAGE_BACKUPS_TYPE == 'azure'

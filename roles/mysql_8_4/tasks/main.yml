@@ -1,59 +1,65 @@
 ---
 - name: Fail if trying to install on an unsupported distribution
-  fail:
+  ansible.builtin.fail:
     msg: MySQL must be installed in a supported distribution
   when: ansible_distribution_release not in MYSQL_8_4_SUPPORTED_DISTRIBUTIONS
 
+- name: Check if MySQL is already installed.
+  ansible.builtin.stat:
+    path: "{{ mysql_config_file }}"
+  register: mysql_installed
+
 - name: Install mysql dependencies
-  apt:
+  ansible.builtin.apt:
     name: "{{ mysql_8_4_debian_pkgs }}"
-    install_recommends: yes
-    update_cache: yes
+    install_recommends: true
+    update_cache: true
     state: present
 
 - name: Add MySQL repository key
-  apt_key:
+  ansible.builtin.apt_key:
     keyserver: "{{ MYSQL_8_4_APT_KEYSERVER }}"
     id: "{{ MYSQL_8_4_APT_KEY }}"
     state: present
 
 - name: Update APT cache
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
 
 - name: Add MySQL repository to sources list
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ MYSQL_8_4_REPO }}"
     state: present
 
 # Installing mysql-8.4-client, mysql-8.4-community-server
 # and mysql-8.4-server in separate tasks to resolve dependencies
-- name: install mysql-8.4-client
-  apt:
+- name: Install mysql-8.4-client
+  ansible.builtin.apt:
     name: "{{ mysql_client_8_4_pkg }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: install mysql-8.4-community-server
-  apt:
+- name: Install mysql-8.4-community-server
+  ansible.builtin.apt:
     name: "{{ mysql_community_server_8_4_pkg }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: install mysql-8.4-server
-  apt:
+- name: Install mysql-8.4-server
+  ansible.builtin.apt:
     name: "{{ mysql_server_8_4_pkg }}"
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: restart mysql
-  command: service mysql restart
-  tags:
-  - molecule-idempotence-notest
+- name: Ensure MySQL is stopped after initial install.
+  ansible.builtin.service:
+    name: mysql
+    state: restarted
+  when: not mysql_installed.stat.exists
 
 - name: Ensure Anonymous user(s) does not exist
-  mysql_user:
-    name: ''
+  community.mysql.mysql_user:
+    name: ""
     host: "{{ item }}"
     state: absent
     login_unix_socket: "{{ mysql_8_4_socket }}"
@@ -62,13 +68,14 @@
     - "{{ ansible_hostname }}"
 
 - name: Alter user root to use caching_sha2_password
-  shell:
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password; SET PASSWORD='';"
+  ansible.builtin.shell: mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password; SET PASSWORD='';"
   become: true
   tags:
-  - molecule-idempotence-notest
+    - molecule-idempotence-notest
 
 - name: Post MySQL installation configuration
-  include_tasks: configure.yml
-- include_tasks: databases.yml
-- include_tasks: users.yml
+  ansible.builtin.include_tasks: configure.yml
+- name: Create databases
+  ansible.builtin.include_tasks: databases.yml
+- name: Create users
+  ansible.builtin.include_tasks: users.yml

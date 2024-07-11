@@ -1,7 +1,10 @@
 ---
-# handlers file for caddy
-- name: restart caddy
-  service: "name=caddy state=restarted"
+- name: Format Caddyfile
+  ansible.builtin.shell:
+    cmd: set -o pipefail && cat /etc/caddy/base | caddy fmt - > /etc/caddy/Caddyfile
+    executable: /bin/bash
 
-- name: reload caddy
-  service: "name=caddy state=reloaded"
+- name: Reload caddy
+  ansible.builtin.service:
+    name: caddy
+    state: reloaded

@@ -1,6 +1,6 @@
 ---
 - name: Add common_users
-  user:
+  ansible.builtin.user:
     name: "{{ item }}"
     shell: /bin/false
   with_items:
@@ -8,7 +8,7 @@
     - "{{ common_log_user }}"
 
 - name: Create common directories
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: "{{ item.state | default('directory') }}"
     owner: "{{ item.owner | default('root') }}"
@@ -20,20 +20,22 @@
     - install:configuration
     - common_directories
 
-- name: update /etc/hosts
-  template:
+- name: Update /etc/hosts
+  ansible.builtin.template:
     src: hosts.j2
     dest: /etc/hosts
+    mode: preserve
   when: COMMON_HOSTNAME|length > 0
   register: etc_hosts
 
-- name: update /etc/hostname
-  template:
+- name: Update /etc/hostname
+  ansible.builtin.template:
     src: hostname.j2
     dest: /etc/hostname
+    mode: preserve
   when: COMMON_HOSTNAME|length > 0
   register: etc_hostname
 
-- name: run hostname
-  shell: hostname -F /etc/hostname
+- name: Run hostname
+  ansible.builtin.command: hostname -F /etc/hostname
   when: COMMON_HOSTNAME|length >0 and (etc_hosts.changed or etc_hostname.changed)

@@ -1,3 +1,4 @@
+---
 # The user that will perform the MySQL restore operation
 MYSQL_RESTORE_USER: "{{ EDXAPP_MYSQL_USER }}"
 MYSQL_RESTORE_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
@@ -5,6 +6,6 @@ MYSQL_RESTORE_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
 MYSQL_RESTORE_DATABASE: ""
 
 # Backup folders
-MYSQL_RESTORE_BACKUP_ROOT: "/var/edunext_tmp/mysql"
+MYSQL_RESTORE_BACKUP_ROOT: /var/edunext_tmp/mysql
 MYSQL_RESTORE_BACKUP_DATE: "{{ ansible_date_time.date }}"
 MYSQL_RESTORE_BACKUP_LOCATION: "{{ MYSQL_RESTORE_BACKUP_ROOT }}/{{ MYSQL_RESTORE_BACKUP_DATE }}.d"

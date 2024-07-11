@@ -1,11 +1,13 @@
 ---
 - name: Check if the suffix for database cloning is non-empty
-  fail:
-    msg: "The variable MONGO_CLONE_RESTORE_SUFFIX must be defined and contain a meaningful suffix so that the cloned databases names are not the same as the source databases names."
+  ansible.builtin.fail:
+    msg: |
+      The variable MONGO_CLONE_RESTORE_SUFFIX must be defined and contain a meaningful suffix so that the cloned databases names are not the same as the source
+      databases names.
   when: MONGO_CLONE_RESTORE_SUFFIX is not defined or MONGO_CLONE_RESTORE_SUFFIX | trim == ''
 
 - name: Extract Mongo backup from database {{ item }}
-  include_role:
+  ansible.builtin.include_role:
     name: mongo_backup
   vars:
     MONGO_BACKUP_ALL_DATABASES: false
@@ -19,11 +21,11 @@
       EXTERNAL_STORAGE_OPTIONS: {}
 
 - name: Generate new database name with suffix
-  set_fact:
+  ansible.builtin.set_fact:
     new_clone_db_name: "{{ item + MONGO_CLONE_RESTORE_SUFFIX }}"
 
 - name: Restore Mongo backup on database {{ new_clone_db_name }}
-  include_role:
+  ansible.builtin.include_role:
     name: mongo_restore
   vars:
     MONGO_RESTORE_BACKUP_ROOT: "{{ MONGO_CLONE_ROOT }}"

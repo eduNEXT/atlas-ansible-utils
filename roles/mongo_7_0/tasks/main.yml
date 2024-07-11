@@ -1,102 +1,93 @@
 ---
 - name: Add disable transparent huge pages systemd service (http://docs.mongodb.org/manual/tutorial/transparent-huge-pages/)
-  copy:
-    src:  etc/systemd/system/disable-transparent-hugepages.service
-    dest: "/etc/systemd/system/disable-transparent-hugepages.service"
+  ansible.builtin.copy:
+    src: etc/systemd/system/disable-transparent-hugepages.service
+    dest: /etc/systemd/system/disable-transparent-hugepages.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
+  notify: Enable/start disable transparent huge pages service
   tags:
-    - "hugepages"
-    - "install"
-    - "install:configuration"
+    - hugepages
+    - install
+    - install:configuration
 
-- name: Enable/start disable transparent huge pages service (http://docs.mongodb.org/manual/tutorial/transparent-huge-pages/)
-  service:
-    name: disable-transparent-hugepages
-    enabled: yes
-    state: started
-  tags:
-    - "hugepages"
-    - "manage"
-    - "manage:start"
-    - molecule-idempotence-notest
-
-- name: install pip3
-  apt:
+- name: Install pip3
+  ansible.builtin.apt:
     name: python3-pip
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: install python pymongo for mongo_user ansible module
-  pip:
+- name: Install python pymongo for mongo_user ansible module
+  ansible.builtin.pip:
     name: pymongo
     state: present
     version: "{{ PYMONGO_VERSION }}"
-    extra_args: "-i {{ COMMON_PYPI_MIRROR_URL }}"
+    extra_args: -i {{ COMMON_PYPI_MIRROR_URL }}
   tags:
-    - "install"
-    - "install:app-requirements"
+    - install
+    - install:app-requirements
 
 - name: Ensure dependencies are installed.
-  apt:
+  ansible.builtin.apt:
     name:
-    - gnupg2
+      - gnupg2
     state: present
-    update_cache: yes
+    update_cache: true
 
-- name: add the mongodb signing key
-  apt_key:
-    url: "https://www.mongodb.org/static/pgp/server-{{ MONGO_VERSION_MAJOR_MINOR }}.asc"
+- name: Add the mongodb signing key
+  ansible.builtin.apt_key:
+    url: https://www.mongodb.org/static/pgp/server-{{ MONGO_VERSION_MAJOR_MINOR }}.asc
     state: present
   retries: 3
   register: add_mongo_signing_key
   tags:
-    - "install"
-    - "install:app-requirements"
+    - install
+    - install:app-requirements
   until: add_mongo_signing_key is succeeded
 
-- name: add the mongodb repo to the sources list
-  apt_repository:
+- name: Add the mongodb repo to the sources list
+  ansible.builtin.apt_repository:
     repo: "{{ MONGODB_REPO }}"
     state: present
   tags:
-    - "install"
-    - "install:app-requirements"
-    - "mongo_packages"
+    - install
+    - install:app-requirements
+    - mongo_packages
 
-- name: install mongo server and recommends
-  apt:
+- name: Install mongo server and recommends
+  ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
-    install_recommends: yes
-    force: yes
-    update_cache: yes
+    install_recommends: true
+    force: true
+    update_cache: true
   register: install_mongo_package
   with_items: "{{ mongodb_debian_pkgs }}"
   tags:
-    - "install"
-    - "install:app-requirements"
-    - "mongo_packages"
+    - install
+    - install:app-requirements
+    - mongo_packages
 
-- name: create mongo dirs
-  file:
+- name: Create mongo dirs
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ mongo_user  }}"
+    owner: "{{ mongo_user }}"
     group: "{{ mongo_user }}"
+    mode: "0755"
   with_items:
     - "{{ mongo_data_dir }}"
     - "{{ mongo_dbpath }}"
     - "{{ mongo_log_dir }}"
     - "{{ mongo_journal_dir }}"
   tags:
-    - "install"
-    - "install:app-configuration"
+    - install
+    - install:app-configuration
 
 # This will error when run on a new replica set, so we ignore_errors
 # and connect anonymously next.
-- name: determine if there is a replica set already
+- name: Determine if there is a replica set already
   mongodb_rs_status:
     host: "{{ ansible_lo['ipv4']['address'] }}"
     username: "{{ MONGO_ADMIN_USER }}"
@@ -105,8 +96,8 @@
   register: authed_replica_set_already_configured
   ignore_errors: true
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
 - name: Try checking the replica set with no user/pass in case this is a new box
   mongodb_rs_status:
@@ -116,97 +107,99 @@
   when: authed_replica_set_already_configured.failed is defined
   ignore_errors: true
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
 # We use these in the templates but also to control a whole bunch of logic
-- name: set facts that default to not initializing a replica set
-  set_fact:
+- name: Set facts that default to not initializing a replica set
+  ansible.builtin.set_fact:
     initialize_replica_set: false
     skip_replica_set: false
   tags:
-    - "install"
-    - "install:app-configuration"
-    - "update_mongod_conf"
-    - "manage"
-    - "manage:db-replication"
+    - install
+    - install:app-configuration
+    - update_mongod_conf
+    - manage
+    - manage:db-replication
 
 # If either auth or unauthed access comes back with a replica set, we
 # do not want to initialize one.  Since initialization requires a bunch
 # of extra templating and restarting, it's not something we want to do on
 # existing boxes.
-- name: track if you have a replica set
-  set_fact:
+- name: Track if you have a replica set
+  ansible.builtin.set_fact:
     initialize_replica_set: true
     skip_replica_set: true
-  when: authed_replica_set_already_configured.status is not defined
-        and unauthed_replica_set_already_configured.status is not defined
+  when: authed_replica_set_already_configured.status is not defined and unauthed_replica_set_already_configured.status is not defined
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
-- name: warn about unconfigured replica sets
-  debug: msg="You do not appear to have a Replica Set configured, deploying one for you"
+- name: Warn about unconfigured replica sets
+  ansible.builtin.debug:
+    msg: '"You do not appear to have a Replica Set configured, deploying one for you"'
   when: initialize_replica_set
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
-- name: copy mongodb key file
-  copy:
+- name: Copy mongodb key file
+  ansible.builtin.copy:
     content: "{{ MONGO_CLUSTER_KEY }}"
     dest: "{{ mongo_key_file }}"
-    mode: 0600
+    mode: "0600"
     owner: mongodb
     group: mongodb
   register: update_mongod_key
   tags:
-    - "manage"
-    - "manage:db-replication"
-    - "mongodb_key"
+    - manage
+    - manage:db-replication
+    - mongodb_key
 
 # If skip_replica_set is true, this template will not contain a replica set stanza
 # because of the fact above.
-- name: copy configuration template
-  template:
+- name: Copy configuration template
+  ansible.builtin.template:
     src: mongod.conf.j2
     dest: /etc/mongod.conf
-    backup: yes
+    backup: true
+    mode: preserve
   register: update_mongod_conf
   tags:
-    - "install"
-    - "install:app-configuration"
-    - "manage"
-    - "manage:db-replication"
-    - "update_mongod_conf"
+    - install
+    - install:app-configuration
+    - manage
+    - manage:db-replication
+    - update_mongod_conf
 
-- name: install logrotate configuration
-  template:
+- name: Install logrotate configuration
+  ansible.builtin.template:
     src: mongo_logrotate.j2
     dest: /etc/logrotate.d/hourly/mongo
+    mode: preserve
   tags:
-    - "install"
-    - "install:app-configuration"
-    - "logrotate"
+    - install
+    - install:app-configuration
+    - logrotate
 
-- name: restart mongo service if we changed our configuration or upgraded mongo
-  service:
+- name: Restart mongo service if we changed our configuration or upgraded mongo
+  ansible.builtin.service:
     name: mongod
     state: restarted
   when: update_mongod_conf.changed or update_mongod_key.changed or install_mongo_package.changed
   tags:
-    - "manage"
-    - "manage:start"
-    - "manage:db-replication"
+    - manage
+    - manage:start
+    - manage:db-replication
 
-- name: wait for mongo server to start
-  wait_for:
+- name: Wait for mongo server to start
+  ansible.builtin.wait_for:
     port: 27017
     delay: 2
   tags:
-    - "manage"
-    - "manage:start"
-    - "manage:db-replication"
+    - manage
+    - manage:start
+    - manage:db-replication
 
 # We only try passwordless superuser creation when
 # we're initializing the replica set and need to use
@@ -216,8 +209,8 @@
 # where we will initialize the replica set.  If we
 # create users on multiple hosts, then they will fail
 # to come into the replica set.
-- name: create super user
-  mongodb_user:
+- name: Create super user
+  community.mongodb.mongodb_user:
     name: "{{ MONGO_ADMIN_USER }}"
     password: "{{ MONGO_ADMIN_PASSWORD }}"
     database: admin
@@ -225,49 +218,50 @@
   when: initialize_replica_set
   run_once: true
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
 # Now that the localhost exemption has been used to create the superuser, we need
 # to add replica set to our configuration.  This will never happen if we detected
 # a replica set in the 'determine if there is a replica set already' task.
 - name: Unset our skip initializing replica set fact so that mongod.conf gets a replica set
-  set_fact:
+  ansible.builtin.set_fact:
     skip_replica_set: false
   when: initialize_replica_set
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
-- name: re-copy configuration template with replica set enabled
-  template:
+- name: Re-copy configuration template with replica set enabled
+  ansible.builtin.template:
     src: mongod.conf.j2
     dest: /etc/mongod.conf
-    backup: yes
+    backup: true
+    mode: preserve
   when: initialize_replica_set
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
-- name: restart mongo service
-  service:
+- name: Restart mongo service
+  ansible.builtin.service:
     name: mongod
     state: restarted
   when: initialize_replica_set
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
-- name: wait for mongo server to start
-  wait_for:
+- name: Wait for mongo server to start
+  ansible.builtin.wait_for:
     port: 27017
     delay: 2
   when: initialize_replica_set
   tags:
-    - "manage"
-    - "manage:db-replication"
+    - manage
+    - manage:db-replication
 
-- name: configure replica set
+- name: Configure replica set
   mongodb_replica_set:
     username: "{{ MONGO_ADMIN_USER }}"
     password: "{{ MONGO_ADMIN_PASSWORD }}"
@@ -276,10 +270,10 @@
   register: replset_status
   when: mongo_configure_replica_set
   tags:
-    - "manage"
-    - "manage:db"
-    - "manage:db-replication"
-    - "manage:db-replication-configuration"
+    - manage
+    - manage:db
+    - manage:db-replication
+    - manage:db-replication-configuration
     - molecule-idempotence-notest
 
 # During initial replica set configuration, it can take a few seconds to vote
@@ -288,9 +282,9 @@
 # checking the replica set status until we see a PRIMARY in the results.
 - name: Wait for the replica set to update and (if needed) elect a primary
   mongodb_rs_status:
-      host: "{{ ansible_lo['ipv4']['address'] }}"
-      username: "{{ MONGO_ADMIN_USER }}"
-      password: "{{ MONGO_ADMIN_PASSWORD }}"
+    host: "{{ ansible_lo['ipv4']['address'] }}"
+    username: "{{ MONGO_ADMIN_USER }}"
+    password: "{{ MONGO_ADMIN_PASSWORD }}"
   register: status
   until: status.status is defined and 'PRIMARY' in status.status.members|map(attribute='stateStr')|list
   when: mongo_configure_replica_set
@@ -298,14 +292,14 @@
   delay: 2
   run_once: true
   tags:
-    - "manage"
-    - "manage:db"
-    - "manage:db-replication"
+    - manage
+    - manage:db
+    - manage:db-replication
 
-- name: create mongodb users in a replica set
-  mongodb_user:
+- name: Create mongodb users in a replica set
+  community.mongodb.mongodb_user:
     database: "{{ item.database }}"
-    login_database: 'admin'
+    login_database: admin
     login_user: "{{ MONGO_ADMIN_USER }}"
     login_password: "{{ MONGO_ADMIN_PASSWORD }}"
     name: "{{ item.user }}"
@@ -317,16 +311,16 @@
   run_once: true
   when: mongo_configure_replica_set
   tags:
-    - "manage"
-    - "manage:db"
-    - "manage:db-users"
-    - "manage:db-replication"
+    - manage
+    - manage:db
+    - manage:db-users
+    - manage:db-replication
     - molecule-idempotence-notest
 
-- name: create mongodb users in a standalone DB
-  mongodb_user:
+- name: Create mongodb users in a standalone DB
+  community.mongodb.mongodb_user:
     database: "{{ item.database }}"
-    login_database: 'admin'
+    login_database: admin
     login_user: "{{ MONGO_ADMIN_USER }}"
     login_password: "{{ MONGO_ADMIN_PASSWORD }}"
     name: "{{ item.user }}"
@@ -337,38 +331,38 @@
   run_once: true
   when: not mongo_configure_replica_set
   tags:
-    - "manage"
-    - "manage:db"
-    - "manage:db-users"
-    - "manage:db-standalone"
+    - manage
+    - manage:db
+    - manage:db-users
+    - manage:db-standalone
 
-- name: ensure mongo starts at boot time
-  service:
+- name: Ensure mongo starts at boot time
+  ansible.builtin.service:
     name: mongod
-    enabled: yes
+    enabled: true
   tags:
-    - "manage"
-    - "manage:start"
+    - manage
+    - manage:start
 
-- name: add serverStatus logging script
-  template:
-    src: "log-mongo-serverStatus.sh.j2"
+- name: Add serverStatus logging script
+  ansible.builtin.template:
+    src: log-mongo-serverStatus.sh.j2
     dest: "{{ COMMON_BIN_DIR }}/log-mongo-serverStatus.sh"
     owner: "{{ mongo_user }}"
     group: "{{ mongo_user }}"
-    mode: 0700
+    mode: "0700"
   when: MONGO_LOG_SERVERSTATUS
   tags:
-    - "install"
-    - "install:app-configuration"
+    - install
+    - install:app-configuration
 
-- name: add serverStatus logging script to cron
-  cron:
+- name: Add serverStatus logging script to cron
+  ansible.builtin.cron:
     name: mongostat logging job
     minute: "*/3"
     job: /edx/bin/log-mongo-serverStatus.sh >> {{ mongo_log_dir }}/serverStatus.log 2>&1
-  become: yes
+  become: true
   when: MONGO_LOG_SERVERSTATUS
   tags:
-    - "install"
-    - "install:app-configuration"
+    - install
+    - install:app-configuration

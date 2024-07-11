@@ -2,14 +2,15 @@
 # It is compatible with the S3 API and Azure Blob Storage.
 ---
 - name: Create backup directory
-  file:
+  ansible.builtin.file:
     path: "{{ MONGO_BACKUP_LOCATION }}"
     state: directory
+    mode: "0755"
 
 # To clone the databases, we use the commands recommended by MongoDB:
 # https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
 - name: Create mongo database backup
-  shell: >
+  ansible.builtin.shell: >
     mongodump
     --authenticationDatabase admin
     -u {{ MONGO_BACKUP_USER }} -p '{{ MONGO_BACKUP_PASSWORD }}'
@@ -18,14 +19,13 @@
     {% if not MONGO_BACKUP_ALL_DATABASES %}
     --db={{ MONGO_BACKUP_DATABASE }}
     {% endif %}
-
 - name: Give the server time to recover
-  pause:
+  ansible.builtin.pause:
     minutes: 1
     prompt: Pausing to give the server time to recover
 
 - name: Upload the backup to a remote storage
-  include_role:
+  ansible.builtin.include_role:
     name: storage_backups
   vars:
     STORAGE_BACKUPS_OPTIONS: "{{ MONGO_BACKUP_STORAGE_OPTIONS }}"

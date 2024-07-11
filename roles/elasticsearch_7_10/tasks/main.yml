@@ -1,5 +1,4 @@
 ---
-
 # elasticsearch
 #
 # Dependencies:
@@ -28,14 +27,14 @@
 #
 
 - name: Ensure dependencies are installed.
-  apt:
+  ansible.builtin.apt:
     name:
-    - gnupg2
+      - gnupg2
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install Elasticsearch repo key
-  apt_key:
+  ansible.builtin.apt_key:
     url: "{{ elasticsearch_apt_key_url }}"
     state: present
   tags:
@@ -43,36 +42,37 @@
     - install:base
 
 - name: Add Elasticsearch Repo
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ elasticsearch_repo }}"
     state: present
   tags:
     - install
     - install:base
 
-- name: install elasticsearch
-  apt:
+- name: Install elasticsearch
+  ansible.builtin.apt:
     pkg: "{{ elasticsearch_package_name }}={{ ELASTICSEARCH_VERSION }}"
     state: present
-    install_recommends: yes
-    force: yes
-    update_cache: yes
+    install_recommends: true
+    force: true
+    update_cache: true
   tags:
     - install
     - install:base
   register: elasticsearch_reinstall
 
-  # Prevent elasticsearch from being upgraded.
-- dpkg_selections:
+- name: Prevent elasticsearch from being upgraded
+  ansible.builtin.dpkg_selections:
     name: elasticsearch
     selection: hold
 
-- name: create directories
-  file:
+- name: Create directories
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
+    mode: "0755" # Only allow the owner to write to the file
   with_items:
     - "{{ elasticsearch_data_dir }}"
     - "{{ elasticsearch_log_dir }}"
@@ -81,65 +81,66 @@
     - install
     - install:base
 
-- name: update elasticsearch defaults
-  template:
+- name: Update elasticsearch defaults
+  ansible.builtin.template:
     src: etc/default/elasticsearch.j2
     dest: /etc/default/elasticsearch
+    mode: preserve
   tags:
     - install
     - install:configuration
 
-- name: drop the elasticsearch config
-  template:
+- name: Drop the elasticsearch config
+  ansible.builtin.template:
     src: edx/etc/elasticsearch/elasticsearch.yml.j2
     dest: "{{ elasticsearch_cfg_dir }}/elasticsearch.yml"
-    mode: 0644
+    mode: "0644"
   tags:
     - install
     - install:configuration
 
-- name: drop the elasticsearch logging config
-  copy:
+- name: Drop the elasticsearch logging config
+  ansible.builtin.copy:
     src: /etc/elasticsearch/log4j2.properties
     dest: "{{ elasticsearch_cfg_dir }}/log4j2.properties"
-    remote_src: yes
-    mode: 0644
+    remote_src: true
+    mode: "0644"
   tags:
     - install
     - install:configuration
 
-- name: drop the elasticsearch jvm config
-  template:
-    src: edx/etc/elasticsearch/jvm.options.j2 
+- name: Drop the elasticsearch jvm config
+  ansible.builtin.template:
+    src: edx/etc/elasticsearch/jvm.options.j2
     dest: "{{ elasticsearch_cfg_dir }}/jvm.options"
-    mode: 0644
+    mode: "0644"
   tags:
     - install
     - install:configuration
 
-- name: drop the elasticsearch systemd service config
-  template:
-    src: lib/systemd/system/elasticsearch.service.j2 
-    dest: "/lib/systemd/system/elasticsearch.service"
-    mode: 0644
+- name: Drop the elasticsearch systemd service config
+  ansible.builtin.template:
+    src: lib/systemd/system/elasticsearch.service.j2
+    dest: /lib/systemd/system/elasticsearch.service
+    mode: "0644"
   tags:
     - install
     - install:configuration
 
 - name: Ensure elasticsearch is enabled and started
-  service:
+  ansible.builtin.service:
     name: elasticsearch
     state: started
-    enabled: yes
+    enabled: true
   tags:
     - manage
     - manage:start
 
 - name: Restart elastic when there has been an upgrade
-  service:
+  ansible.builtin.service:
     name: elasticsearch
     state: restarted
-    enabled: yes
+    enabled: true
   when: elasticsearch_reinstall.changed
   tags:
     - manage

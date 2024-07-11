@@ -1,7 +1,8 @@
+---
 # Deploy Redis Server
 - name: Deploy Redis Server
   hosts: redis_servers
-  become: True
-  gather_facts: True
+  become: true
+  gather_facts: true
   roles:
     - role: redis_6_2

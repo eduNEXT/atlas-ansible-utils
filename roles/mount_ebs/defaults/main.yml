@@ -1,3 +1,4 @@
+---
 # Expects a list of dicts with these keys
 #  - device: /dev/xvdk
 #    mount: /edx/var/mongo
@@ -11,7 +12,6 @@
 # otherwise this role will mount /edx/var/mongo over the top of /edx/var/mongo/mongodb/journal
 # which is not what you wanted.
 volumes: []
-
 UNMOUNT_DISKS: false
 # WARNING! FORCE_REFORMAT_DISKS will cause your volumes to always be reformatted
 # even if all the volume's attributes already match what you've defined in volumes[]

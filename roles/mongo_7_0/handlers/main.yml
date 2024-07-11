@@ -1,0 +1,6 @@
+---
+- name: Enable/start disable transparent huge pages service
+  ansible.builtin.service:
+    name: disable-transparent-hugepages
+    enabled: true
+    state: started
