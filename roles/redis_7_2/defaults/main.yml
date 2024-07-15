@@ -1,0 +1,37 @@
+---
+#
+# edX Configuration
+#
+# github:     https://github.com/openedx/configuration
+# wiki:       https://openedx.atlassian.net/wiki/display/OpenOPS
+# code style: https://openedx.atlassian.net/wiki/display/OpenOPS/Ansible+Code+Conventions
+# license:    https://github.com/openedx/configuration/blob/master/LICENSE.TXT
+#
+##
+# Defaults for role redis
+#
+REDIS_PASSWORD:
+REDIS_BIND_IP: 127.0.0.1
+REDIS_PERSISTENCE_DIR: /var/lib/redis
+REDIS_MEMORY_LIMIT: 512mb
+REDIS_MAX_MEMORY_POLICY: allkeys-lru
+#
+# vars are namespace with the module name.
+#
+redis_role_name: redis
+
+redis_user: redis
+redis_group: redis
+
+#
+# OS packages
+#
+
+REDIS_REPO: deb https://packages.redis.io/deb {{ ansible_distribution_release }} main
+REDIS_VERSION: 6:7.2.5-1rl1~jammy1
+
+redis_debian_pkgs:
+  - redis-tools={{ REDIS_VERSION }}
+  - redis-server={{ REDIS_VERSION }}
+
+redis_redhat_pkgs: []
