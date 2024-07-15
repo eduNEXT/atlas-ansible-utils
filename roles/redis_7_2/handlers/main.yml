@@ -10,11 +10,11 @@
 #
 #
 # Handlers for role redis
-# 
-# Overview:
-# 
 #
-- name: reload redis
-  service:
+# Overview:
+#
+#
+- name: Reload redis
+  ansible.builtin.service:
     name: redis-server
     state: restarted
