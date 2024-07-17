@@ -5,11 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.8.0...HEAD)
+## [Unreleased](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.9.0...HEAD)
 
 Please do not update the unreleased notes.
 
 <!-- Content should be placed here -->
+## [v1.9.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.8.0...v1.9.0) - 2024-07-17
+
+### [1.9.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.8.0...v1.9.0) (2024-07-17)
+
+#### Features
+
+- add mongo 7.0 support ([#31](https://github.com/eduNEXT/atlas-ansible-utils/issues/31)) ([3cfa344](https://github.com/eduNEXT/atlas-ansible-utils/commit/3cfa344c829be4564732b2dc9771bea7f88d09fc))
+- add redis 7.2 playbook ([#40](https://github.com/eduNEXT/atlas-ansible-utils/issues/40)) ([0c4ce6f](https://github.com/eduNEXT/atlas-ansible-utils/commit/0c4ce6fe1d88b134ab390d43fe35038a60eacbd9))
+- create playbook to install mysql8.4 ([#33](https://github.com/eduNEXT/atlas-ansible-utils/issues/33)) ([bd3bcdb](https://github.com/eduNEXT/atlas-ansible-utils/commit/bd3bcdbbff76657b83bba47bc47ff529196375d9))
+- setup ansible lint ([#37](https://github.com/eduNEXT/atlas-ansible-utils/issues/37)) ([1e38950](https://github.com/eduNEXT/atlas-ansible-utils/commit/1e38950a1111e86ab72c4ae3659785689dcdbe95))
+- upgrade to python 3.11 ([#36](https://github.com/eduNEXT/atlas-ansible-utils/issues/36)) ([7cdca0b](https://github.com/eduNEXT/atlas-ansible-utils/commit/7cdca0b2232c231ec54d5259986d17c162286050))
+
+#### Bug Fixes
+
+- disable protected mode in redis 7.2 ([#41](https://github.com/eduNEXT/atlas-ansible-utils/issues/41)) ([3919e5e](https://github.com/eduNEXT/atlas-ansible-utils/commit/3919e5e3be06f5b14021340f9a21e48e7938606c))
+
+#### Build Systems
+
+- add integration testing for main roles ([#34](https://github.com/eduNEXT/atlas-ansible-utils/issues/34)) ([68c4dc1](https://github.com/eduNEXT/atlas-ansible-utils/commit/68c4dc1e6f032adccd666339cd61ff2c0e7f8572))
+
 ## [v1.8.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.7.0...v1.8.0) - 2024-05-07
 
 ### [1.8.0](https://github.com/eduNEXT/atlas-ansible-utils/compare/v1.7.0...v1.8.0) (2024-05-07)
