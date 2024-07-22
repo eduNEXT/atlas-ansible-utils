@@ -2,7 +2,7 @@
 # This playbook is ONLY used for testing purposes.
 # It helps to verify ansible-playbook binary is able to run playbooks as expected.
 - name: Test OS info
-  hosts: localhost
+  hosts: test_hosts
   gather_facts: true
   become: false
   tasks:
