@@ -1,0 +1,9 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "sparse-checkout-file"
+  namespace: {{ include "ansible-runner.namespace" . }}
+data:
+  sparse-checkout: |
+    {{- .Values.checkoutDirs | nindent 4 }}
