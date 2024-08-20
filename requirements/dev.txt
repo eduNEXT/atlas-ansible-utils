@@ -4,38 +4,38 @@
 #
 #    make upgrade
 #
-ansible==10.1.0
+ansible==10.3.0
     # via -r requirements/base.in
-ansible-compat==24.6.1
+ansible-compat==24.8.0
     # via
     #   ansible-lint
     #   molecule
-ansible-core==2.17.1
+ansible-core==2.17.3
     # via
     #   ansible
     #   ansible-compat
     #   ansible-lint
     #   molecule
-ansible-lint==24.6.1
+ansible-lint==24.7.0
     # via -r requirements/base.in
-attrs==23.2.0
+attrs==24.2.0
     # via
     #   jsonschema
     #   referencing
-black==24.4.2
+black==24.8.0
     # via ansible-lint
-boto3==1.34.142
+boto3==1.35.1
     # via -r requirements/base.in
-botocore==1.34.142
+botocore==1.35.1
     # via
     #   -r requirements/base.in
     #   boto3
     #   s3transfer
-bracex==2.4
+bracex==2.5
     # via wcmatch
 certifi==2024.7.4
     # via requests
-cffi==1.16.0
+cffi==1.17.0
     # via cryptography
 charset-normalizer==3.3.2
     # via requests
@@ -46,7 +46,7 @@ click==8.1.7
     #   molecule
 click-help-colors==0.9.4
     # via molecule
-cryptography==42.0.8
+cryptography==43.0.0
     # via ansible-core
 distro==1.9.0
     # via selinux
@@ -60,7 +60,7 @@ filelock==3.15.4
     # via ansible-lint
 idna==3.7
     # via requests
-importlib-metadata==8.0.0
+importlib-metadata==8.3.0
     # via ansible-lint
 jinja2==3.1.4
     # via
@@ -83,7 +83,7 @@ markupsafe==2.1.5
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
-molecule==24.6.1
+molecule==24.8.0
     # via
     #   -r requirements/dev.in
     #   molecule-plugins
@@ -115,7 +115,7 @@ pymongo==4.8.0
     # via -r requirements/base.in
 python-dateutil==2.9.0.post0
     # via botocore
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   ansible-compat
     #   ansible-core
@@ -137,7 +137,7 @@ rich==13.7.1
     #   ansible-lint
     #   enrich
     #   molecule
-rpds-py==0.19.0
+rpds-py==0.20.0
     # via
     #   jsonschema
     #   referencing
@@ -160,11 +160,11 @@ urllib3==2.2.2
     #   botocore
     #   docker
     #   requests
-wcmatch==8.5.2
+wcmatch==9.0
     # via
     #   ansible-lint
     #   molecule
 yamllint==1.35.1
     # via ansible-lint
-zipp==3.19.2
+zipp==3.20.0
     # via importlib-metadata
