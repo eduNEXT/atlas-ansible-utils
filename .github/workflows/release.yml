@@ -1,84 +1,32 @@
 name: Release
-on: [workflow_dispatch]
-
-env:
-  IMAGE_NAME: atlas-ansible-utils
+on:
+  - workflow_dispatch
 
 jobs:
-  bumpversion:
+  release:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.tag_version.outputs.new_version }}
-      previous_tag: ${{ steps.tag_version.outputs.previous_tag }}
-      bump_commit_sha: ${{ steps.bumpversion.outputs.commit_hash }}
+    concurrency: release
+    permissions:
+      id-token: write
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Get next version
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
+      - name: Checkout Code
+        uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: false
-          default_prerelease_bump: false
-          dry_run: true
-      - name: Set up Python 3.8
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
-      - name: Update Changelog
-        if: steps.tag_version.outputs.new_version
-        uses: stefanzweifel/changelog-updater-action@v1.6.2
-        with:
-          latest-version: ${{ steps.tag_version.outputs.new_tag }}
-          release-notes: ${{ steps.tag_version.outputs.changelog }}
-      - name: Commit bumpversion
-        id: bumpversion
-        if: steps.tag_version.outputs.new_version
-        uses: stefanzweifel/git-auto-commit-action@v4.14.1
-        with:
-          branch: ${{ github.ref }}
-          commit_message: "chore(release): preparing ${{ steps.tag_version.outputs.new_version }}"
-          file_pattern: CHANGELOG.md
-  release:
-    needs: bumpversion
-    if: needs.bumpversion.outputs.version
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.tag_version.outputs.new_tag }}
-      changelog: ${{ steps.tag_version.outputs.changelog }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          commit_sha: ${{ needs.bumpversion.outputs.bump_commit_sha }}
-          default_bump: false
-          default_prerelease_bump: false
-      - name: Create a GitHub release
-        if: steps.tag_version.outputs.new_tag
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          python-version: 3.11
 
-  build_and_push:
-    needs: bumpversion
-    if: needs.bumpversion.outputs.version
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          tags: ednxops/${{ env.IMAGE_NAME }}:${{ needs.bumpversion.outputs.version }}
+      - name: Install dependencies
+        run: |
+          pip install -r requirements/dev.txt
+
+      - name: Generate release
+        run: |
+          make release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

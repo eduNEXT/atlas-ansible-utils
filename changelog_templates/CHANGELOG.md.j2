@@ -1,0 +1,91 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+{%- if context.history.unreleased | length > 0 %}
+{# UNRELEASED #}
+## Unreleased
+
+{%- for type_, commits in context.history.unreleased | dictsort %}
+
+{%- if type_ != "unknown" %}
+
+### {{ type_ | capitalize }}
+
+{#- Commits #}
+{% for commit in commits %}
+- {{ commit.descriptions.0 | capitalize }} ([`{{ commit.commit.hexsha[:7] }}`]({{ commit.commit.hexsha | commit_hash_url }}))
+{%- endfor %}{% endif %}{% endfor %}{% endif %}
+
+{#- RELEASED #}
+{%- for version, release in context.history.released.items() %}
+{%- if release.version.major>0 or release.version.minor > 1 %}
+{#-
+Generate changelog from 1.2.0 onwards. Previous versions have unparseable commits so
+we include manual changelog entries for those.
+#}
+
+## {{ version.as_tag() }} ({{ release.tagged_date.strftime("%Y-%m-%d") }})
+
+{%- for type_, commits in release["elements"] | dictsort %}
+
+{%- if type_ != "unknown" %}
+
+### {{ type_ | capitalize }}
+
+{#- Commits #}
+{% for commit in commits %}
+- {{ commit.descriptions.0 | capitalize }} ([`{{ commit.commit.hexsha[:7] }}`]({{ commit.commit.hexsha | commit_hash_url }}))
+{%- endfor %}{% endif %}{% endfor %}{%endif%}{% endfor %}
+
+{#- Old Changelog #}
+
+## v1.1.0 (2023-08-25)
+
+### Feature
+
+- Add releases for docker image ([#7](https://github.com/eduNEXT/atlas-ansible-utils/issues/7)) ([d069421](https://github.com/eduNEXT/atlas-ansible-utils/commit/d069421a78e7beb85ef3227e2ad880f146cbe139))
+
+### Fix
+
+- Update package cache when installing dependencies ([#9](https://github.com/eduNEXT/atlas-ansible-utils/issues/9)) ([2b55913](https://github.com/eduNEXT/atlas-ansible-utils/commit/2b559130fb5559ca744b2e8f15b98170a394c55f))
+
+## v1.0.0 (2022-10-27)
+
+### Feature
+
+- Adding generic Ansible configuration generated with "$ ansible-config init --disabled > ansible.cfg".
+- Adding MySQL role just to install MySQL Inspired on openedx-configuration MySQL role.
+- Adding role to configure MySQL installation.
+- Adding main MySQL 5.7 playbook.
+- Adding mongo 4.2 role and other main roles.
+- Adding custom modules required by Mongo 4.2 role.
+- Adding main Mongo 4.2 playbook.
+- Adding role to mount volumes in MySQL and Mongo roles.
+- Adding support to define MySQL server charset and collation.
+- Adding first version of Percona 5.7 playbook.
+- Adding playbook to deploy Percona database in specific hosts.
+- Adding support for machine hostnames.
+
+### Refactor
+
+- Update requirements to use Pymongo.
+- Update cache before installing python3-pip.
+- Use a new variable in the mysql_config role to control where to store the custom MySQL configuration files.
+- Updating requirements.
+
+### Fix
+
+- Add missing bracket in jinja template.
+- Fixing a couple of issues with Mongo and MySQL roles.
+- Create Mongo DBs when using a standalone installation to avoid connection failures.
+- Move percona role under the proper key in requirements file.
+
+## v0.1.0 (2022-10-27)
+
+### Feature
+
+- First release on GitHub before being a stable library.
