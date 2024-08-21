@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ansible-runner
+description: Kubernetes jobs to execute ansible playbooks
+type: application
+version: 1.9.0
+appVersion: 1.9.0
