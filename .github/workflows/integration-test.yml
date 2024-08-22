@@ -21,7 +21,7 @@ jobs:
       - name: Find changed roles
         id: changed_roles
         run: |
-          ROLES=$(git diff --name-only origin/${{github.base_ref}} origin/${GITHUB_HEAD_REF} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
+          ROLES=$(git diff --name-only origin/${{ github.base_ref || 'main~' }} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
           echo "roles=$ROLES" >> $GITHUB_OUTPUT
 
       - name: Find available scenarios
@@ -49,6 +49,7 @@ jobs:
         run: make quality
 
   molecule:
+    if: ${{ needs.load-roles.outputs.roles != '[]' && needs.load-roles.outputs.roles != '' }}
     needs: load-roles
     strategy:
       fail-fast: false

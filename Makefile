@@ -25,3 +25,13 @@ upgrade: piptools ## Upgrade requirements with pip-tools.
 	pip-compile --upgrade requirements/base.in
 	pip-compile --upgrade requirements/dev.in
 
+release: ## release a new version
+	@echo "Releasing a new version."
+	@echo "This is a remote release, it will push to the remote repository."
+	semantic-release --config release.toml version --changelog --push --tag --commit
+
+local-release: ## release a new version without pushing
+	@echo "Releasing a new version."
+	@echo "This is a local release, it will not push to the remote repository."
+	@echo "You can push the changes and release manually."
+	semantic-release --config release.toml version --changelog --commit --tag --no-push

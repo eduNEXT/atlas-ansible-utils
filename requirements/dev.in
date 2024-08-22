@@ -2,3 +2,4 @@
 
 molecule
 molecule-plugins[docker]
+python-semantic-release
