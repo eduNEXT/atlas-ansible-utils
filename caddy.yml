@@ -1,6 +1,0 @@
----
-- name: Caddy installation
-  hosts: caddy_servers
-  become: true
-  roles:
-    - caddy

@@ -1,9 +1,0 @@
----
-# Playbook to provision MySQL
-
-- name: Configure db MySQL instances
-  hosts: mysql_servers
-  become: true
-  gather_facts: true
-  roles:
-    - role: mysql_8_4

@@ -1,9 +1,0 @@
-apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: atlas-ansible-utils
-  description: Ansible roles for the persistence layer of k8s installations
-spec:
-  type: library
-  owner: shipyard-crew
-  lifecycle: production
