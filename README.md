@@ -42,7 +42,7 @@ Let's say we want to provision a machine to run MySQL, so we run the following i
     source venv/bin/activate
     cd atlas-ansible-utils/
     make requirements
-    ansible-playbook mysql_5_7.yml -i ../your-inventory-repo/path/to/hosts.ini -v
+    ansible-playbook playbooks/mysql_5_7.yml -i ../your-inventory-repo/path/to/hosts.ini -v
 
 Full options for **ansible-playbook** command can be found [here](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html)
 
@@ -227,13 +227,13 @@ This process will be carried out using the `admin` user for MySQL and Mongo, whi
   For mongo:
 
    ```bash
-   ansible-playbook mongo_backup_restore.yml -i /path/inventory/host.ini -v
+   ansible-playbook playbooks/mongo_backup_restore.yml -i /path/inventory/host.ini -v
    ```
 
   For mongo:
 
    ```bash
-   ansible-playbook mysql_backup_restore.yml -i /path/inventory/host.ini -v
+   ansible-playbook playbooks/mysql_backup_restore.yml -i /path/inventory/host.ini -v
    ```
 
 Upon completion of the execution, you should observe both the existing databases and the new databases suffixed with `_clone` in your database instance, as per the default configuration.

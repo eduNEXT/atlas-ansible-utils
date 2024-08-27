@@ -5,4 +5,4 @@
     - name: "Include atlas-ansible-utils"
       include_role:
         name: "atlas-ansible-utils"
-- import_playbook: ../../redis_6_2.yml
+- import_playbook: ../../playbooks/redis_6_2.yml
