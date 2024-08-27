@@ -1,0 +1,42 @@
+---
+DOCKER_MYSQL_IMAGE: docker.io/mysql:8.4.0
+
+# Bind adress and ports exposed by the docker container.
+# We keep the default port and bind address inside the container and instead
+# configure the address and port used by the host using the docker port mapping
+# feature.
+DOCKER_MYSQL_BIND_ADDRESS: 0.0.0.0
+DOCKER_MYSQL_PORT: 3306
+
+MYSQL_CONFIG_SERVER_ID: 1
+MYSQL_CONFIG_READ_ONLY: "OFF"
+MYSQL_CONFIG_CHARACTER_SET_SERVER: utf8mb4
+MYSQL_CONFIG_COLLATION_SERVER: utf8mb4_unicode_ci
+MYSQL_CONFIG_KEY_BUFFER_SIZE: 8M
+MYSQL_CONFIG_MAX_ALLOWED_PACKET: 16M
+MYSQL_CONFIG_MAX_CONNECTIONS: 1200
+MYSQL_CONFIG_OPEN_FILES_LIMIT: 5000
+MYSQL_CONFIG_EXPIRE_LOGS_SECONDS: 432000
+MYSQL_CONFIG_TABLE_OPEN_CACHE: 2000
+MYSQL_CONFIG_INNODB_BUFFER_POOL_SIZE: 128M
+MYSQL_CONFIG_INNODB_IO_CAPACITY: 200
+
+MYSQL_CONFIG_INNODB_IO_CAPACITY_MAX: 1000
+MYSQL_CONFIG_INNODB_LOG_CAPACITY: 48M
+
+MYSQL_CONFIG_INNODB_LOG_FILE_SIZE: 48M
+MYSQL_CONFIG_INNODB_LOG_BUFFER_SIZE: 16M
+MYSQL_CONFIG_INNODB_READ_IO_THREADS: 4
+MYSQL_CONFIG_INNODB_WRITE_IO_THREADS: 4
+MYSQL_CONFIG_INNODB_FLUSH_LOG_AT_TRX_COMMIT: 1
+
+# Volume variable used to mount a docker volume directly
+# into a block device. This method was the most peformant
+# during testing and has the added benefit of keeping the data
+# even when deleting the docker volume (the files will stay in
+# the disk partition and can be manually mounted using the linux
+# mount command).
+# DOCKER_MYSQL_VOLUME:
+#   device: /dev/nvme1n1
+#   fstype: xfs
+#   size: "50.00 GB"

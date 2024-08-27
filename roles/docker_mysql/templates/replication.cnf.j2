@@ -1,0 +1,27 @@
+[mysqld]
+server-id                         = {{ MYSQL_CONFIG_SERVER_ID }}
+read_only                         = {{ MYSQL_CONFIG_READ_ONLY }}
+
+binlog-row-image                  = MINIMAL
+binlog-rows-query-log-events      = ON
+log-bin-trust-function-creators   = TRUE
+max-binlog-size                   = 1G
+relay-log-recovery                = ON
+replica-parallel-type             = LOGICAL_CLOCK
+replica-preserve-commit-order     = ON
+replica-parallel-workers          = 8
+replica-type-conversions          = ALL_NON_LOSSY
+sync-master-info                  = 1000
+sync-relay-log                    = 1000
+
+
+log-bin
+enforce-gtid-consistency          = ON
+log_replica_updates               = ON
+binlog-checksum                   = NONE
+# prevent use of non-transactional storage engines
+disabled_storage_engines          = "MyISAM,BLACKHOLE,FEDERATED,ARCHIVE"
+# InnoDB gap locks are problematic for multi-primary conflict detection; none are used with READ-COMMITTED
+# So if you don't rely on REPEATABLE-READ semantics and/or wish to use multi-primary mode then this
+# isolation level is recommended
+transaction-isolation             = 'READ-COMMITTED'

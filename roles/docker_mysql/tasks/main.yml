@@ -1,0 +1,115 @@
+---
+- name: Check disk size
+  ansible.builtin.assert:
+    that: "{{ ansible_devices[DOCKER_MYSQL_VOLUME.device | basename]['size'] == DOCKER_MYSQL_VOLUME.size }}"
+    fail_msg: >
+      Actual size {{ ansible_devices[DOCKER_MYSQL_VOLUME.device | basename]['size'] }}
+      !=
+      Expected size {{ DOCKER_MYSQL_VOLUME.device }}. Rebooting the instance may fix the ordering issue"
+  tags:
+    - mysql
+    - disks
+  when: >
+    DOCKER_MYSQL_VOLUME is defined
+    and DOCKER_MYSQL_VOLUME.device is defined
+    and DOCKER_MYSQL_VOLUME.fstype is defined
+
+- name: Format Disks
+  become: true
+  community.general.filesystem:
+    dev: "{{ DOCKER_MYSQL_VOLUME.device }}"
+    fstype: "{{ DOCKER_MYSQL_VOLUME.fstype }}"
+    force: false
+  tags:
+    - mysql
+    - disks
+  when: >
+    DOCKER_MYSQL_VOLUME is defined
+    and DOCKER_MYSQL_VOLUME.device is defined
+    and DOCKER_MYSQL_VOLUME.fstype is defined
+
+- name: Configure MySQL Volumes in {{ DOCKER_MYSQL_VOLUME.device }}
+  community.docker.docker_volume:
+    volume_name: mysql-data
+    state: present
+    driver: local
+    driver_options:
+      type: "{{ DOCKER_MYSQL_VOLUME.fstype }}"
+      device: "{{ DOCKER_MYSQL_VOLUME.device }}"
+  tags:
+    - mysql
+    - volume
+  when: >
+    DOCKER_MYSQL_VOLUME is defined
+    and DOCKER_MYSQL_VOLUME.device is defined
+    and DOCKER_MYSQL_VOLUME.fstype is defined
+
+- name: Configure MySQL Volumes in /var/lib/docker
+  community.docker.docker_volume:
+    volume_name: mysql-data
+    state: present
+    driver: local
+  tags:
+    - mysql
+    - volume
+  when: >
+    DOCKER_MYSQL_VOLUME is not defined
+    or DOCKER_MYSQL_VOLUME.device is not defined
+    or DOCKER_MYSQL_VOLUME.fstype is not defined
+
+- name: Creating MySQL Configuration Dir
+  become: true
+  ansible.builtin.file:
+    path: /etc/mysql.conf.d/
+    state: directory
+    mode: "0755"
+  tags:
+    - config
+
+- name: Render MySQL configuration
+  become: true
+  ansible.builtin.template:
+    src: mysqld.cnf.j2
+    dest: /etc/mysql.conf.d/custom.cnf
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+  tags:
+    - mysql
+    - config
+  notify:
+    - Restart MySQL Container
+
+- name: Render MySQL Replication configuration
+  become: true
+  ansible.builtin.template:
+    src: replication.cnf.j2
+    dest: /etc/mysql.conf.d/replication.cnf
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+  tags:
+    - mysql
+    - config
+  notify:
+    - Restart MySQL Container
+
+- name: Start MySQL Container
+  community.docker.docker_container:
+    name: mysql
+    image: "{{ DOCKER_MYSQL_IMAGE }}"
+    restart_policy: unless-stopped
+    state: started
+    published_ports:
+      - "{{  DOCKER_MYSQL_BIND_ADDRESS }}:{{ DOCKER_MYSQL_PORT }}:3306"
+    mounts:
+      - source: mysql-data
+        target: /var/lib/mysql
+      - source: /etc/mysql.conf.d/
+        target: /etc/mysql/conf.d/
+        type: bind
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ DOCKER_MYSQL_ROOT_PASSWORD }}"
+  tags:
+    - mysql
+    - container
