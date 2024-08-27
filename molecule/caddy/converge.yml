@@ -5,4 +5,4 @@
     - name: "Include atlas-ansible-utils"
       include_role:
         name: "atlas-ansible-utils"
-- import_playbook: ../../caddy.yml
+- import_playbook: ../../playbooks/caddy.yml

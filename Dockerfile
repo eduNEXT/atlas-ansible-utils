@@ -54,4 +54,4 @@ ENV ATLAS_ANSIBLE_PLAYBOOK="test_os_info.yml"
 ENV ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS=""
 ENV ANSIBLE_INVENTORY="/etc/ansible/hosts.ini"
 
-CMD [ "/bin/sh", "-c", "ansible-playbook ${ATLAS_ANSIBLE_PLAYBOOK} ${ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS}" ]
+CMD [ "/bin/sh", "-c", "ansible-playbook playbooks/${ATLAS_ANSIBLE_PLAYBOOK} ${ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS}" ]

@@ -14,10 +14,10 @@ dev-requirements: ## install development requirements
 	ansible-galaxy install -r requirements.yml
 
 quality: ## Lint based in ansible.
-	ansible-lint -c .ansible-lint.yml
+	ansible-lint --exclude charts -c .ansible-lint.yml
 
 format:
-	ansible-lint -c .ansible-lint.yml --fix
+	ansible-lint --exclude charts -c .ansible-lint.yml --fix
 
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: piptools ## Upgrade requirements with pip-tools.
