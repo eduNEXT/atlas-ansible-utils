@@ -1,0 +1,7 @@
+---
+- name: Deploy MySQL in Docker containers
+  hosts: mysql_servers
+  gather_facts: true
+  become: false
+  roles:
+    - role: docker_mysql
