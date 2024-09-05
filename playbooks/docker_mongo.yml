@@ -1,0 +1,7 @@
+---
+- name: Deploy MongoDB in Docker containers
+  hosts: mongo_servers
+  gather_facts: true
+  become: false
+  roles:
+    - role: docker_mongo

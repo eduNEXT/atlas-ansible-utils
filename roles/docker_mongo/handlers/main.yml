@@ -1,0 +1,6 @@
+---
+- name: Restart MongoDB Container
+  community.docker.docker_container:
+    name: mongo
+    state: started
+    restart: true

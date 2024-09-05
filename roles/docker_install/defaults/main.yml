@@ -1,0 +1,4 @@
+---
+DOCKER_APT_REPOSITORY_URL: https://download.docker.com/linux/ubuntu/
+DOCKER_GPG_KEY_URL: https://download.docker.com/linux/ubuntu/gpg
+DOCKER_DEFAULT_USER: "{{ ansible_user }}"

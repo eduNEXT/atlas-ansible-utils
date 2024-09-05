@@ -1,0 +1,106 @@
+---
+- name: Check disk size
+  ansible.builtin.assert:
+    that: "{{ ansible_devices[DOCKER_MONGO_VOLUME.device | basename]['size'] == DOCKER_MONGO_VOLUME.size }}"
+    fail_msg: >
+      Actual size {{ ansible_devices[DOCKER_MONGO_VOLUME.device | basename]['size'] }}
+      !=
+      Expected size {{ DOCKER_MONGO_VOLUME.device }}. Rebooting the instance may fix the ordering issue"
+  tags:
+    - mongo
+    - disks
+  when: >
+    DOCKER_MONGO_VOLUME is defined
+    and DOCKER_MONGO_VOLUME.device is defined
+    and DOCKER_MONGO_VOLUME.fstype is defined
+
+- name: Format Disks
+  become: true
+  community.general.filesystem:
+    dev: "{{ DOCKER_MONGO_VOLUME.device }}"
+    fstype: "{{ DOCKER_MONGO_VOLUME.fstype }}"
+    force: false
+  tags:
+    - mongo
+    - disks
+  when: >
+    DOCKER_MONGO_VOLUME is defined
+    and DOCKER_MONGO_VOLUME.device is defined
+    and DOCKER_MONGO_VOLUME.fstype is defined
+
+- name: Configure MongoDB Volumes in {{ DOCKER_MONGO_VOLUME.device }}
+  community.docker.docker_volume:
+    volume_name: mongo-data
+    state: present
+    driver: local
+    driver_options:
+      type: "{{ DOCKER_MONGO_VOLUME.fstype }}"
+      device: "{{ DOCKER_MONGO_VOLUME.device }}"
+  tags:
+    - mongo
+    - volume
+  when: >
+    DOCKER_MONGO_VOLUME is defined
+    and DOCKER_MONGO_VOLUME.device is defined
+    and DOCKER_MONGO_VOLUME.fstype is defined
+
+- name: Configure MongoDB Volumes in /var/lib/docker
+  community.docker.docker_volume:
+    volume_name: mongo-data
+    state: present
+    driver: local
+  tags:
+    - mongo
+    - volume
+  when: >
+    DOCKER_MONGO_VOLUME is not defined
+    or DOCKER_MONGO_VOLUME.device is not defined
+    or DOCKER_MONGO_VOLUME.fstype is not defined
+
+- name: Creating MongoDB Configuration Dir
+  become: true
+  ansible.builtin.file:
+    path: /etc/mongo.conf.d/
+    state: directory
+    mode: "0755"
+  tags:
+    - mongo
+    - config
+
+- name: Render MongoDB configuration
+  become: true
+  ansible.builtin.template:
+    src: mongod.conf.j2
+    dest: /etc/mongo.conf.d/mongod.conf
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+  tags:
+    - mongo
+    - config
+  notify:
+    - Restart MongoDB Container
+
+- name: Start MongoDB Container
+  community.docker.docker_container:
+    name: mongo
+    image: "{{ DOCKER_MONGO_IMAGE }}"
+    restart_policy: unless-stopped
+    command:
+      - --config
+      - /etc/mongod.conf
+    state: started
+    published_ports:
+      - "{{  DOCKER_MONGO_BIND_ADDRESS }}:{{ DOCKER_MONGO_PORT }}:27017"
+    mounts:
+      - source: mongo-data
+        target: /data/db
+      - source: /etc/mongo.conf.d/mongod.conf
+        target: /etc/mongod.conf
+        type: bind
+    env:
+      MONGO_INITDB_ROOT_USERNAME: "{{ DOCKER_MONGO_ROOT_USERNAME }}"
+      MONGO_INITDB_ROOT_PASSWORD: "{{ DOCKER_MONGO_ROOT_PASSWORD }}"
+  tags:
+    - mongo
+    - container

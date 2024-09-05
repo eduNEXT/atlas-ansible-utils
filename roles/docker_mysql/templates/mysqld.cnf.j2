@@ -1,0 +1,22 @@
+#
+# The MySQL database server configuration file.
+
+[mysqld]
+key_buffer_size                = {{ MYSQL_CONFIG_KEY_BUFFER_SIZE }}
+max_allowed_packet             = {{ MYSQL_CONFIG_MAX_ALLOWED_PACKET }}
+max_connections                = {{ MYSQL_CONFIG_MAX_CONNECTIONS }}
+table_open_cache               = {{ MYSQL_CONFIG_TABLE_OPEN_CACHE }}
+open_files_limit               = {{ MYSQL_CONFIG_OPEN_FILES_LIMIT }}
+
+binlog_expire_logs_seconds     = {{ MYSQL_CONFIG_EXPIRE_LOGS_SECONDS }}
+collation_server               = {{ MYSQL_CONFIG_COLLATION_SERVER }}
+character_set_server           = {{ MYSQL_CONFIG_CHARACTER_SET_SERVER }}
+
+innodb_buffer_pool_size        = {{ MYSQL_CONFIG_INNODB_BUFFER_POOL_SIZE }}
+innodb_io_capacity             = {{ MYSQL_CONFIG_INNODB_IO_CAPACITY }}
+innodb_io_capacity_max         = {{ MYSQL_CONFIG_INNODB_IO_CAPACITY_MAX }}
+innodb_redo_log_capacity       = {{ MYSQL_CONFIG_INNODB_LOG_CAPACITY }}
+innodb_log_buffer_size         = {{ MYSQL_CONFIG_INNODB_LOG_BUFFER_SIZE }}
+innodb_read_io_threads         = {{ MYSQL_CONFIG_INNODB_READ_IO_THREADS }}
+innodb_write_io_threads        = {{ MYSQL_CONFIG_INNODB_WRITE_IO_THREADS }}
+innodb_flush_log_at_trx_commit = {{ MYSQL_CONFIG_INNODB_FLUSH_LOG_AT_TRX_COMMIT }}
