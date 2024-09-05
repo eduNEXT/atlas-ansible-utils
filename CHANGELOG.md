@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.11.0 (2024-09-05)
+
+### Feature
+
+- Add routine to deploy dbs in docker (#45) ([`b172c2e`](https://github.com/eduNEXT/atlas-ansible-utils/commit/b172c2eba0d9dd83cd59002fee43f7e0097c09a1))
+
 ## v1.10.0 (2024-08-22)
 
 ### Feature
