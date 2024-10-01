@@ -1,5 +1,0 @@
----
-dependencies:
-  - common
-  - role: mount_ebs
-    volumes: "{{ MONGO_VOLUMES }}"
