@@ -4,7 +4,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: redis-7-2-instance
+  - name: redis-7-4-instance
     image: geerlingguy/docker-ubuntu2404-ansible:latest
     command: ""
     volumes:
