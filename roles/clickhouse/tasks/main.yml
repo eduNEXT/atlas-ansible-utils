@@ -5,6 +5,7 @@
       - apt-transport-https
       - ca-certificates
       - dirmngr
+      - gpg-agent
     state: present
     update_cache: true
 
