@@ -18,7 +18,7 @@ OS compability matrix
 
 | Playbook           | Ubuntu 22.04 | Ubuntu 24.04 |
 |--------------------|--------------|--------------|
-| redis_7_4          |              |              |
+| redis_7_2          |      x       |              |
 | mysql_8_4          |      x       |       x      |
 | mongo_7_0          |      x       |              |
 | elasticsearch_7_10 |      x       |              |
