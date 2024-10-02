@@ -17,6 +17,7 @@ MYSQL_8_4_APT_KEY: B7B3B788A8D3785C
 MYSQL_8_4_REPO: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
 
 MYSQL_8_4_SUPPORTED_DISTRIBUTIONS:
+  - jammy
   - noble
 
 # List of dictionaries as described in the mount_ebs role's default
