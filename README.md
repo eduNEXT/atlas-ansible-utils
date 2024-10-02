@@ -2,6 +2,29 @@
 
 This repository contains a collection of Ansible roles and playbooks used to deploy different services in the OpenedX platform context. Although the adoption of containerized application platforms like Kubernetes by the OpenedX community, there are special case where Ansible tools are still required, for instance, to deploy databases in on-premises.
 
+Version compatibility matrix
+----------------------------
+
+You must install a supported release of this plugin to match the version
+needed for the OpenEdx installation
+
+| Open edX release | Tutor version     | Plugin release |
+|------------------|-------------------|--------------- |
+| Quince and older | `<18`             | 1.11.0         |
+| Redwood          | `>=18.0, <19`     | >=18.0.0       |
+
+OS compability matrix
+---------------------
+
+| Playbook           | Ubuntu 22.04 | Ubuntu 24.04 |
+|--------------------|--------------|--------------|
+| redis_7_4          |              |              |
+| mysql_8_4          |      x       |       x      |
+| mongo_7_0          |      x       |              |
+| elasticsearch_7_10 |      x       |              |
+| percona_5_7        |      x       |              |
+| clickhouse         |      x       |              |
+
 ## How to use this repo
 
 In most cases, this repo is used from **command and control** instance (Ubuntu 20.04 or later versions) to provision target machines. Before using this repo in the CNC machine, verify that:
