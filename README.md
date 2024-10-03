@@ -5,8 +5,8 @@ This repository contains a collection of Ansible roles and playbooks used to dep
 Version compatibility matrix
 ----------------------------
 
-You must install a supported release of this plugin to match the version
-needed for the OpenEdx installation
+You must install a supported release of this repository to match the version
+needed for your infrastructure.
 
 | Open edX release | Tutor version     | Atlas Ansible Utils version |
 |------------------|-------------------|-----------------------------|
