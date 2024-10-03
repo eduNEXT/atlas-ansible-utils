@@ -17,7 +17,7 @@ The following is the list of supported operating systems.
 
 | Playbook           | Ubuntu 22.04 | Ubuntu 24.04 |
 |--------------------|--------------|--------------|
-| redis_7            |      x       |              |
+| redis_7            |      x       |       x      |
 | mysql_8_4          |      x       |       x      |
 | mongo_7_0          |      x       |              |
 | elasticsearch_7    |      x       |              |
