@@ -29,7 +29,7 @@ redis_group: redis
 #
 
 REDIS_REPO: deb https://packages.redis.io/deb {{ ansible_distribution_release }} main
-REDIS_VERSION: 6:7.4.0-1rl1~noble1
+REDIS_VERSION: 6:7.2.5-1rl1~{{ ansible_distribution_release }}1
 
 redis_debian_pkgs:
   - redis-tools={{ REDIS_VERSION }}
