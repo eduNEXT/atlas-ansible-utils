@@ -23,7 +23,7 @@
     name: pymongo
     state: present
     version: "{{ PYMONGO_VERSION }}"
-    extra_args: -i {{ COMMON_PYPI_MIRROR_URL }}
+    extra_args: -i {{ COMMON_PYPI_MIRROR_URL }} --break-system-packages
   tags:
     - install
     - install:app-requirements
