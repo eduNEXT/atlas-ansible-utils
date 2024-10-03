@@ -2,6 +2,27 @@
 
 This repository contains a collection of Ansible roles and playbooks used to deploy different services in the OpenedX platform context. Although the adoption of containerized application platforms like Kubernetes by the OpenedX community, there are special case where Ansible tools are still required, for instance, to deploy databases in on-premises.
 
+Versioning
+----------
+
+This repository follows the same versioning scheme as the Tutor project, where each major version maps to an Open edX release. For each release we provide the ansible scripts needed to provision the databases used by an Open edX instance on said release.
+
+
+| Open edX release | Tutor version     | Atlas Ansible Utils version |
+|------------------|-------------------|-----------------------------|
+| Quince and older | `<18`             | 1.11.0                      |
+| Redwood          | `>=18.0, <19`     | >=18.0.0                    |
+
+The following is the list of supported operating systems.
+
+| Playbook           | Ubuntu 22.04 | Ubuntu 24.04 |
+|--------------------|--------------|--------------|
+| redis_7            |      x       |              |
+| mysql_8_4          |      x       |       x      |
+| mongo_7_0          |      x       |              |
+| elasticsearch_7    |      x       |              |
+| clickhouse         |      x       |              |
+
 ## How to use this repo
 
 In most cases, this repo is used from **command and control** instance (Ubuntu 20.04 or later versions) to provision target machines. Before using this repo in the CNC machine, verify that:

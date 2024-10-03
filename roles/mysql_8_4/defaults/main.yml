@@ -3,6 +3,7 @@ mysql_8_4_debian_pkgs:
   - python3-mysqldb
   - gpg
   - dirmngr
+  - gpg-agent
 
 mysql_server_8_4_pkg: mysql-server=8.4.*
 mysql_client_8_4_pkg: mysql-client=8.4.*
@@ -11,11 +12,13 @@ mysql_config_file: /etc/mysql/my.cnf
 mysql_8_4_socket: /var/run/mysqld/mysqld.sock
 
 MYSQL_8_4_APT_KEYSERVER: keyserver.ubuntu.com
-MYSQL_8_4_APT_KEY: A8D3785C
+# FROM: https://repo.mysql.com/apt/ubuntu/conf/distributions
+MYSQL_8_4_APT_KEY: B7B3B788A8D3785C
 MYSQL_8_4_REPO: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
 
 MYSQL_8_4_SUPPORTED_DISTRIBUTIONS:
   - jammy
+  - noble
 
 # List of dictionaries as described in the mount_ebs role's default
 # for the volumes.
