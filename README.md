@@ -20,7 +20,7 @@ The following is the list of supported operating systems.
 | redis_7            |      x       |              |
 | mysql_8_4          |      x       |       x      |
 | mongo_7_0          |      x       |              |
-| elasticsearch_7    |      x       |              |
+| elasticsearch_7    |      x       |       x      |
 | clickhouse         |      x       |              |
 
 ## How to use this repo
