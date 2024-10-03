@@ -15,7 +15,7 @@ elasticsearch_group: elasticsearch
 ELASTICSEARCH_CLUSTER_MEMBERS: []
 ELASTICSEARCH_HEAP_SIZE: 512m
 ELASTICSEARCH_START_TIMEOUT: "600"
-ELASTICSEARCH_VERSION: 7.10.2
+ELASTICSEARCH_VERSION: 7.17.3
 
 # Search variables
 # This will set indices.query.bool.max_clause_count search configuration

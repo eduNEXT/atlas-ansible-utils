@@ -5,4 +5,4 @@
   become: true
   gather_facts: true
   roles:
-    - role: elasticsearch_7_10
+    - role: elasticsearch_7
