@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm AS minimal
+FROM python:3.12-slim-bookworm AS minimal
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -21,7 +21,7 @@ RUN --mount=type=cache,mode=0755,target=/root/.cache/pip \
 COPY ./requirements.yml .
 RUN ansible-galaxy install -r requirements.yml
 
-FROM python:3.11-slim-bookworm AS final
+FROM python:3.12-slim-bookworm AS final
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
