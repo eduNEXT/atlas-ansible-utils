@@ -8,21 +8,20 @@ Version compatibility matrix
 You must install a supported release of this plugin to match the version
 needed for the OpenEdx installation
 
-| Open edX release | Tutor version     | Plugin release |
-|------------------|-------------------|--------------- |
-| Quince and older | `<18`             | 1.11.0         |
-| Redwood          | `>=18.0, <19`     | >=18.0.0       |
+| Open edX release | Tutor version     | Atlas Ansible Utils version |
+|------------------|-------------------|-----------------------------|
+| Quince and older | `<18`             | 1.11.0                      |
+| Redwood          | `>=18.0, <19`     | >=18.0.0                    |
 
 OS compability matrix
 ---------------------
 
 | Playbook           | Ubuntu 22.04 | Ubuntu 24.04 |
 |--------------------|--------------|--------------|
-| redis_7_2          |      x       |              |
+| redis_7            |      x       |              |
 | mysql_8_4          |      x       |       x      |
 | mongo_7_0          |      x       |              |
-| elasticsearch_7_10 |      x       |              |
-| percona_5_7        |      x       |              |
+| elasticsearch_7    |      x       |              |
 | clickhouse         |      x       |              |
 
 ## How to use this repo
