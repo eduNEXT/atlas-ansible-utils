@@ -5,4 +5,4 @@
   become: true
   gather_facts: true
   roles:
-    - role: redis_7_2
+    - role: redis_7
