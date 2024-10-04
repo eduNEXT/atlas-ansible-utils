@@ -85,6 +85,26 @@
     - install
     - install:app-configuration
 
+- name: Restart mongo service if we changed our configuration or upgraded mongo
+  ansible.builtin.service:
+    name: mongod
+    state: restarted
+  when: install_mongo_package.changed
+  tags:
+    - manage
+    - manage:start
+    - manage:db-replication
+
+- name: Wait for mongo server to start
+  ansible.builtin.wait_for:
+    port: 27017
+    delay: 2
+  when: install_mongo_package.changed
+  tags:
+    - manage
+    - manage:start
+    - manage:db-replication
+
 # This will error when run on a new replica set, so we ignore_errors
 # and connect anonymously next.
 - name: Determine if there is a replica set already
