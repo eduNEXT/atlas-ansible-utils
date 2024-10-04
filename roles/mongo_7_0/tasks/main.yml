@@ -12,11 +12,9 @@
     - install
     - install:configuration
 
-- name: Install pip3 and cron
+- name: Install pip3
   ansible.builtin.apt:
-    name:
-      - python3-pip
-      - cron
+    name: python3-pip
     state: present
     update_cache: true
 
@@ -369,26 +367,3 @@
   tags:
     - manage
     - manage:start
-
-- name: Add serverStatus logging script
-  ansible.builtin.template:
-    src: log-mongo-serverStatus.sh.j2
-    dest: "{{ COMMON_BIN_DIR }}/log-mongo-serverStatus.sh"
-    owner: "{{ mongo_user }}"
-    group: "{{ mongo_user }}"
-    mode: "0700"
-  when: MONGO_LOG_SERVERSTATUS
-  tags:
-    - install
-    - install:app-configuration
-
-- name: Add serverStatus logging script to cron
-  ansible.builtin.cron:
-    name: mongostat logging job
-    minute: "*/3"
-    job: /edx/bin/log-mongo-serverStatus.sh >> {{ mongo_log_dir }}/serverStatus.log 2>&1
-  become: true
-  when: MONGO_LOG_SERVERSTATUS
-  tags:
-    - install
-    - install:app-configuration
