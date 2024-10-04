@@ -70,6 +70,7 @@
     - install
     - install:app-requirements
     - mongo_packages
+    - molecule-idempotence-notest
 
 - name: Create mongo dirs
   ansible.builtin.file:
@@ -96,6 +97,7 @@
     - manage
     - manage:start
     - manage:db-replication
+    - molecule-idempotence-notest
 
 - name: Wait for mongo server to start
   ansible.builtin.wait_for:
@@ -106,6 +108,7 @@
     - manage
     - manage:start
     - manage:db-replication
+    - molecule-idempotence-notest
 
 # This will error when run on a new replica set, so we ignore_errors
 # and connect anonymously next.
@@ -213,6 +216,7 @@
     - manage
     - manage:start
     - manage:db-replication
+    - molecule-idempotence-notest
 
 - name: Wait for mongo server to start
   ansible.builtin.wait_for:
