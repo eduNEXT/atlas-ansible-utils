@@ -18,9 +18,10 @@
     state: present
     update_cache: true
 
-- name: Set break_system_packages if Ubuntu version >= 24
-  ansible.builtin.set_fact:
-    PIP_EXTRA_ARGS: "{{ PIP_EXTRA_ARGS }} --break-system-packages"
+- name: Ignore PEP 668
+  ansible.builtin.file:
+    path: /usr/lib/python3.12/EXTERNALLY-MANAGED
+    state: absent
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24', '>=')
 
 - name: Install python pymongo for mongo_user ansible module
@@ -28,7 +29,7 @@
     name: pymongo
     state: present
     version: "{{ PYMONGO_VERSION }}"
-    extra_args: -i {{ COMMON_PYPI_MIRROR_URL }} {{ PIP_EXTRA_ARGS }}
+    extra_args: -i {{ COMMON_PYPI_MIRROR_URL }}
   tags:
     - install
     - install:app-requirements
