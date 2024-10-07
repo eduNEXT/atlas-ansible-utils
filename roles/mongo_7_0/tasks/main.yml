@@ -18,6 +18,12 @@
     state: present
     update_cache: true
 
+- name: Ignore PEP 668
+  ansible.builtin.file:
+    path: /usr/lib/python3.12/EXTERNALLY-MANAGED
+    state: absent
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24', '>=')
+
 - name: Install python pymongo for mongo_user ansible module
   ansible.builtin.pip:
     name: pymongo
@@ -68,6 +74,7 @@
     - install
     - install:app-requirements
     - mongo_packages
+    - molecule-idempotence-notest
 
 - name: Create mongo dirs
   ansible.builtin.file:
@@ -84,6 +91,28 @@
   tags:
     - install
     - install:app-configuration
+
+- name: Restart mongo service if we changed our configuration or upgraded mongo
+  ansible.builtin.service:
+    name: mongod
+    state: restarted
+  when: install_mongo_package.changed
+  tags:
+    - manage
+    - manage:start
+    - manage:db-replication
+    - molecule-idempotence-notest
+
+- name: Wait for mongo server to start
+  ansible.builtin.wait_for:
+    port: 27017
+    delay: 2
+  when: install_mongo_package.changed
+  tags:
+    - manage
+    - manage:start
+    - manage:db-replication
+    - molecule-idempotence-notest
 
 # This will error when run on a new replica set, so we ignore_errors
 # and connect anonymously next.
@@ -191,6 +220,7 @@
     - manage
     - manage:start
     - manage:db-replication
+    - molecule-idempotence-notest
 
 - name: Wait for mongo server to start
   ansible.builtin.wait_for:
@@ -343,26 +373,3 @@
   tags:
     - manage
     - manage:start
-
-- name: Add serverStatus logging script
-  ansible.builtin.template:
-    src: log-mongo-serverStatus.sh.j2
-    dest: "{{ COMMON_BIN_DIR }}/log-mongo-serverStatus.sh"
-    owner: "{{ mongo_user }}"
-    group: "{{ mongo_user }}"
-    mode: "0700"
-  when: MONGO_LOG_SERVERSTATUS
-  tags:
-    - install
-    - install:app-configuration
-
-- name: Add serverStatus logging script to cron
-  ansible.builtin.cron:
-    name: mongostat logging job
-    minute: "*/3"
-    job: /edx/bin/log-mongo-serverStatus.sh >> {{ mongo_log_dir }}/serverStatus.log 2>&1
-  become: true
-  when: MONGO_LOG_SERVERSTATUS
-  tags:
-    - install
-    - install:app-configuration
