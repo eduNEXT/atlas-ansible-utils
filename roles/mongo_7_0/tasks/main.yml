@@ -19,7 +19,7 @@
     update_cache: true
 
 - name: Set break_system_packages if Ubuntu version >= 24
-  set_fact:
+  ansible.builtin.set_fact:
     PIP_EXTRA_ARGS: "{{ PIP_EXTRA_ARGS }} --break-system-packages"
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24', '>=')
 
