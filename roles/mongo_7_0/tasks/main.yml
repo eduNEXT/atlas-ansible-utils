@@ -18,12 +18,17 @@
     state: present
     update_cache: true
 
+- name: Set break_system_packages if Ubuntu version >= 24
+  set_fact:
+    PIP_EXTRA_ARGS: "{{ PIP_EXTRA_ARGS }} --break-system-packages"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24', '>=')
+
 - name: Install python pymongo for mongo_user ansible module
   ansible.builtin.pip:
     name: pymongo
     state: present
     version: "{{ PYMONGO_VERSION }}"
-    extra_args: -i {{ COMMON_PYPI_MIRROR_URL }} --break-system-packages
+    extra_args: -i {{ COMMON_PYPI_MIRROR_URL }} {{ PIP_EXTRA_ARGS }}
   tags:
     - install
     - install:app-requirements
