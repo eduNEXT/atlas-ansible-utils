@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v18.0.0 (2024-10-08)
+
+### Breaking
+
+- Remove older playbooks and roles (#51) ([`d54f78c`](https://github.com/eduNEXT/atlas-ansible-utils/commit/d54f78cfb0cfc0a7826ae14440fd55e0d11e9291))
+
+### Feature
+
+- Add support for ubuntu24 for mongo 7.0 (#52) ([`826f088`](https://github.com/eduNEXT/atlas-ansible-utils/commit/826f0887b442919065f80ead18bd1248a5851f07))
+- Add support to clickhouse for ubuntu 24 (#48) ([`5637a7b`](https://github.com/eduNEXT/atlas-ansible-utils/commit/5637a7bc610e8049241b266fc9f1a45b3d894fae))
+- Add support to redis for ubuntu 24 (#50) ([`c2a9e61`](https://github.com/eduNEXT/atlas-ansible-utils/commit/c2a9e61899e646b1e0e0fb0e71df5bf8133c3d5f))
+- Add support to mysql8.4 for ubuntu 24.04 (#47) ([`a7d93f5`](https://github.com/eduNEXT/atlas-ansible-utils/commit/a7d93f5382fbc5f9141b1c3e943903535fbde366))
+- Add support to elasticsearch for ubuntu 24 (#49) ([`acb5d19`](https://github.com/eduNEXT/atlas-ansible-utils/commit/acb5d19f74f597a0c1de71fbafec6f496d4810b6))
+
 ## v1.11.0 (2024-09-05)
 
 ### Feature
