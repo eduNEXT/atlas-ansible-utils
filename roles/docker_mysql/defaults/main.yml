@@ -8,6 +8,11 @@ DOCKER_MYSQL_IMAGE: docker.io/mysql:8.4.0
 DOCKER_MYSQL_BIND_ADDRESS: 0.0.0.0
 DOCKER_MYSQL_PORT: 3306
 
+# Name of the network used by the containers. User created networks allow
+# containers to communicate using Docker's Name resolution (i.e. using the
+# container name as the hostname).
+DOCKER_MYSQL_NETWORK: databases
+
 MYSQL_CONFIG_SERVER_ID: 1
 MYSQL_CONFIG_READ_ONLY: "OFF"
 MYSQL_CONFIG_CHARACTER_SET_SERVER: utf8mb4
