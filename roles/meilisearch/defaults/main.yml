@@ -59,3 +59,4 @@ meilisearch_cfg_ssl_tickets: "false"
 
 meilisearch_cfg_experimental_enable_metrics: "false"
 meilisearch_cfg_experimental_reduce_indexing_memory_usage: "false"
+meilisearch_cfg_experimental_max_number_of_batched_tasks: 100

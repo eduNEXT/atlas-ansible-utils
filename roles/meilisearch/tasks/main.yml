@@ -64,7 +64,7 @@
     owner: "{{ meilisearch_user }}"
     group: "{{ meilisearch_group }}"
     state: directory
-  loop: 
+  loop:
     - "{{ meilisearch_db_path }}"
     - "{{ meilisearch_cfg_db_path }}"
     - "{{ meilisearch_cfg_dump_dir }}"
