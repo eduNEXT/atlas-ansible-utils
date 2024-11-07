@@ -12,14 +12,19 @@ meilisearch_stable_os:
 meilisearch_state: started
 meilisearch_enabled_at_boot: true
 
-meilisearch_user: 'meilisearch'
-meilisearch_group: 'meilisearch'
+meilisearch_user: "meilisearch"
+meilisearch_group: "meilisearch"
 
-meilisearch_exe_path: '/usr/bin/meilisearch'
-meilisearch_db_path: '/var/lib/meilisearch'
+meilisearch_exe_path: "/usr/bin/meilisearch"
+meilisearch_db_path: "/var/lib/meilisearch"
 meilisearch_listen_ip: 127.0.0.1
 meilisearch_listen_port: 7700
-meilisearch_master_key: 'Y0urVery-S3cureAp1K3y'
+meilisearch_master_key: "Y0urVery-S3cureAp1K3y"
+
+# This download URL is based on the official Meilisearch docs:
+# https://www.meilisearch.com/docs/learn/self_hosted/install_meilisearch_locally#installing-older-versions-of-meilisearch
+meilisearch_version: "1.8.4"
+meilisearch_release_url: "https://github.com/meilisearch/meilisearch/releases/download/v{{ meilisearch_version }}/meilisearch-linux-amd64"
 
 # use config file instead of visible master key in ps -ef | grep meilisearch
 # base file: https://raw.githubusercontent.com/meilisearch/meilisearch/latest/config.toml

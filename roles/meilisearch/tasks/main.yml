@@ -28,19 +28,12 @@
     system: 'yes'
     state: present
 
-- name: "Get MeiliSearch Installation Script."
+- name: "Get MeiliSearch binary."
   ansible.builtin.get_url:
-    url: https://install.meilisearch.com
-    dest: "/tmp/meilisearch.sh"
+    url: "{{ meilisearch_release_url }}"
+    dest: "/tmp/meilisearch"
     mode: 0750
     owner: root
-  when: not meilisearch_status.stat.exists | bool
-
-- name: "Run MeiliSearch Installation Script."
-  ansible.builtin.shell: /tmp/meilisearch.sh
-  args:
-    chdir: /tmp
-    # warn: 'false'
   when: not meilisearch_status.stat.exists | bool
 
 - name: "Move MeiliSearch Binary into Place."
