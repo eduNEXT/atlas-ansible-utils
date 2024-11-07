@@ -94,11 +94,20 @@
   notify:
     - Restart MySQL Container
 
+- name: Configure MySQL Network
+  community.docker.docker_network:
+    name: "{{ DOCKER_MYSQL_NETWORK }}"
+  tags:
+    - mysql
+    - network
+
 - name: Start MySQL Container
   community.docker.docker_container:
     name: mysql
     image: "{{ DOCKER_MYSQL_IMAGE }}"
     restart_policy: unless-stopped
+    networks:
+      - name: "{{ DOCKER_MYSQL_NETWORK }}"
     state: started
     published_ports:
       - "{{  DOCKER_MYSQL_BIND_ADDRESS }}:{{ DOCKER_MYSQL_PORT }}:3306"

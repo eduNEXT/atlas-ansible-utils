@@ -28,6 +28,13 @@
     and DOCKER_MONGO_VOLUME.device is defined
     and DOCKER_MONGO_VOLUME.fstype is defined
 
+- name: Configure MongoDB Network
+  community.docker.docker_network:
+    name: "{{ DOCKER_MONGO_NETWORK }}"
+  tags:
+    - mongo
+    - network
+
 - name: Configure MongoDB Volumes in {{ DOCKER_MONGO_VOLUME.device }}
   community.docker.docker_volume:
     volume_name: mongo-data
@@ -86,6 +93,8 @@
     name: mongo
     image: "{{ DOCKER_MONGO_IMAGE }}"
     restart_policy: unless-stopped
+    networks:
+      - name: "{{ DOCKER_MONGO_NETWORK }}"
     command:
       - --config
       - /etc/mongod.conf

@@ -19,4 +19,9 @@ DOCKER_MONGO_PORT: 27017
 #   fstype: xfs
 #   size: "50.00 GB"
 
+# Name of the network used by the containers. User created networks allow
+# containers to communicate using Docker's Name resolution (i.e. using the
+# container name as the hostname).
+DOCKER_MONGO_NETWORK: databases
+
 mongo_extra_conf: ""
