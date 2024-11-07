@@ -1,11 +1,11 @@
 ---
 # handlers file for meilisearch
 
-- name: "systemd daemon-reload"
-  systemd:
+- name: "Systemd daemon-reload"
+  ansible.builtin.systemd:
     daemon_reload: 'yes'
 
-- name: "restart meilisearch"
+- name: "Restart meilisearch"
   ansible.builtin.service:
     name: meilisearch
     state: restarted

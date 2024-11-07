@@ -32,12 +32,12 @@
   ansible.builtin.get_url:
     url: "{{ meilisearch_release_url }}"
     dest: "/tmp/meilisearch"
-    mode: 0750
+    mode: "0750"
     owner: root
   when: not meilisearch_status.stat.exists | bool
 
 - name: "Move MeiliSearch Binary into Place."
-  ansible.builtin.shell: mv /tmp/meilisearch "{{ meilisearch_exe_path }}"
+  ansible.builtin.command: mv /tmp/meilisearch "{{ meilisearch_exe_path }}"
   args:
     chdir: /tmp
     # warn: 'false'
@@ -46,14 +46,14 @@
 - name: "Ensure Permissions on MeiliSearch Binary."
   ansible.builtin.file:
     path: "{{ meilisearch_exe_path }}"
-    mode: 0750
+    mode: "0750"
     owner: "{{ meilisearch_user }}"
     group: "{{ meilisearch_group }}"
 
 - name: "Ensure MeiliSearch DB Directory exists."
   ansible.builtin.file:
     path: "{{ item }}"
-    mode: 0750
+    mode: "0750"
     owner: "{{ meilisearch_user }}"
     group: "{{ meilisearch_group }}"
     state: directory
@@ -69,9 +69,9 @@
     dest: "{{ meilisearch_configfile }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify:
-    - restart meilisearch
+    - Restart meilisearch
 
 - name: "Copy MeiliSearch systemd unit file into place."
   ansible.builtin.template:
@@ -79,11 +79,11 @@
     dest: /etc/systemd/system/meilisearch.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when: "ansible_service_mgr == 'systemd'"
   notify:
-    - systemd daemon-reload
-    - restart meilisearch
+    - Systemd daemon-reload
+    - Restart meilisearch
 
 - name: "Configure the MeiliSearch Service."
   ansible.builtin.service:
