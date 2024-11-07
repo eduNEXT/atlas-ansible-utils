@@ -12,6 +12,7 @@ This repository follows the same versioning scheme as the Tutor project, where e
 |------------------|-------------------|-----------------------------|
 | Quince and older | `<18`             | 1.11.0                      |
 | Redwood          | `>=18.0, <19`     | >=18.0.0                    |
+| Sumac            | `>=19.0, <20`     | >=19.0.0                    |
 
 The following is the list of supported operating systems.
 
@@ -22,6 +23,7 @@ The following is the list of supported operating systems.
 | mongo_7_0          |      x       |       x      |
 | elasticsearch_7    |      x       |       x      |
 | clickhouse         |      x       |       x      |
+| meilisearch        |      x       |       x      |
 
 ## How to use this repo
 
