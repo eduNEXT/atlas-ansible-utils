@@ -7,11 +7,9 @@ piptools: ## install pinned version of pip-compile and pip-sync
 
 requirements: ## install  environment requirements
 	pip install -r requirements/base.txt
-	ansible-galaxy install -r requirements.yml
 
 dev-requirements: ## install development requirements
 	pip install -r requirements/dev.txt
-	ansible-galaxy install -r requirements.yml
 
 quality: ## Lint based in ansible.
 	ansible-lint --exclude charts -c .ansible-lint.yml
