@@ -185,11 +185,7 @@ or you can create it via ArgoCD.
 
 **NOTE**
 
-For now this repo supports the playbooks for:
-- MySQL 5.7
-- Mongo 4.2
-- Percona 5.7
-- Caddy
+Explore the `playbooks` folder to check the available playbooks this repository offers.
 
 ---
 ## Extract and Restore databases:
