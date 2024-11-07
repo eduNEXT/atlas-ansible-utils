@@ -1,0 +1,11 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Verify Meilisearch installation
+    uri:
+      url: http://localhost:7700/health
+      status_code: 200
+      timeout: 1
+      return_content: yes
