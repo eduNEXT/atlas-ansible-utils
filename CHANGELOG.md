@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v18.0.1 (2024-11-07)
+
+### Fix
+
+- Removing galaxy dependencies (#56) ([`b89eb61`](https://github.com/eduNEXT/atlas-ansible-utils/commit/b89eb6141c862319a96f2fb1953da6f2a7b0e48d))
+
 ## v18.0.0 (2024-10-08)
 
 ### Breaking
