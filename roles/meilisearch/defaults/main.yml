@@ -15,7 +15,7 @@ meilisearch_group: "meilisearch"
 
 meilisearch_exe_path: "/usr/bin/meilisearch"
 meilisearch_db_path: "/var/lib/meilisearch"
-meilisearch_listen_ip: 127.0.0.1
+meilisearch_listen_ip: 0.0.0.0
 meilisearch_listen_port: 7700
 
 # Using a robust master_key is strongly recommended. Please override this variable in your inventory

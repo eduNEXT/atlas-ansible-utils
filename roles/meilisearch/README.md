@@ -36,7 +36,7 @@ Configure the path where the binary should be placed.
 
 Configure the path where the database should be placed.
 
-    meilisearch_listen_ip: 127.0.0.1
+    meilisearch_listen_ip: 0.0.0.0
     meilisearch_listen_port: 7700
 
 Configure the IP and port on which MeiliSearch should listen.
