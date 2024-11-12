@@ -43,7 +43,7 @@ Configure the IP and port on which MeiliSearch should listen.
 
     meilisearch_master_key: 'Y0urVery-S3cureAp1K3y'
 
-The MeiliSearch master key. This should be changed for security reasons. For more information see [this link](https://www.meilisearch.com/docs/learn/self_hosted/configure_meilisearch_at_launch#master-key).
+The MeiliSearch master key. **This must be changed for security reasons**. For more information see [this link](https://www.meilisearch.com/docs/learn/self_hosted/configure_meilisearch_at_launch#master-key).
 
 Dependencies
 ------------

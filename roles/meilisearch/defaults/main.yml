@@ -1,8 +1,6 @@
 ---
 # defaults file for meilisearch
 
-# https://docs.meilisearch.com/reference/features/configuration.html
-
 meilisearch_stable_os:
   - Debian 11
   - Debian 12
@@ -19,6 +17,8 @@ meilisearch_exe_path: "/usr/bin/meilisearch"
 meilisearch_db_path: "/var/lib/meilisearch"
 meilisearch_listen_ip: 127.0.0.1
 meilisearch_listen_port: 7700
+
+# Using a robust master_key is strongly recommended. Please override this variable in your inventory
 meilisearch_master_key: "Y0urVery-S3cureAp1K3y"
 
 # This download URL is based on the official Meilisearch docs:
@@ -26,10 +26,10 @@ meilisearch_master_key: "Y0urVery-S3cureAp1K3y"
 meilisearch_version: "1.8.4"
 meilisearch_release_url: "https://github.com/meilisearch/meilisearch/releases/download/v{{ meilisearch_version }}/meilisearch-linux-amd64"
 
-# use config file instead of visible master key in ps -ef | grep meilisearch
-# base file: https://raw.githubusercontent.com/meilisearch/meilisearch/latest/config.toml
-# All variables are defined here: https://www.meilisearch.com/docs/learn/configuration/instance_options#environment-variables
-# below the config variables prefixed with "meilisearch_cfg_"
+# Using a config file to run Meilisearch
+# Base file: https://raw.githubusercontent.com/meilisearch/meilisearch/latest/config.toml
+# All variables are defined here: https://www.meilisearch.com/docs/learn/self_hosted/configure_meilisearch_at_launch#environment-variables
+# Below the config variables prefixed with "meilisearch_cfg_"
 
 meilisearch_configfile: "/etc/meilisearch.toml"
 
@@ -61,7 +61,3 @@ meilisearch_cfg_ssl_ocsp_path: "./path/to/ocsp-file"
 meilisearch_cfg_ssl_require_auth: "false"
 meilisearch_cfg_ssl_resumption: "false"
 meilisearch_cfg_ssl_tickets: "false"
-
-meilisearch_cfg_experimental_enable_metrics: "false"
-meilisearch_cfg_experimental_reduce_indexing_memory_usage: "false"
-meilisearch_cfg_experimental_max_number_of_batched_tasks: 100
