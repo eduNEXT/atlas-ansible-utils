@@ -18,10 +18,18 @@ Role Variables
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
-    meilisearch_state: started
-    meilisearch_enabled_at_boot: true
+    meilisearch_listen_ip: 0.0.0.0
+    meilisearch_listen_port: 7700
 
-Start and enable MeiliSearch at boot.
+Configure the IP and port on which MeiliSearch should listen.
+
+    meilisearch_master_key: 'Y0urVery-S3cureAp1K3y'
+
+Configure the MeiliSearch master key. **This must be changed for security reasons**. For more information see [this link](https://www.meilisearch.com/docs/learn/self_hosted/configure_meilisearch_at_launch#master-key).
+
+    meilisearch_version: "1.8.4"
+
+Define the MeiliSearch version to be installed.
 
     meilisearch_user: 'meilisearch'
     meilisearch_group: 'meilisearch'
@@ -35,15 +43,6 @@ Configure the path where the binary should be placed.
     meilisearch_db_path: '/var/lib/meilisearch'
 
 Configure the path where the database should be placed.
-
-    meilisearch_listen_ip: 0.0.0.0
-    meilisearch_listen_port: 7700
-
-Configure the IP and port on which MeiliSearch should listen.
-
-    meilisearch_master_key: 'Y0urVery-S3cureAp1K3y'
-
-The MeiliSearch master key. **This must be changed for security reasons**. For more information see [this link](https://www.meilisearch.com/docs/learn/self_hosted/configure_meilisearch_at_launch#master-key).
 
 Dependencies
 ------------
