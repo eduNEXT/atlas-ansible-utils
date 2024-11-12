@@ -7,9 +7,6 @@ meilisearch_stable_os:
   - Ubuntu 22
   - Ubuntu 24
 
-meilisearch_state: started
-meilisearch_enabled_at_boot: true
-
 meilisearch_user: "meilisearch"
 meilisearch_group: "meilisearch"
 
@@ -34,7 +31,6 @@ meilisearch_release_url: "https://github.com/meilisearch/meilisearch/releases/do
 meilisearch_configfile: "/etc/meilisearch.toml"
 
 meilisearch_cfg_http_addr: "{{ meilisearch_listen_ip }}:{{ meilisearch_listen_port }}"
-meilisearch_cfg_env: "production"
 meilisearch_cfg_db_path: "{{ meilisearch_db_path }}/data/"
 meilisearch_cfg_no_analytics: "true"
 meilisearch_cfg_http_payload_size_limit: "100 MB"

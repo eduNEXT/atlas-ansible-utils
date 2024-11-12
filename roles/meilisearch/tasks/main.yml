@@ -88,5 +88,5 @@
 - name: "Configure the MeiliSearch Service."
   ansible.builtin.service:
     name: meilisearch
-    state: "{{ meilisearch_state }}"
-    enabled: "{{ meilisearch_enabled_at_boot }}"
+    state: started
+    enabled: true
