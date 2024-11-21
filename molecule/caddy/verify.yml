@@ -9,3 +9,13 @@
     register: caddy
     shell: |
       caddy version
+      curl -I http://localhost:8080 -f -s # Make sure we receive responses from :8080
+      curl -I http://localhost:8081 -f -s # Make sure we receive responses instead of timeouts
+      curl -I http://localhost:8081 -f -s # Make sure we receive responses instead of timeouts
+      curl -I http://localhost:8082 -f -s -m 2
+      if [ $? -ne 0 ]; then
+        echo "Can't connect to :8082 but :8081 is still alive"
+        exit 0
+      else
+        exit 1
+      fi

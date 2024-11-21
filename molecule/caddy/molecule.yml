@@ -20,6 +20,17 @@ platforms:
 provisioner:
   name: ansible
   inventory:
-    all: {}
+    group_vars:
+      all:
+        caddy_backend_targets:
+        - 'localhost:8080'
+        # This emulates a bad node: curl: (7) Failed to connect to localhost port 8082 after 0 ms: Connection refused
+        - 'localhost:8082'
+        # This emulates a host which proxies 8080 and 8082
+        caddy_extra_rules: |
+          :8081 {
+            import https-proxy {{caddy_backend_targets|join(' ')}}
+          }
+
 verifier:
   name: ansible
