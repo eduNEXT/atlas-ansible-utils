@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v18.1.0 (2024-11-25)
+
+### Feature
+
+- Add caddy health checks (#58) ([`e9b267d`](https://github.com/eduNEXT/atlas-ansible-utils/commit/e9b267dd7365cd2bf6e1c76a9898961343f3610d))
+
 ## v18.0.1 (2024-11-07)
 
 ### Fix
