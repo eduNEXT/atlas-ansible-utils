@@ -27,3 +27,5 @@ caddy_backend_target:
 caddy_global_options: |
   # Additional caddy global options
   # See https://caddyserver.com/docs/caddyfile/options for more information
+
+caddy_health_uri: /healthz

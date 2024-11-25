@@ -13,6 +13,9 @@ respond "Hello, world!"
     reverse_proxy {
         to {args[:]}
         lb_policy round_robin
+
+        health_timeout 5s
+        health_uri {{ caddy_health_uri }}
     }
 }
 
