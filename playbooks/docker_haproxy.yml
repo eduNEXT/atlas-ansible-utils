@@ -1,0 +1,7 @@
+---
+- name: Deploy HAProxy in Docker containers
+  hosts: haproxy_servers
+  gather_facts: true
+  become: false
+  roles:
+    - role: docker_haproxy
