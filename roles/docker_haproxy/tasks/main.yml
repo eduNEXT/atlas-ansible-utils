@@ -30,7 +30,6 @@
     published_ports:
       - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:80:80"
       - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:443:443"
-      - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:8404:8404"
     mounts:
       - source: /etc/haproxy/
         target: /usr/local/etc/haproxy

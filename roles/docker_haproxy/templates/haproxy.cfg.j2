@@ -44,8 +44,8 @@ frontend https
   default_backend https_k8s_servers
   mode tcp
 
-frontend stats
-  bind *:8404
-  stats enable
-  stats uri /
-  stats refresh 10s
+# frontend stats
+#   bind *:8404
+#   stats enable
+#   stats uri /
+#   stats refresh 10s
