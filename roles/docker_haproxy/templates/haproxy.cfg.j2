@@ -21,14 +21,14 @@ defaults
   timeout server  50000
 
 backend http_k8s_servers
-  balance roundrobin
+  balance source
   {% for backend in DOCKER_HAPROXY_BACKENDS %}
   server s1 {{backend}}:{{DOCKER_HAPROXY_HTTP_PORT}} check send-proxy
   {% endfor %}
   mode tcp
 
 backend https_k8s_servers
-  balance roundrobin
+  balance source
   {% for backend in DOCKER_HAPROXY_BACKENDS %}
   server s1 {{backend}}:{{DOCKER_HAPROXY_HTTPS_PORT}} check send-proxy
   {% endfor %}
