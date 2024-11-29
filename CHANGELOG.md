@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v18.2.0 (2024-11-29)
+
+### Feature
+
+- Add haproxy docker role (#59) ([`38148de`](https://github.com/eduNEXT/atlas-ansible-utils/commit/38148de738adf4de262047e0cc803becd852b773))
+- Use a custom network for docker databases (#55) ([`ace0b76`](https://github.com/eduNEXT/atlas-ansible-utils/commit/ace0b767973eb7a0353222e81763773a4a51b4c3))
+
 ## v18.1.0 (2024-11-25)
 
 ### Feature
