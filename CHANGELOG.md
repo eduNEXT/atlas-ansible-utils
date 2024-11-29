@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v18.2.1 (2024-11-29)
+
+### Fix
+
+- Use ip hash as load balancing algorithm (#60) ([`f6ce39c`](https://github.com/eduNEXT/atlas-ansible-utils/commit/f6ce39c98608a6cbb54556bc3a28b9a24bc08609))
+
 ## v18.2.0 (2024-11-29)
 
 ### Feature
