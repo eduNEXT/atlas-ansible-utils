@@ -1,0 +1,18 @@
+---
+DOCKER_HAPROXY_IMAGE: docker.io/haproxy:3.1
+
+# Bind adress and ports exposed by the docker container.
+# We keep the default port and bind address inside the container and instead
+# configure the address and port used by the host using the docker port mapping
+# feature.
+DOCKER_HAPROXY_BIND_ADDRESS: 0.0.0.0
+
+# Name of the network used by the containers. User created networks allow
+# containers to communicate using Docker's Name resolution (i.e. using the
+# container name as the hostname).
+DOCKER_HAPROXY_NETWORK: proxy
+
+DOCKER_HAPROXY_BACKENDS: []
+
+DOCKER_HAPROXY_HTTP_PORT: 32080
+DOCKER_HAPROXY_HTTPS_PORT: 32443

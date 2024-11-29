@@ -1,0 +1,39 @@
+- name: Render HAProxy configuration
+  become: true
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+  tags:
+    - haproxy
+    - config
+  notify:
+    - Restart HAProxy Container
+
+- name: Configure HAProxy Network
+  community.docker.docker_network:
+    name: "{{ DOCKER_HAPROXY_NETWORK }}"
+  tags:
+    - docker
+    - network
+
+- name: Start HAProxy Container
+  community.docker.docker_container:
+    name: haproxy
+    image: "{{ DOCKER_HAPROXY_IMAGE }}"
+    restart_policy: unless-stopped
+    networks:
+      - name: "{{ DOCKER_HAPROXY_NETWORK }}"
+    state: started
+    published_ports:
+      - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:80:80"
+      - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:443:443"
+    mounts:
+      - source: /etc/haproxy/
+        target: /usr/local/etc/haproxy
+        type: bind
+  tags:
+    - haproxy
+    - container
