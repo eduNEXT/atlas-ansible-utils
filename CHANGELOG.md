@@ -5,28 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v19.0.0 (2024-12-18)
+
+### Breaking
+
+- Sumac support (#57) ([`d8dafcf`](https://github.com/eduNEXT/atlas-ansible-utils/commit/d8dafcf3084fb1fa4743c191882fd38845e1d6b4))
+
 ## v18.2.1 (2024-11-29)
 
-### Fix
+### Bug fixes
 
 - Use ip hash as load balancing algorithm (#60) ([`f6ce39c`](https://github.com/eduNEXT/atlas-ansible-utils/commit/f6ce39c98608a6cbb54556bc3a28b9a24bc08609))
 
 ## v18.2.0 (2024-11-29)
 
-### Feature
+### Features
 
 - Add haproxy docker role (#59) ([`38148de`](https://github.com/eduNEXT/atlas-ansible-utils/commit/38148de738adf4de262047e0cc803becd852b773))
 - Use a custom network for docker databases (#55) ([`ace0b76`](https://github.com/eduNEXT/atlas-ansible-utils/commit/ace0b767973eb7a0353222e81763773a4a51b4c3))
 
 ## v18.1.0 (2024-11-25)
 
-### Feature
+### Features
 
 - Add caddy health checks (#58) ([`e9b267d`](https://github.com/eduNEXT/atlas-ansible-utils/commit/e9b267dd7365cd2bf6e1c76a9898961343f3610d))
 
 ## v18.0.1 (2024-11-07)
 
-### Fix
+### Bug fixes
 
 - Removing galaxy dependencies (#56) ([`b89eb61`](https://github.com/eduNEXT/atlas-ansible-utils/commit/b89eb6141c862319a96f2fb1953da6f2a7b0e48d))
 
@@ -36,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove older playbooks and roles (#51) ([`d54f78c`](https://github.com/eduNEXT/atlas-ansible-utils/commit/d54f78cfb0cfc0a7826ae14440fd55e0d11e9291))
 
-### Feature
+### Features
 
 - Add support for ubuntu24 for mongo 7.0 (#52) ([`826f088`](https://github.com/eduNEXT/atlas-ansible-utils/commit/826f0887b442919065f80ead18bd1248a5851f07))
 - Add support to clickhouse for ubuntu 24 (#48) ([`5637a7b`](https://github.com/eduNEXT/atlas-ansible-utils/commit/5637a7bc610e8049241b266fc9f1a45b3d894fae))
@@ -46,19 +52,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.11.0 (2024-09-05)
 
-### Feature
+### Features
 
 - Add routine to deploy dbs in docker (#45) ([`b172c2e`](https://github.com/eduNEXT/atlas-ansible-utils/commit/b172c2eba0d9dd83cd59002fee43f7e0097c09a1))
 
 ## v1.10.0 (2024-08-22)
 
-### Feature
+### Features
 
 - Add a helmchart to run the playbooks on k8s (#42) ([`b86fd0e`](https://github.com/eduNEXT/atlas-ansible-utils/commit/b86fd0efeca08d1511d0bb5b6b48a071bb71d96b))
 
 ## v1.9.0 (2024-07-17)
 
-### Feature
+### Bug fixes
+
+- Disable protected mode in redis 7.2 (#41) ([`3919e5e`](https://github.com/eduNEXT/atlas-ansible-utils/commit/3919e5e3be06f5b14021340f9a21e48e7938606c))
+
+### Features
 
 - Add redis 7.2 playbook (#40) ([`0c4ce6f`](https://github.com/eduNEXT/atlas-ansible-utils/commit/0c4ce6fe1d88b134ab390d43fe35038a60eacbd9))
 - Setup ansible lint (#37) ([`1e38950`](https://github.com/eduNEXT/atlas-ansible-utils/commit/1e38950a1111e86ab72c4ae3659785689dcdbe95))
@@ -66,56 +76,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Create playbook to install mysql8.4 (#33) ([`bd3bcdb`](https://github.com/eduNEXT/atlas-ansible-utils/commit/bd3bcdbbff76657b83bba47bc47ff529196375d9))
 - Add mongo 7.0 support (#31) ([`3cfa344`](https://github.com/eduNEXT/atlas-ansible-utils/commit/3cfa344c829be4564732b2dc9771bea7f88d09fc))
 
-### Fix
-
-- Disable protected mode in redis 7.2 (#41) ([`3919e5e`](https://github.com/eduNEXT/atlas-ansible-utils/commit/3919e5e3be06f5b14021340f9a21e48e7938606c))
-
 ## v1.8.0 (2024-05-07)
 
-### Feature
-
-- Add gpg in mysql dependencies (#28) ([`eb03b97`](https://github.com/eduNEXT/atlas-ansible-utils/commit/eb03b9704bda89a5eac2bb32cca9ada435d72cfb))
-
-### Fix
+### Bug fixes
 
 - Use default auth plugin in mysql8 (#29) ([`517f8d3`](https://github.com/eduNEXT/atlas-ansible-utils/commit/517f8d3c13eab1b78df97822ffc90815ef7e0e96))
 - Verify that the content of the variable defining the suffix contains characters (#27) ([`2d58400`](https://github.com/eduNEXT/atlas-ansible-utils/commit/2d584007cb79dc5f262ccf2c41de0ff34c98fdec))
 - Include the --drop flag to delete the destination database before the restore mongo (#26) ([`aa0b02f`](https://github.com/eduNEXT/atlas-ansible-utils/commit/aa0b02fc3553806e760b3f8d88b88c3b30e45cbd))
 
+### Features
+
+- Add gpg in mysql dependencies (#28) ([`eb03b97`](https://github.com/eduNEXT/atlas-ansible-utils/commit/eb03b9704bda89a5eac2bb32cca9ada435d72cfb))
+
 ## v1.7.0 (2024-04-03)
 
-### Feature
+### Features
 
 - Add support for restore dbs (#25) ([`3bc5fa7`](https://github.com/eduNEXT/atlas-ansible-utils/commit/3bc5fa77a4859234e25a75bb41f952c91fe8997f))
 
 ## v1.6.3 (2024-02-06)
 
-### Fix
+### Bug fixes
 
 - Update mysql repo apt key (#24) ([`fa6d4dc`](https://github.com/eduNEXT/atlas-ansible-utils/commit/fa6d4dc66251cc1c8744c6d5df6ab15a5de72421))
 
 ## v1.6.2 (2024-01-17)
 
-### Fix
+### Bug fixes
 
 - Set maxmemory-policy to allkeys-lru (#23) ([`c9798c2`](https://github.com/eduNEXT/atlas-ansible-utils/commit/c9798c20a126ce47b8a0790390fdb8ec7ba3bf5e))
 - Add variables in elasticsearch template (#21) ([`6de8d0a`](https://github.com/eduNEXT/atlas-ansible-utils/commit/6de8d0aec593f647cf6f9fd3b807fe1b05105491))
 
 ## v1.6.1 (2023-11-22)
 
-### Fix
+### Bug fixes
 
 - Process to restart/reload caddy (#20) ([`994de2f`](https://github.com/eduNEXT/atlas-ansible-utils/commit/994de2f326faa177b84a3cdd0db62019458e2db8))
 
 ## v1.6.0 (2023-11-16)
 
-### Feature
+### Features
 
 - Add azstorage for backups (#19) ([`f41286b`](https://github.com/eduNEXT/atlas-ansible-utils/commit/f41286bb023fd048d0e21eea64d4f0781ce7c5d3))
 
 ## v1.5.0 (2023-11-09)
 
-### Feature
+### Features
 
 - Redis role (#15) ([`a13fc51`](https://github.com/eduNEXT/atlas-ansible-utils/commit/a13fc51946e8c91ce6f82b7d094abab5bc9a91fd))
 - Elasticsearch role (#14) ([`3beea01`](https://github.com/eduNEXT/atlas-ansible-utils/commit/3beea01bdee0faf5ed24dba37c273b394cddf50e))
@@ -123,35 +129,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.4.0 (2023-11-07)
 
-### Feature
+### Features
 
 - Add playbooks to provision clickhouse (#17) ([`31b15b2`](https://github.com/eduNEXT/atlas-ansible-utils/commit/31b15b21a10170099cd10a52ac453471d539fdb3))
 
 ## v1.3.0 (2023-10-09)
 
-### Feature
+### Features
 
 - Add mysql8.0 and mongo4.4 playbooks (#13) ([`33184f0`](https://github.com/eduNEXT/atlas-ansible-utils/commit/33184f01195b91202ae858b39d4a2dff5b751545))
 
 ## v1.2.0 (2023-10-02)
 
-### Feature
+### Features
 
 - Add backup ansible playbooks (#11) ([`3f7433f`](https://github.com/eduNEXT/atlas-ansible-utils/commit/3f7433f7c7aba0aeb1573d7e8d8164bf8a0d0104))
 
 ## v1.1.0 (2023-08-25)
 
-### Feature
-
-- Add releases for docker image (#7) ([`d069421`](https://github.com/eduNEXT/atlas-ansible-utils/commit/d069421a78e7beb85ef3227e2ad880f146cbe139))
-
-### Fix
+### Bug fixes
 
 - Update package cache when installing dependencies (#9) ([`2b55913`](https://github.com/eduNEXT/atlas-ansible-utils/commit/2b559130fb5559ca744b2e8f15b98170a394c55f))
 
+### Features
+
+- Add releases for docker image (#7) ([`d069421`](https://github.com/eduNEXT/atlas-ansible-utils/commit/d069421a78e7beb85ef3227e2ad880f146cbe139))
+
 ## v1.0.0 (2022-12-30)
 
-### Feature
+### Bug fixes
+
+- Adding percona role under the proper key in requirements file ([`cc50909`](https://github.com/eduNEXT/atlas-ansible-utils/commit/cc50909ce979ef80405b001e26d03ad2a6cbb9c8))
+- Creating mongo dbs when using a standalone installation ([`62ad5ab`](https://github.com/eduNEXT/atlas-ansible-utils/commit/62ad5abae31b3a469b76ee02f6f5aae9ca056e43))
+- Templating error ([`d458cf9`](https://github.com/eduNEXT/atlas-ansible-utils/commit/d458cf9f7eba7a1b767a7f626967c6d593174eb6))
+
+### Features
 
 - Adding support for machine hostnames ([`6f7e680`](https://github.com/eduNEXT/atlas-ansible-utils/commit/6f7e6809762b4aa5e2be2bfb7c1e9c6e7d7f7b7e))
 - Adding first version of percona 5.7 playbook ([`4f4b756`](https://github.com/eduNEXT/atlas-ansible-utils/commit/4f4b7560ec3db7c1ab307f555425f0c9095b317b))
@@ -169,13 +181,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adding mysql role just to install mysql ([`cdf31aa`](https://github.com/eduNEXT/atlas-ansible-utils/commit/cdf31aa84a4703462c05ef5be32ebac2819aaae6))
 - Adding generic ansible configuration ([`73e5274`](https://github.com/eduNEXT/atlas-ansible-utils/commit/73e5274bf2ea40459647cf8dcf45f9a3f4a10218))
 
-### Fix
-
-- Adding percona role under the proper key in requirements file ([`cc50909`](https://github.com/eduNEXT/atlas-ansible-utils/commit/cc50909ce979ef80405b001e26d03ad2a6cbb9c8))
-- Creating mongo dbs when using a standalone installation ([`62ad5ab`](https://github.com/eduNEXT/atlas-ansible-utils/commit/62ad5abae31b3a469b76ee02f6f5aae9ca056e43))
-- Templating error ([`d458cf9`](https://github.com/eduNEXT/atlas-ansible-utils/commit/d458cf9f7eba7a1b767a7f626967c6d593174eb6))
-
-### Refactor
+### Refactoring
 
 - Use standard changelog file with repo changes (#2) ([`402fa0b`](https://github.com/eduNEXT/atlas-ansible-utils/commit/402fa0b126084370e4357b75a62de1eed7a64fa5))
 
