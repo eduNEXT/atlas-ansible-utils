@@ -1,0 +1,59 @@
+---
+# defaults file for meilisearch
+
+meilisearch_stable_os:
+  - Debian 11
+  - Debian 12
+  - Ubuntu 22
+  - Ubuntu 24
+
+meilisearch_user: "meilisearch"
+meilisearch_group: "meilisearch"
+
+meilisearch_exe_path: "/usr/bin/meilisearch"
+meilisearch_db_path: "/var/lib/meilisearch"
+meilisearch_listen_ip: 0.0.0.0
+meilisearch_listen_port: 7700
+
+# Using a robust master_key is strongly recommended. Please override this variable in your inventory
+meilisearch_master_key: "Y0urVery-S3cureAp1K3y"
+
+# This download URL is based on the official Meilisearch docs:
+# https://www.meilisearch.com/docs/learn/self_hosted/install_meilisearch_locally#installing-older-versions-of-meilisearch
+meilisearch_version: "1.8.4"
+meilisearch_release_url: "https://github.com/meilisearch/meilisearch/releases/download/v{{ meilisearch_version }}/meilisearch-linux-amd64"
+
+# Using a config file to run Meilisearch
+# Base file: https://raw.githubusercontent.com/meilisearch/meilisearch/latest/config.toml
+# All variables are defined here: https://www.meilisearch.com/docs/learn/self_hosted/configure_meilisearch_at_launch#environment-variables
+# Below the config variables prefixed with "meilisearch_cfg_"
+
+meilisearch_configfile: "/etc/meilisearch.toml"
+
+meilisearch_cfg_http_addr: "{{ meilisearch_listen_ip }}:{{ meilisearch_listen_port }}"
+meilisearch_cfg_db_path: "{{ meilisearch_db_path }}/data/"
+meilisearch_cfg_no_analytics: "true"
+meilisearch_cfg_http_payload_size_limit: "100 MB"
+meilisearch_cfg_log_level: "INFO"
+meilisearch_cfg_max_indexing_memory: "2 GiB"
+meilisearch_cfg_max_indexing_threads: 4
+
+meilisearch_cfg_dump_dir: "{{ meilisearch_db_path }}/dumps/"
+meilisearch_cfg_import_dump: "./path/to/my/file.dump"
+meilisearch_cfg_ignore_missing_dump: "false"
+
+meilisearch_cfg_ignore_dump_if_db_exists: "false"
+meilisearch_cfg_schedule_snapshot: "false"
+meilisearch_cfg_snapshot_dir: "{{ meilisearch_db_path }}/snapshots/"
+meilisearch_cfg_import_snapshot: "./path/to/my/snapshot"
+meilisearch_cfg_ignore_missing_snapshot: "false"
+meilisearch_cfg_ignore_snapshot_if_db_exists: "false"
+
+meilisearch_use_ssl: false
+meilisearch_cfg_ssl_auth_path: "./path/to/root"
+meilisearch_cfg_ssl_cert_path: "./path/to/certfile"
+meilisearch_cfg_ssl_key_path: "./path/to/private-key"
+meilisearch_cfg_ssl_ocsp_path: "./path/to/ocsp-file"
+meilisearch_cfg_ssl_require_auth: "false"
+meilisearch_cfg_ssl_resumption: "false"
+meilisearch_cfg_ssl_tickets: "false"

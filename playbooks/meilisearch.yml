@@ -1,0 +1,9 @@
+---
+# Playbook to provision Meilisearch
+
+- name: Configure Meilisearch instances
+  hosts: meilisearch_servers
+  become: true
+  gather_facts: true
+  roles:
+    - role: meilisearch
