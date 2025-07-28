@@ -2,5 +2,5 @@ apiVersion: v2
 name: ansible-runner
 description: Kubernetes jobs to execute ansible playbooks
 type: application
-version: 19.1.0
-appVersion: 19.1.0
+version: 19.0.1
+appVersion: 19.0.1
