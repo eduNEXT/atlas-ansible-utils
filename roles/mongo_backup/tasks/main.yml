@@ -17,7 +17,7 @@
 
 - name: Ignore PEP 668 (Ubuntu/Debian)
   ansible.builtin.file:
-    path: "/usr/lib/python{{ python_info.python.version | regex_replace('^(\\d+\\.\\d+).*', '\\1') }}/EXTERNALLY-MANAGED"
+    path: "/usr/lib/python{{ python_info.python_version | regex_replace('^(\\d+\\.\\d+).*', '\\1') }}/EXTERNALLY-MANAGED"
     state: absent
   when:
     # Condition for Ubuntu 24.04+ or Debian 12+
