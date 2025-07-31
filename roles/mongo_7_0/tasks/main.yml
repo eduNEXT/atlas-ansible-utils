@@ -24,7 +24,7 @@
 
 - name: Ignore PEP 668 (Ubuntu/Debian)
   ansible.builtin.file:
-    path: "/usr/lib/python{{ python_info.python}}/EXTERNALLY-MANAGED"
+    path: "/usr/lib/python{{python_info.python_version_info.major}}.{{python_info.python_version_info.minor}}/EXTERNALLY-MANAGED"
     state: absent
   when:
     # Condition for Ubuntu 24.04+ or Debian 12+
