@@ -18,6 +18,8 @@
     state: present
     update_cache: true
 
+# Since ubuntu 24/Debian 12 have problems with the backup playbook because of PEP 668 when updating the libraries, we proceed
+# to create a task to ignore EXTERNALLY-MANAGED
 - name: Get python system info
   community.general.python_requirements_info:
   register: python_info
@@ -27,7 +29,6 @@
     path: "/usr/lib/python{{ python_info.python_version_info.major }}.{{ python_info.python_version_info.minor }}/EXTERNALLY-MANAGED"
     state: absent
   when:
-    # Condition for Ubuntu 24.04+ or Debian 12+
     - (ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24', '>=')) or
       (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 12)
 
