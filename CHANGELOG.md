@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v19.0.1 (2025-08-01)
+
+### Bug fixes
+
+- Added ignore to pep 668 in backups playbooks (#61) ([`b34c18d`](https://github.com/eduNEXT/atlas-ansible-utils/commit/b34c18dae55dd062337c67fa30a5af74ade479ab))
+
 ## v19.0.0 (2024-12-18)
 
 ### Breaking
