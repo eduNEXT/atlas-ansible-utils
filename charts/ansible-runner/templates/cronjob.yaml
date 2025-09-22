@@ -42,6 +42,9 @@ spec:
                   name: ssh-key
                   subPath: ssh-privatekey
                   readOnly: true
+                {{- with .extraVolumeMounts }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
           initContainers:
             - image: registry.k8s.io/git-sync/git-sync:v4.0.0
               name: inventory-git-sync
@@ -93,4 +96,7 @@ spec:
           - name: ssh-key
             secret:
               secretName: ssh-key
+        {{- with .extraVolumes }}
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
 {{- end }}

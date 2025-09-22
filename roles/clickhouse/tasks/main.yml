@@ -26,18 +26,40 @@
     update_cache: true
   become: true
 
-- name: Create /etc/clickhouse-server/config.d/host.xml
+- name: Create configuration files
+  tags:
+    - configuration
   ansible.builtin.template:
-    src: host.xml.j2
-    dest: /etc/clickhouse-server/config.d/host.xml
-    mode: preserve
+    src: "{{ item.src }}"
+    dest: "/etc/clickhouse-server/config.d/{{ item.path }}"
+    mode: "preserve"
+  loop: "{{ lookup('community.general.filetree', 'templates/config.d/') }}"
 
-# - name: Grant default user permissions to create users and groups
-- name: Edit /etc/clickhouse-server/users.xml
+- name: Create users configuration file
+  tags:
+    - configuration
   ansible.builtin.template:
-    src: users.xml.j2
-    dest: /etc/clickhouse-server/users.xml
-    mode: preserve
+    src: "{{ item.src }}"
+    dest: "/etc/clickhouse-server/users.d/{{ item.path }}"
+    owner: "clickhouse"
+    group: "clickhouse"
+    mode: "0600"
+  loop: "{{ lookup('community.general.filetree', 'templates/users.d/', wantlist=True) }}"
+
+- name: Copy TLS certificates
+  when: CLICKHOUSE_ENABLE_TLS
+  tags:
+    - tls
+  ansible.builtin.copy:
+    src: "{{ CLICKHOUSE_CERTIFICATES_SOURCE_DIR }}/{{ item }}"
+    dest: "/etc/clickhouse-server/certs/{{ item }}"
+    owner: clickhouse
+    group: clickhouse
+    mode: '0600'
+    backup: true
+  loop:
+    - "tls.key"
+    - "tls.crt"
 
 - name: Start clickhouse service
   ansible.builtin.service:
