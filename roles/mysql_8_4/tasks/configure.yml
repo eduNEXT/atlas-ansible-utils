@@ -28,3 +28,45 @@
     mode: preserve
   notify:
     - Restart mysql
+
+### Encryption-at-rest configuration ###
+
+- name: Ensure keyring directory exists
+  ansible.builtin.file:
+    path: "{{ MYSQL_CONFIG_KEYRING_DIR }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: '0700'
+
+- name: Install global manifest to load keyring component early
+  ansible.builtin.copy:
+    dest: "{{ MYSQL_CONFIG_BASEDIR }}/mysqld.my"
+    owner: mysql
+    group: mysql
+    mode: '0644'
+    content: |
+      { "components": "file://component_keyring_file" }
+
+- name: Install component_keyring_file config (JSON)
+  ansible.builtin.copy:
+    dest: "{{ MYSQL_CONFIG_PLUGIN_DIR }}/component_keyring_file.cnf"
+    owner: mysql
+    group: mysql
+    mode: '0640'
+    content: |
+      {
+        "path": "{{ MYSQL_CONFIG_KEYRING_DIR }}/keyring",
+        "read_only": false
+      }
+
+- name: Put encryption configuration file
+  ansible.builtin.template:
+    src: encryption.cnf.j2
+    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/encryption.cnf"
+    mode: preserve
+  notify:
+    - Restart mysql
+
+- name: Flush all notified handlers now
+  ansible.builtin.meta: flush_handlers

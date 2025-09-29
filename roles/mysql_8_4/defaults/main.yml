@@ -39,6 +39,17 @@ MYSQL_CONFIG_DATABASES: []
 #   priv: 'mydb.*:ALL'
 #   state: present
 #   append_privs: no
+
+# MySQL configuration paths
+MYSQL_CONFIG_BASEDIR: /usr
+MYSQL_CONFIG_DATADIR: /var/lib/mysql
+MYSQL_CONFIG_PLUGIN_DIR: /usr/lib/mysql/plugin
+
+# Encryption-at-rest settings
+MYSQL_CONFIG_KEYRING_DIR: /var/lib/mysql-keyring
+# This enables encryption-at-rest for new tables and logs
+MYSQL_CONFIG_ENABLE_AUTO_ENCRYPTION: true
+
 MYSQL_CONFIG_USERS: []
 MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS: "%"
 

@@ -75,6 +75,9 @@
 
 - name: Post MySQL installation configuration
   ansible.builtin.include_tasks: configure.yml
+- name: MySQL system tablespace encryption (if required)
+  ansible.builtin.include_tasks: encrypt_system.yml
+  when: MYSQL_CONFIG_ENABLE_AUTO_ENCRYPTION
 - name: Create databases
   ansible.builtin.include_tasks: databases.yml
 - name: Create users
