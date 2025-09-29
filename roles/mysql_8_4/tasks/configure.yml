@@ -41,7 +41,7 @@
 
 - name: Install global manifest to load keyring component early
   ansible.builtin.copy:
-    dest: "{{ MYSQL_CONFIG_BASEDIR }}/mysqld.my"
+    dest: "{{ MYSQL_CONFIG_BASEDIR }}/sbin/mysqld.my"
     owner: mysql
     group: mysql
     mode: '0644'
@@ -67,6 +67,18 @@
     mode: preserve
   notify:
     - Restart mysql
+
+- name: Ensure AppArmor rules for MySQL keyring/manifest
+  ansible.builtin.blockinfile:
+    path: /etc/apparmor.d/usr.sbin.mysqld
+    marker: "# {mark} managed by Ansible: mysql keyring"
+    block: |
+      /usr/sbin/mysqld.my r,
+
+- name: Reload AppArmor
+  ansible.builtin.service:
+    name: apparmor
+    state: reloaded
 
 - name: Flush all notified handlers now
   ansible.builtin.meta: flush_handlers
