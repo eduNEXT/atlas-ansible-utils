@@ -29,69 +29,8 @@
   notify:
     - Restart mysql
 
-### Encryption-at-rest configuration ###
-
-- name: Ensure keyring directory exists
-  ansible.builtin.file:
-    path: "{{ MYSQL_CONFIG_KEYRING_DIR }}"
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: '0700'
-
-- name: Install global manifest to load keyring component early
-  ansible.builtin.copy:
-    dest: "{{ MYSQL_CONFIG_BASEDIR }}/sbin/mysqld.my"
-    owner: mysql
-    group: mysql
-    mode: '0644'
-    content: |
-      { "components": "file://component_keyring_file" }
-
-- name: Install component_keyring_file config (JSON)
-  ansible.builtin.copy:
-    dest: "{{ MYSQL_CONFIG_PLUGIN_DIR }}/component_keyring_file.cnf"
-    owner: mysql
-    group: mysql
-    mode: '0640'
-    content: |
-      {
-        "path": "{{ MYSQL_CONFIG_KEYRING_DIR }}/keyring",
-        "read_only": false
-      }
-
-- name: Put encryption configuration file
-  ansible.builtin.template:
-    src: encryption.cnf.j2
-    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/encryption.cnf"
-    mode: preserve
-  notify:
-    - Restart mysql
-
-# We need to adjust AppArmor to allow mysqld to read/write the keyring files
-# in /usr/sbin/mysqld.my
-- name: Ensure AppArmor local dir exists
-  ansible.builtin.file:
-    path: /etc/apparmor.d/local
-    state: directory
-    mode: "0755"
-
-# The main apparmor profile for mysqld is in /etc/apparmor.d/usr.sbin.mysqld.
-# By default, it includes /etc/apparmor.d/local/usr.sbin.mysqld with the line:
-#   #include <local/usr.sbin.mysqld>
-# We add our custom rules there to avoid modifying the main profile directly.
-- name: Install custom rules for mysqld in local include
-  ansible.builtin.copy:
-    dest: /etc/apparmor.d/local/usr.sbin.mysqld
-    mode: "0644"
-    content: |
-      # Keyring/manifest permissions
-      /usr/sbin/mysqld.my r,
-
-- name: Reload AppArmor
-  ansible.builtin.service:
-    name: apparmor
-    state: reloaded
-
-- name: Flush all notified handlers now
-  ansible.builtin.meta: flush_handlers
+- name: Configure encryption at rest with component_keyring_file
+  ansible.builtin.include_tasks: encrypt_component_keyring_file.yml
+  when :
+    - MYSQL_CONFIG_ENCRYPTION_ENABLED
+    - MYSQL_CONFIG_KEYRING_COMPONENT == 'component_keyring_file'
