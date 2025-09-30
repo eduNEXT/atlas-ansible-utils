@@ -1,7 +1,7 @@
 [mysqld]
 # Default encrypt new tables
 table_encryption_privilege_check=ON
-{% if MYSQL_CONFIG_AUTO_ENCRYPTION_ENABLED %}
+{% if MYSQL_CONFIG_ENCRYPTION_ENABLED and MYSQL_CONFIG_AUTO_ENCRYPTION_ENABLED %}
 default_table_encryption=ON
 # Logs at rest
 innodb_redo_log_encrypt=ON
