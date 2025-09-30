@@ -31,6 +31,6 @@
 
 - name: Configure encryption at rest with component_keyring_file
   ansible.builtin.include_tasks: encrypt_component_keyring_file.yml
-  when :
+  when:
     - MYSQL_CONFIG_ENCRYPTION_ENABLED
     - MYSQL_CONFIG_KEYRING_COMPONENT == 'component_keyring_file'
