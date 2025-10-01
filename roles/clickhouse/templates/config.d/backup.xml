@@ -1,0 +1,16 @@
+<clickhouse>
+{% if CLICKHOUSE_ENABLE_BACKUPS %}
+    <storage_configuration>
+        <disks>
+            <backups>
+                <type>local</type>
+                <path>{{ CLICKHOUSE_BACKUP_ROOT }}/</path>
+            </backups>
+        </disks>
+    </storage_configuration>
+    <backups>
+        <allowed_disk>backups</allowed_disk>
+        <allowed_path>{{ CLICKHOUSE_BACKUP_ROOT }}/</allowed_path>
+    </backups>
+{% endif %}
+</clickhouse>

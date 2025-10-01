@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv
 FROM python:3.12-slim-bookworm AS minimal
 ARG DEBIAN_FRONTEND=noninteractive
 

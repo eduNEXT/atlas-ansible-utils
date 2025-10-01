@@ -1,0 +1,31 @@
+<clickhouse>
+    {% if CLICKHOUSE_ENABLE_ENCRYPTION %}
+    <storage_configuration>
+        <disks>
+            <default>
+                <keep_free_space_bytes>0</keep_free_space_bytes>
+            </default>
+            <default_encrypted>
+                <type>encrypted</type>
+                <disk>default</disk>
+                <path>encrypted/</path>
+                <algorithm>{{ CLICKHOUSE_ENCRYPTION_ALGORITHM }}</algorithm>
+                <key_hex id="0">{{ CLICKHOUSE_ENCRYPTION_KEY }}</key_hex>
+                <current_key_id>0</current_key_id>
+            </default_encrypted>
+        </disks>
+        <policies>
+            <encrypted_policy>
+                <volumes>
+                    <main>
+                        <disk>default_encrypted</disk>
+                    </main>
+                </volumes>
+            </encrypted_policy>
+        </policies>
+    </storage_configuration>
+    <merge_tree>
+        <storage_policy>encrypted_policy</storage_policy>
+    </merge_tree>
+    {% endif %}
+</clickhouse>

@@ -1,0 +1,26 @@
+<clickhouse>
+    <http_port>{{ CLICKHOUSE_HOST_HTTP_PORT }}</http_port>
+    <https_port>{{ CLICKHOUSE_HOST_HTTPS_PORT }}</https_port>
+
+    <tcp_port>{{ CLICKHOUSE_TCP_PORT }}</tcp_port>
+    <tcp_port_secure>{{ CLICKHOUSE_TCP_PORT_SECURE }}</tcp_port_secure>
+
+    {% if CLICKHOUSE_ENABLE_TLS %}
+    <openSSL>
+        <server>
+            <certificateFile>/etc/clickhouse-server/certs/tls.crt</certificateFile>
+            <privateKeyFile>/etc/clickhouse-server/certs/tls.key</privateKeyFile>
+            <verificationMode>relaxed</verificationMode>
+            <cacheSessions>true</cacheSessions>
+            <disableProtocols>sslv2,sslv3</disableProtocols>
+            <preferServerCiphers>true</preferServerCiphers>
+        </server>
+    </openSSL>
+    {% endif %}
+
+    {% for host in CLICKHOUSE_LISTEN_HOSTS %}
+    <listen_host>{{ host }}</listen_host>
+    {% endfor %}
+    <listen_try>1</listen_try>
+
+</clickhouse>
