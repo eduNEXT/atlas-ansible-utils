@@ -44,3 +44,17 @@
   when: not MYSQL_CONFIG_ENCRYPTION_ENABLED
   notify:
     - Restart mysql
+
+- name: Configure SSL for MySQL
+  ansible.builtin.include_tasks: ssl_config.yml
+  when: MYSQL_CONFIG_SSL_ENABLED
+
+# Render the SSL config file when disabling SSL
+- name: Put SSL configuration file
+  ansible.builtin.template:
+    src: ssl.cnf.j2
+    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/ssl.cnf"
+    mode: preserve
+  when: not MYSQL_CONFIG_SSL_ENABLED
+  notify:
+    - Restart mysql

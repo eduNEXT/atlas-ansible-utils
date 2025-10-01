@@ -1,0 +1,40 @@
+---
+- name: Ensure SSL dir exists for MySQL
+  ansible.builtin.file:
+    path: "{{ MYSQL_CONFIG_SSL_DIR }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: '0700'
+
+- name: Install ca.pem
+  ansible.builtin.copy:
+    dest: "{{ MYSQL_CONFIG_SSL_DIR }}/ca.pem"
+    content: "{{ MYSQL_CONFIG_SSL_CA_PEM }}"
+    owner: mysql
+    group: mysql
+    mode: '0600'
+
+- name: Install server-cert.pem
+  ansible.builtin.copy:
+    dest: "{{ MYSQL_CONFIG_SSL_DIR }}/server-cert.pem"
+    content: "{{ MYSQL_CONFIG_SSL_SERVER_CERT_PEM }}"
+    owner: mysql
+    group: mysql
+    mode: '0644'
+
+- name: Install server-key.pem
+  ansible.builtin.copy:
+    dest: "{{ MYSQL_CONFIG_SSL_DIR }}/server-key.pem"
+    content: "{{ MYSQL_CONFIG_SSL_SERVER_KEY_PEM }}"
+    owner: mysql
+    group: mysql
+    mode: '0600'
+
+- name: Put SSL configuration file
+  ansible.builtin.template:
+    src: ssl.cnf.j2
+    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/ssl.cnf"
+    mode: preserve
+  notify:
+    - Restart mysql

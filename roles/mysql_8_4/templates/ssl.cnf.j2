@@ -1,0 +1,14 @@
+[mysqld]
+{% if MYSQL_CONFIG_SSL_ENABLED %}
+ssl_ca={{ MYSQL_CONFIG_SSL_DIR }}/ca.pem
+ssl_cert={{ MYSQL_CONFIG_SSL_DIR }}/server-cert.pem
+ssl_key={{ MYSQL_CONFIG_SSL_DIR }}/server-key.pem
+
+# Obliga conexiones cifradas por TCP/IP (Unix socket sigue permitido)
+{% if MYSQL_CONFIG_SSL_REQUIRE_SECURE_TRANSPORT %}
+require_secure_transport=ON
+{% endif %}
+
+# Protocolos recomendados
+tls_version=TLSv1.2,TLSv1.3
+{% endif %}
