@@ -57,6 +57,29 @@ MYSQL_CONFIG_KEYRING_DIR: /var/lib/mysql-keyring
 # This enables encryption-at-rest for new tables and logs.
 MYSQL_CONFIG_AUTO_ENCRYPTION_ENABLED: true
 
+### SSL settings ###
+MYSQL_CONFIG_SSL_ENABLED: false
+# This is where we will store the SSL certs and keys
+MYSQL_CONFIG_SSL_DIR: /etc/mysql/ssl
+# Force all clients to use SSL
+MYSQL_CONFIG_SSL_REQUIRE_SECURE_TRANSPORT: false
+
+# Contenido PEM inline:
+MYSQL_CONFIG_SSL_CA_PEM: |
+  -----BEGIN CERTIFICATE-----
+  SETMEPLEASE
+  -----END CERTIFICATE-----
+
+MYSQL_CONFIG_SSL_SERVER_CERT_PEM: |
+  -----BEGIN CERTIFICATE-----
+  SETMEPLEASE
+  -----END CERTIFICATE-----
+
+MYSQL_CONFIG_SSL_SERVER_KEY_PEM: |
+  -----BEGIN PRIVATE KEY-----
+  SETMEPLEASE
+  -----END PRIVATE KEY-----
+
 MYSQL_CONFIG_USERS: []
 MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS: "%"
 
