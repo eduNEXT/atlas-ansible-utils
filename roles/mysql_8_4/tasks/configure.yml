@@ -34,3 +34,13 @@
   when:
     - MYSQL_CONFIG_ENCRYPTION_ENABLED
     - MYSQL_CONFIG_KEYRING_COMPONENT == 'component_keyring_file'
+
+# Render the encryption config file when disabling encryption
+- name: Put encryption configuration file (encryption disabled)
+  ansible.builtin.template:
+    src: encryption.cnf.j2
+    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/encryption.cnf"
+    mode: preserve
+  when: not MYSQL_CONFIG_ENCRYPTION_ENABLED
+  notify:
+    - Restart mysql
