@@ -17,7 +17,7 @@
 
 - name: Add ClickHouse repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=amd64] https://packages.clickhouse.com/deb stable main"
+    repo: "{{ CLICKHOUSE_REPO }}"
     filename: clickhouse
     state: present
     update_cache: yes
