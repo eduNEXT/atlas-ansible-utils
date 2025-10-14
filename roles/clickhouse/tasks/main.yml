@@ -20,7 +20,7 @@
     repo: "{{ CLICKHOUSE_REPO }}"
     filename: clickhouse
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install ClickHouse
   ansible.builtin.apt:
