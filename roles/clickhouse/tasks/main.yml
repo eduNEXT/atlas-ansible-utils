@@ -9,15 +9,18 @@
     state: present
     update_cache: true
 
-- name: Add the ClickHouse signing key
+- name: Add ClickHouse GPG key
   ansible.builtin.apt_key:
-    keyserver: "{{ CLICKHOUSE_KEY_SERVER }}"
-    id: "{{ CLICKHOUSE_APT_KEY }}"
+    url: https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key
+    keyring: /usr/share/keyrings/clickhouse-keyring.gpg
+    state: present
 
-- name: Add the ClickHouse repo to the sources list
+- name: Add ClickHouse repository
   ansible.builtin.apt_repository:
     repo: "{{ CLICKHOUSE_REPO }}"
+    filename: clickhouse
     state: present
+    update_cache: true
 
 - name: Install ClickHouse
   ansible.builtin.apt:

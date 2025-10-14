@@ -24,4 +24,4 @@ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT: 9000
 
 CLICKHOUSE_KEY_SERVER: keyserver.ubuntu.com
 CLICKHOUSE_APT_KEY: 8919F6BD2B48D754
-CLICKHOUSE_REPO: deb https://packages.clickhouse.com/deb stable main
+CLICKHOUSE_REPO: deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=amd64] https://packages.clickhouse.com/deb stable main
