@@ -1,3 +1,4 @@
+-c dev-constraints.txt
 -r base.in
 
 molecule

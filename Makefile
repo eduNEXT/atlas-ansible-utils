@@ -5,7 +5,7 @@ help: ## Display this help message.
 piptools: ## install pinned version of pip-compile and pip-sync
 	pip install -r requirements/pip-tools.txt
 
-requirements: ## install  environment requirements
+requirements: ## install environment requirements
 	pip install -r requirements/base.txt
 
 dev-requirements: ## install development requirements
