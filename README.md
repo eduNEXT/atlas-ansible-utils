@@ -13,23 +13,23 @@ This repository follows the same versioning scheme as the Tutor project, where e
 | Quince and older | `<18`             | 1.11.0                      |
 | Redwood          | `>=18.0, <19`     | >=18.0.0                    |
 | Sumac            | `>=19.0, <20`     | >=19.0.0                    |
+| Teak             | `>=20.0, <21`     | >=20.0.0                    |
 
-The following is the list of supported operating systems.
+The following is the list of supported operating systems for playbooks in the latest version (Teak):
 
 | Playbook           | Ubuntu 22.04 | Ubuntu 24.04 |
 |--------------------|--------------|--------------|
 | redis_7            |      x       |       x      |
 | mysql_8_4          |      x       |       x      |
 | mongo_7_0          |      x       |       x      |
-| elasticsearch_7    |      x       |       x      |
 | clickhouse         |      x       |       x      |
 | meilisearch        |      x       |       x      |
 
 ## How to use this repo
 
-In most cases, this repo is used from **command and control** instance (Ubuntu 20.04 or later versions) to provision target machines. Before using this repo in the CNC machine, verify that:
+In most cases, this repo is used from **command and control** instance (Ubuntu 22.04 or later versions) to provision target machines. Before using this repo in the CNC machine, verify that:
 
-- CNC runs Python 3.8 or a later version (3.8 recommended)
+- CNC runs Python 3.12 or a later version (3.12 strongly recommended)
 - You have SSH connectivity between the CNC instances and the machines you want to provision
 - You have an Ansible inventory with configuration variables (check section below)
 
@@ -65,7 +65,7 @@ Let's say we want to provision a machine to run MySQL, so we run the following i
     source venv/bin/activate
     cd atlas-ansible-utils/
     make requirements
-    ansible-playbook playbooks/mysql_5_7.yml -i ../your-inventory-repo/path/to/hosts.ini -v
+    ansible-playbook playbooks/mysql_8_4.yml -i ../your-inventory-repo/path/to/hosts.ini -v
 
 Full options for **ansible-playbook** command can be found [here](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html)
 
@@ -89,7 +89,7 @@ When this command is executed:
 
 Use other command line parameters to override the default values. For example:
 
-    docker run --rm -it -v "/your/local/path/ssh-key/id_key:/app/.ssh/id_rsa" -v "/your/local/path/inventory:/app/inventory" -e "ATLAS_ANSIBLE_PLAYBOOK=mysql_5_7.yml" -e "ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS=-i /app/inventory/hosts.ini -u ubuntu -v" ednxops/atlas-ansible-utils:<tagname>
+    docker run --rm -it -v "/your/local/path/ssh-key/id_key:/app/.ssh/id_rsa" -v "/your/local/path/inventory:/app/inventory" -e "ATLAS_ANSIBLE_PLAYBOOK=mysql_8_4.yml" -e "ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS=-i /app/inventory/hosts.ini -u ubuntu -v" ednxops/atlas-ansible-utils:<tagname>
 
 In this case, we can override the default variables using:
 
@@ -122,7 +122,7 @@ To run the atlas-ansible-utils playbooks to provision external servers from Kube
             image: ednxops/atlas-ansible-utils:1.1.0
             env:
             - name: ATLAS_ANSIBLE_PLAYBOOK
-              value: "mysql_5_7.yml"
+              value: "mysql_8_4.yml"
             - name: ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS
               value: "-i /git/manifests/manifests-yamato.git/ansible_inventory/hosts -u ubuntu -v"
             - name: ANSIBLE_PRIVATE_KEY_FILE
