@@ -9,15 +9,15 @@ This guide is designed to help you correctly provision and configure a MySQL dat
 In host.ini, you need to add the replica and primary instances, for example:
 
 ```ini
-[mysql_master]
-<master ip>     MYSQL_CONFIG_SERVER_ID=1 COMMON_HOSTNAME=mysql-master ansible_user=ubuntu
+[mysql_primary]
+<primary ip>     MYSQL_CONFIG_SERVER_ID=1 COMMON_HOSTNAME=mysql-master ansible_user=ubuntu
 
-[mysql_replicas]
+[mysql_replica_1]
 <replica ip>    MYSQL_CONFIG_SERVER_ID=2 COMMON_HOSTNAME=mysql-replica ansible_user=ubuntu
 
 [mysql_servers:children]
-mysql_master
-mysql_replicas
+mysql_primary
+mysql_replica_1
 
 ```
 
@@ -60,13 +60,58 @@ Run the mysql_8_4 playbook using the **--limit** flag to specify the replica ins
 
 ### 3. Master and replica configuration
 
-If the databases it's **not** in producction can follow the next steps in this documentation: [Configuring Replication](https://dev.mysql.com/doc/refman/8.4/en/replication-configuration.html)
+Create the backup like this:
 
-However, if the databases are in production, step “19.1.2.4 Obtaining the Replication Source Binary Log Coordinates” can cause problems because when we execute `FLUSH TABLES WITH READ LOCK;` we stop writing to the tables. In the case of production, it is advisable to skip that command and continue with the following steps.
+``` bash
+mysqldump \
+  --all-databases \
+  --single-transaction \
+  --hex-blob --master-data=2 --set-gtid-purged=OFF \
+  | gzip > /tmp/full-backup.sql.gz
+```
+
+Restore in the replica instance like this:
+
+```bash
+gunzip -c full-backup.sql.gz | mysql
+```
+Get the log_pos with this command:
+
+```bash
+gunzip -c full-backup.sql.gz | head -n 30
+```
+
+Log in to the MySQL shell of the replica instance and configure with the next commands:
+
+```sql
+STOP REPLICA;
+
+RESET REPLICA ALL;
+
+CHANGE REPLICATION SOURCE TO
+  SOURCE_HOST='x.x.x.x',
+  SOURCE_PORT=3306,
+  SOURCE_USER='replicator',
+  SOURCE_PASSWORD='xxxxxxxxxxxxxx',
+  SOURCE_LOG_FILE='sturgeon-mysql-bin.000006',
+  SOURCE_LOG_POS=154;
+
+START REPLICA;
+```
+
+Verify the replica status with:
+
+```sql
+SHOW REPLICA STATUS\G
+```
+
+After configuring and starting the replica, an error may appear and you may need to restart the replica instance.
+
+NOTE: The replication user password cannot exceed 32 characters; otherwise, the replica cannot be configured correctly.
 
 ### 4. Common problems
 
-In many cases, event replication problems may arise. When checking the replication status, you may encounter the following:
+In many cases, replication errors may occur. When checking the replication status, you may encounter the following:
 
 ```bash
 mysql> SHOW REPLICA STATUS\G
@@ -75,20 +120,20 @@ Replica_IO_State: Waiting for source to send event
 Source_Host: x.x.x.x
 Source_User: replicator
 Source_Port: 3306
-Connect_Retry: 60 
-Source_Log_File: mysql-bin.000001 
-Read_Source_Log_Pos: 530289431 
-Relay_Log_File: mysql-replica-relay-bin.000002 
-Relay_Log_Pos: 320 
-Relay_Source_Log_File: mysql-bin.000001 
-Replica_IO_Running: Yes 
-Replica_SQL_Running: No 
+Connect_Retry: 60
+Source_Log_File: mysql-bin.000001
+Read_Source_Log_Pos: 530289431
+Relay_Log_File: mysql-replica-relay-bin.000002
+Relay_Log_Pos: 320
+Relay_Source_Log_File: mysql-bin.000001
+Replica_IO_Running: Yes
+Replica_SQL_Running: No
 .
 .
 .
-Replicate_Wild_Ignore_Table: 
-    Last_Errno: 1062 
-    Last_Error: Coordinator stopped because there were error(s) in the worker(s). The most recent failure being: Worker 4 failed executing transaction 'ANONYMOUS' at source log mysql-bin.000001, end_log_pos 447225645. See error log and/or performance_schema.replication_applier_status_by_worker table for more details about this failure or others, if any. 
+Replicate_Wild_Ignore_Table:
+    Last_Errno: 1062
+    Last_Error: Coordinator stopped because there were error(s) in the worker(s). The most recent failure being: Worker 4 failed executing transaction 'ANONYMOUS' at source log mysql-bin.000001, end_log_pos 447225645. See error log and/or performance_schema.replication_applier_status_by_worker table for more details about this failure or others, if any.
     Skip_Counter: 0
 .
 .
@@ -99,7 +144,7 @@ In these cases, it is necessary to review the error in detail by running ```SELE
 FROM performance_schema.replication_applier_status_by_worker
 WHERE CHANNEL_NAME = ‘’;```
 
-If the transaction you are trying to apply is already the same in both instances (master and replica), you can follow these steps to skip this error **(Be careful and check carefully if this transaction is necessary)**:
+If the transaction you are trying to apply is already the same in both instances (master and replica), you can follow these steps to skip this error **(Be careful and make sure the transaction can safely be skipped)**:
 ```sql
 STOP REPLICA;
 SET GLOBAL SQL_SLAVE_SKIP_COUNTER = 1;
@@ -108,7 +153,10 @@ START REPLICA;
 
 After this, when checking the status of the replica, you should see the following:
 ```sql
-Replica_IO_Running: Yes 
-Replica_SQL_Running: Yes 
+Replica_IO_Running: Yes
+Replica_SQL_Running: Yes
 ```
 
+## Relevant links:
+
+ - [Configuring Replication of MySQL instance](https://dev.mysql.com/doc/refman/8.4/en/replication-configuration.html)

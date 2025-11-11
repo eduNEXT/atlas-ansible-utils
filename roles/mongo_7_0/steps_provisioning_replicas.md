@@ -1,7 +1,7 @@
 Steps for provisioning mongo replicas
 =====================================
 
-This is a guide for provisioning and configuring mongod on replica instance of the same.
+This is a guide for provisioning and configuring mongod on replica instance.
 
 Normally, for Mongo replicas, you need two replicas and one primary instance. Or, failing that, a primary, a replica, or an arbitrator. In this case, only the first case is explained.
 
@@ -32,7 +32,7 @@ mongo_replica_2
 ```
 Since the primary instance already has a replica_set configured, the playbook may throw an error when attempting to configure a replica set for each replica, causing an error since MongoDB does not allow partial replica sets for replicas.
 
-So it is necessary to set the ```mongo_configuration_replica_set``` variable to **false** in the group_vars configuation of the replicas.
+Therefore, you must set the ```mongo_configuration_replica_set``` variable to **false** in the group_vars configuration of the replicas.
 This will skip the steps for configuring the replicasets on the replicas.
 
 ### 2. Playbook
