@@ -11,8 +11,8 @@
 
 - name: Add ClickHouse GPG key
   ansible.builtin.apt_key:
-    url: https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key
-    keyring: /usr/share/keyrings/clickhouse-keyring.gpg
+    url: "{{ CLICKHOUSE_GPG_KEY_URL }}"
+    keyring: "{{ CLICKHOUSE_KEYRING_PATH }}"
     state: present
 
 - name: Add ClickHouse repository

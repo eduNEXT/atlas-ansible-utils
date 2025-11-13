@@ -1,8 +1,3 @@
 ---
 - name: Converge
-  hosts: all
-  tasks:
-    - name: "Include atlas-ansible-utils"
-      include_role:
-        name: "atlas-ansible-utils"
-- import_playbook: ../../playbooks/redis_7.yml
+  import_playbook: ../../playbooks/redis_7.yml
