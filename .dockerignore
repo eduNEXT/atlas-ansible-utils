@@ -1,6 +1,7 @@
 *
-!requirements/
-!requirements.yml
+!pyproject.toml
+!uv.lock
+!entrypoint.sh
 !roles/
 !library/
 !Makefile
