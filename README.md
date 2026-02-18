@@ -14,6 +14,7 @@ This repository follows the same versioning scheme as the Tutor project, where e
 | Redwood          | `>=18.0, <19`     | >=18.0.0                    |
 | Sumac            | `>=19.0, <20`     | >=19.0.0                    |
 | Teak             | `>=20.0, <21`     | >=20.0.0                    |
+| Ulmo             | `>=21.0, <22`     | >=21.0.0                    |
 
 The following is the list of supported operating systems for playbooks in the latest version (Teak):
 
