@@ -1,6 +1,0 @@
--c dev-constraints.txt
--r base.in
-
-molecule
-molecule-plugins[docker]
-python-semantic-release

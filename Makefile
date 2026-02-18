@@ -1,35 +1,20 @@
-.PHONY: requirements
-help: ## Display this help message.
-	@echo "Please use \`make <target>' where <target> is one of"
-	@awk -F ':.*?## ' '/^[a-zA-Z]/ && NF==2 {printf "\033[36m  %-28s\033[0m %s\n", $$1, $$2}' Makefile | sort
-piptools: ## install pinned version of pip-compile and pip-sync
-	pip install -r requirements/pip-tools.txt
+.DEFAULT_GOAL := help
+.PHONY: help
 
-requirements: ## install environment requirements
-	pip install -r requirements/base.txt
+quality: ## Run linters
+	uv run ansible-lint --exclude charts -c .ansible-lint.yml
 
-dev-requirements: ## install development requirements
-	pip install -r requirements/dev.txt
+quality-fix: ## Run automatic linter fixes
+	uv ansible-lint --exclude charts -c .ansible-lint.yml --fix
 
-quality: ## Lint based in ansible.
-	ansible-lint --exclude charts -c .ansible-lint.yml
+changelog-entry: ## Run scriv to create a changelog entry
+	uv run scriv create
 
-format:
-	ansible-lint --exclude charts -c .ansible-lint.yml --fix
+changelog-collect: ## Collect all the changelog entries and rebuild CHANGELOG.md
+	uv run scriv collect
 
-upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
-upgrade: piptools ## Upgrade requirements with pip-tools.
-	pip-compile --upgrade requirements/pip-tools.in
-	pip-compile --upgrade requirements/base.in
-	pip-compile --upgrade requirements/dev.in
-
-release: ## release a new version
-	@echo "Releasing a new version."
-	@echo "This is a remote release, it will push to the remote repository."
-	semantic-release --config release.toml version --changelog --push --tag --commit
-
-local-release: ## release a new version without pushing
-	@echo "Releasing a new version."
-	@echo "This is a local release, it will not push to the remote repository."
-	@echo "You can push the changes and release manually."
-	semantic-release --config release.toml version --changelog --commit --tag --no-push
+ESCAPE = 
+help: ## Print this help
+	@grep -E '^([a-zA-Z_-]+:.*?## .*|######* .+)$$' Makefile \
+		| sed 's/######* \(.*\)/@               $(ESCAPE)[1;31m\1$(ESCAPE)[0m/g' | tr '@' '\n' \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%-30s\033[0m %s\n", $$1, $$2}'

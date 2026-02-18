@@ -1,77 +1,72 @@
-name: Integration Test
+name: CI
 
 on:
-  pull_request:
   push:
     branches:
       - main
+  pull_request:
+
+env:
+  UV_VERSION: 0.10.4
 
 jobs:
 
-  load-roles:
+  linter:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          version: ${{ env.UV_VERSION }}
+          python-version: 3.12
+      - name: Run quality checks
+        run: make quality
+
+  gather-tests:
+    name: Gather tests
     runs-on: ubuntu-latest
     outputs:
       roles: ${{ steps.changed_roles.outputs.roles }}
       scenarios: ${{ steps.scenarios.outputs.scenarios}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
       - name: Find changed roles
         id: changed_roles
         run: |
           ROLES=$(git diff --name-only origin/${{ github.base_ref || 'main~' }} -- roles/*/ | awk -F '/' '{print $2}' | uniq | jq -R -s -c 'split("\n")[:-1]')
           echo "roles=$ROLES" >> $GITHUB_OUTPUT
-
       - name: Find available scenarios
         id: scenarios
         run: |
           SCENARIOS=$(ls molecule | jq -R -s -c 'split("\n")[:-1]')
           echo "scenarios=$SCENARIOS" >> $GITHUB_OUTPUT
 
-  linter:
+  tests:
+    if: ${{ needs.gather-tests.outputs.roles != '[]' && needs.gather-tests.outputs.roles != '' }}
+    name: Run Molecule Tests
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-
-      - name: Install test dependencies
-        run: make dev-requirements
-
-      - name: Run linter
-        run: make quality
-
-  molecule:
-    if: ${{ needs.load-roles.outputs.roles != '[]' && needs.load-roles.outputs.roles != '' }}
-    needs: load-roles
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         environment: ${{ fromJson(needs.load-roles.outputs.roles) }}
-    runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v6
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
         with:
+          enable-cache: true
+          version: ${{ env.UV_VERSION }}
           python-version: 3.12
-
-      - name: Install test dependencies
-        run: make dev-requirements
-
       - name: Run molecule tests
         if: ${{ contains(fromJson(needs.load-roles.outputs.scenarios), matrix.environment) }}
-        run: molecule test -s ${{ matrix.environment }}
+        run: uv run molecule test -s ${{ matrix.environment }}
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLORS: '1'

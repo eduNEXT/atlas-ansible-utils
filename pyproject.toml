@@ -1,0 +1,27 @@
+[project]
+name = "atlas-ansible-utils"
+version = "20.0.1"
+requires-python = ">=3.12"
+dependencies = [
+	"ansible",
+	"boto3",
+	"botocore",
+	"pymongo",
+]
+
+[dependency-groups]
+dev = [
+	"molecule",
+	"molecule-plugins[docker]",
+	"ansible-lint",
+	"scriv>=1.8.0",
+]
+
+[tool.scriv]
+version = "literal: pyproject.toml: project.version"
+categories = "Added, Changed, Fixed, Removed"
+format = "md"
+md_header_level = 2
+new_fragment_template = "file: changelog.d/scriv/new_fragment.md.j2"
+entry_title_template = "file: changelog.d/scriv/entry_title.md.j2"
+

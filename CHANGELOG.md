@@ -1,10 +1,19 @@
-# Changelog
+# CHANGELOG
 
-All notable changes to this project will be documented in this file.
+<!--
+All enhancements and changes will be documented in this file.  It adheres to
+the structure of http://keepachangelog.com/ ,
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This project adheres to Semantic Versioning (http://semver.org/).
+-->
 
+## Unreleased
+
+See the fragment files in the [changelog.d/ directory](./changelog.d).
+
+<!-- scriv-insert-here -->
+
+<a id='changelog-20.0.1'></a>
 ## v20.0.1 (2026-02-10)
 
 ### Bug fixes

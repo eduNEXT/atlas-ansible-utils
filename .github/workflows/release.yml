@@ -2,73 +2,46 @@ name: Release
 on:
   - workflow_dispatch
 
+env:
+  UV_VERSION: 0.10.4
+
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
-    concurrency: release
     permissions:
-      id-token: write
       contents: write
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements/dev.txt
-
-      - name: Retrieve Next Version
-        id: next-version
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          NEXT_VERSION=$(semantic-release version --print)
-          echo "next_version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Bump Helm appVersion
-        env:
-            NEXT_VERSION: ${{ steps.next-version.outputs.next_version }}
-        run: |
-          yq -i ".version = \"$NEXT_VERSION\", .appVersion = \"$NEXT_VERSION\"" charts/ansible-runner/Chart.yaml
-          git add -u charts
-
-      - name: Generate release
-        run: |
-          make release
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
-
-  release-helm:
-    runs-on: ubuntu-latest
-    needs: release
-    concurrency: release
-    permissions:
-      id-token: write
-      contents: write
+      pages: write
+    outputs:
+      version: ${{ steps.create_release.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: main
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          version: ${{ env.UV_VERSION }}
 
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Install Helm
-        uses: azure/setup-helm@v4
+      - name: Create Release
+        id: create_release
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(uv version --short)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          uv run scriv print --version $VERSION --output release-body
+          gh release create "v${VERSION}" \
+            --title  ${VERSION} \
+            --target "${{ github.sha }}" \
+            --notes-file release-body
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1
@@ -76,3 +49,15 @@ jobs:
           mark_as_latest: false
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+  docker-publish:
+    name: Docker publish
+    permissions:
+      contents: write
+    needs:
+     - release
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      tag: ${{ needs.release.outputs.version }}
+    secrets: inherit
+
