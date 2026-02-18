@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   ansible-runner:
   - apiVersion: v2
+    appVersion: 21.0.0
+    created: "2026-02-18T13:42:29.208332368Z"
+    description: Kubernetes jobs to execute ansible playbooks
+    digest: a19ff4b439a8955348d86631b12c5e10f1e7a4e4ddb954596a57c0d1b3c2f312
+    name: ansible-runner
+    type: application
+    urls:
+    - https://github.com/eduNEXT/atlas-ansible-utils/releases/download/ansible-runner-21.0.0/ansible-runner-21.0.0.tgz
+    version: 21.0.0
+  - apiVersion: v2
     appVersion: 20.0.1
     created: "2026-02-10T17:27:08.751279928Z"
     description: Kubernetes jobs to execute ansible playbooks
@@ -121,4 +131,4 @@ entries:
     urls:
     - https://github.com/eduNEXT/atlas-ansible-utils/releases/download/ansible-runner-1.10.0/ansible-runner-1.10.0.tgz
     version: 1.10.0
-generated: "2026-02-10T17:27:08.751327386Z"
+generated: "2026-02-18T13:42:29.208433196Z"
