@@ -1,0 +1,9 @@
+<clickhouse>
+{% for host in CLICKHOUSE_LISTEN_HOSTS %}
+    <listen_host>{{ host }}</listen_host>
+{% endfor %}
+    <http_port>{{ CLICKHOUSE_HTTP_PORT }}</http_port>
+    <tcp_port>{{ CLICKHOUSE_NATIVE_PORT }}</tcp_port>
+    <interserver_http_port>{{ CLICKHOUSE_INTERSERVER_HTTP_PORT }}</interserver_http_port>
+    <interserver_http_host>{{ clickhouse_current_node_config.host }}</interserver_http_host>
+</clickhouse>

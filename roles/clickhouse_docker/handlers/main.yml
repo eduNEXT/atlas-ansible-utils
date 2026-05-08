@@ -1,0 +1,13 @@
+---
+- name: Restart clickhouse container
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - -f
+      - "{{ CLICKHOUSE_BASE_DIR }}/docker-compose.yml"
+      - up
+      - -d
+      - --force-recreate
+      - --remove-orphans
+  changed_when: false
