@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify node_exporter binary exists
+      ansible.builtin.stat:
+        path: /usr/local/bin/node_exporter
+      register: node_exporter_binary
+      failed_when: not node_exporter_binary.stat.exists
+
+    - name: Verify node_exporter service is running
+      ansible.builtin.service:
+        name: node_exporter
+        state: started
+
+    - name: Verify node_exporter socket is listening
+      ansible.builtin.wait_for:
+        port: 9100
+        state: started
+        timeout: 10
+
+    - name: Verify node_exporter metrics endpoint
+      ansible.builtin.uri:
+        url: http://localhost:9100/metrics
+        return_content: false
+      register: metrics
+      failed_when: metrics.status != 200

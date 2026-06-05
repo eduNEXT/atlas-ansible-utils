@@ -47,5 +47,15 @@ provisioner:
             import https-proxy {{caddy_backend_targets|join(' ')}}
           }
 
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
+
 verifier:
   name: ansible

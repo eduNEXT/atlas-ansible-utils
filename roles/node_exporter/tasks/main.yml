@@ -1,0 +1,94 @@
+---
+- name: "Check current node_exporter version"
+  ansible.builtin.command: "{{ node_exporter_bin_path }}/node_exporter --version"
+  failed_when: false
+  changed_when: false
+  register: node_exporter_current_version
+
+- name: "Download node_exporter archive"
+  ansible.builtin.get_url:
+    url: "{{ node_exporter_release_url }}"
+    dest: "/tmp/node_exporter-{{ node_exporter_version }}.tar.gz"
+    checksum: "{{ node_exporter_checksum }}"
+    mode: "0644"
+  when: >
+    node_exporter_current_version.stdout is not defined or node_exporter_version not in node_exporter_current_version.stdout
+
+- name: "Extract binary from archive into {{ node_exporter_bin_path }}"
+  ansible.builtin.unarchive:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.tar.gz"
+    include:
+      - "node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+    dest: "{{ node_exporter_bin_path }}"
+    extra_opts:
+      - "--strip-components=1"
+    remote_src: true
+    mode: "0755"
+  notify: "Restart node_exporter"
+  when: >
+    node_exporter_current_version.stdout is not defined or node_exporter_version not in node_exporter_current_version.stdout
+
+- name: "Remove node_exporter archive"
+  ansible.builtin.file:
+    path: "/tmp/node_exporter-{{ node_exporter_version }}.tar.gz"
+    state: absent
+
+- name: Create node_exporter system group
+  ansible.builtin.group:
+    name: node_exporter
+    system: true
+    gid: "{{ node_exporter_gid | default(omit) }}"
+    state: present
+
+- name: Create node_exporter system user
+  ansible.builtin.user:
+    name: node_exporter
+    system: true
+    home: /var/lib/node_exporter
+    create_home: false
+    shell: /usr/sbin/nologin
+    uid: "{{ node_exporter_uid | default(omit) }}"
+    group: node_exporter
+    state: present
+
+- name: "Create node_exporter textfile collector directory"
+  ansible.builtin.file:
+    path: "{{ node_exporter_textfile_dir }}"
+    state: directory
+    owner: node_exporter
+    group: node_exporter
+    mode: "0755"
+
+- name: "Copy the node_exporter config file"
+  ansible.builtin.template:
+    src: node_exporter.conf.j2
+    dest: /etc/node_exporter.conf
+    mode: "0644"
+  notify: "Restart node_exporter"
+
+- name: "Copy the node_exporter systemd socket file"
+  ansible.builtin.template:
+    src: node_exporter.socket.j2
+    dest: /etc/systemd/system/node_exporter.socket
+    mode: "0644"
+  register: node_exporter_socket
+  notify: "Restart node_exporter"
+
+- name: "Copy the node_exporter systemd service file"
+  ansible.builtin.template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    mode: "0644"
+  register: node_exporter_service
+  notify: "Restart node_exporter"
+
+- name: "Reload systemd daemon if unit files changed"
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: "node_exporter_service is changed or node_exporter_socket is changed"
+
+- name: "Enable and start node_exporter service"
+  ansible.builtin.service:
+    name: node_exporter
+    state: started
+    enabled: true

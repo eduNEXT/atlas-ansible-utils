@@ -1,0 +1,16 @@
+---
+driver:
+  name: docker
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

@@ -42,5 +42,14 @@ provisioner:
         password: password
         state: present
         append_privs: no
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
 verifier:
   name: ansible

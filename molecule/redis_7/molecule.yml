@@ -36,5 +36,14 @@ provisioner:
   name: ansible
   inventory:
     all: {}
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
 verifier:
   name: ansible
