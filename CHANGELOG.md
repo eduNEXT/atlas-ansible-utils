@@ -13,6 +13,15 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.1.0'></a>
+## 21.1.0 — 2026-06-11
+
+### Added
+
+- A new node_exporter role and playbook that installs Prometheus'
+  [node_exporter](https://github.com/prometheus/node_exporter) on Linux hosts.
+  node_exporter is ran and managed via a systemd unit service.
+
 <a id='changelog-21.0.0'></a>
 ## 21.0.0 — 2026-02-18
 
