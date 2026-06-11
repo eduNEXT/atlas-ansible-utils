@@ -84,7 +84,7 @@ wheels = [
 
 [[package]]
 name = "atlas-ansible-utils"
-version = "21.0.0"
+version = "21.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "ansible" },
