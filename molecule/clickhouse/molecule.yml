@@ -37,5 +37,14 @@ provisioner:
   inventory:
     all:
       CLICKHOUSE_DEFAULT_USER_PASSWORD: password
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
 verifier:
   name: ansible

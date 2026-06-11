@@ -48,13 +48,14 @@ jobs:
           echo "scenarios=$SCENARIOS" >> $GITHUB_OUTPUT
 
   tests:
+    needs: gather-tests
     if: ${{ needs.gather-tests.outputs.roles != '[]' && needs.gather-tests.outputs.roles != '' }}
     name: Run Molecule Tests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        environment: ${{ fromJson(needs.load-roles.outputs.roles) }}
+        environment: ${{ fromJson(needs.gather-tests.outputs.roles) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -65,7 +66,7 @@ jobs:
           version: ${{ env.UV_VERSION }}
           python-version: 3.12
       - name: Run molecule tests
-        if: ${{ contains(fromJson(needs.load-roles.outputs.scenarios), matrix.environment) }}
+        if: ${{ contains(fromJson(needs.gather-tests.outputs.scenarios), matrix.environment) }}
         run: uv run molecule test -s ${{ matrix.environment }}
         env:
           PY_COLORS: '1'
