@@ -13,6 +13,13 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.1.1'></a>
+## 21.1.1 — 2026-06-11
+
+### Fixed
+
+- Bump the Helm chart to properly publish the Chart release.
+
 <a id='changelog-21.1.0'></a>
 ## 21.1.0 — 2026-06-11
 
