@@ -1,0 +1,89 @@
+### Encryption-at-rest configuration using component_keyring_file ###
+
+- name: Ensure keyring directory exists
+  ansible.builtin.file:
+    path: "{{ MYSQL_CONFIG_KEYRING_DIR }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: '0700'
+
+- name: Install global manifest to load keyring component early
+  ansible.builtin.copy:
+    dest: "{{ MYSQL_CONFIG_BASEDIR }}/sbin/mysqld.my"
+    owner: mysql
+    group: mysql
+    mode: '0644'
+    content: |
+      { "components": "file://component_keyring_file" }
+
+- name: Install component_keyring_file config (JSON)
+  ansible.builtin.copy:
+    dest: "{{ MYSQL_CONFIG_PLUGIN_DIR }}/component_keyring_file.cnf"
+    owner: mysql
+    group: mysql
+    mode: '0640'
+    content: |
+      {
+        "path": "{{ MYSQL_CONFIG_KEYRING_DIR }}/keyring",
+        "read_only": false
+      }
+
+- name: Put encryption configuration file
+  ansible.builtin.template:
+    src: encryption.cnf.j2
+    dest: "{{ MYSQL_CONFIG_EXTRA_CONFIG_PATH }}/encryption.cnf"
+    mode: preserve
+  notify:
+    - Restart mysql
+
+# We need to adjust AppArmor to allow mysqld to read/write the keyring files
+# in /usr/sbin/mysqld.my
+- name: Ensure AppArmor local dir exists
+  ansible.builtin.file:
+    path: /etc/apparmor.d/local
+    state: directory
+    mode: "0755"
+
+# The main apparmor profile for mysqld is in /etc/apparmor.d/usr.sbin.mysqld.
+# By default, it includes /etc/apparmor.d/local/usr.sbin.mysqld with the line:
+#   #include <local/usr.sbin.mysqld>
+# We add our custom rules there to avoid modifying the main profile directly.
+- name: Install custom rules for mysqld in local include
+  ansible.builtin.copy:
+    dest: /etc/apparmor.d/local/usr.sbin.mysqld
+    mode: "0644"
+    content: |
+      # Keyring/manifest permissions
+      /usr/sbin/mysqld.my r,
+
+- name: Reload AppArmor
+  ansible.builtin.service:
+    name: apparmor
+    state: reloaded
+
+- name: Flush all notified handlers now
+  ansible.builtin.meta: flush_handlers
+
+- name: Check current encryption state of mysql tablespace
+  ansible.builtin.shell: |
+    mysql -e "
+      SELECT COALESCE(
+        (SELECT ENCRYPTION
+           FROM INFORMATION_SCHEMA.INNODB_TABLESPACES
+          WHERE NAME='mysql' LIMIT 1),
+        'N'
+      ) AS enc;
+    "
+  register: mysql_ts_enc
+  changed_when: false  # This task does not change the system state
+  when: MYSQL_CONFIG_AUTO_ENCRYPTION_ENABLED
+
+- name: Encrypt mysql system tablespace if needed
+  ansible.builtin.shell: |
+    mysql -e "
+      ALTER TABLESPACE mysql ENCRYPTION='Y';
+    "
+  when:
+    - MYSQL_CONFIG_AUTO_ENCRYPTION_ENABLED
+    - mysql_ts_enc.stdout.find('N') != -1
