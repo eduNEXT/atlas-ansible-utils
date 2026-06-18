@@ -1,0 +1,10 @@
+---
+# Description: Playbook to launch ClickHouse backups
+- name: Launch backups
+  hosts: clickhouse_servers
+  become: true
+  gather_facts: true
+  roles:
+    - role: clickhouse_backup
+      tags:
+        - clickhouse_backup

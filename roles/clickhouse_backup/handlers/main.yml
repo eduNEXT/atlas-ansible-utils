@@ -1,0 +1,23 @@
+---
+- name: Restart ClickHouse for backup disk
+  when: CLICKHOUSE_BACKUP_RESTART_ON_CONFIG_CHANGE | bool
+  block:
+    - name: Restart native ClickHouse server
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
+      when: not clickhouse_backup_use_docker | bool
+
+    - name: Recreate ClickHouse docker container
+      ansible.builtin.command:
+        argv:
+          - docker
+          - compose
+          - -f
+          - "{{ clickhouse_backup_compose_file }}"
+          - up
+          - -d
+          - --force-recreate
+          - --remove-orphans
+      when: clickhouse_backup_use_docker | bool
+      changed_when: false

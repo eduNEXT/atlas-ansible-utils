@@ -1,0 +1,38 @@
+---
+- name: Ensure ClickHouse backup host path exists
+  ansible.builtin.file:
+    path: "{{ clickhouse_backup_host_path }}"
+    state: directory
+    owner: "{{ CLICKHOUSE_CONTAINER_UID | default('101') }}"
+    group: "{{ CLICKHOUSE_CONTAINER_GID | default('101') }}"
+    mode: "0755"
+  when: clickhouse_backup_use_docker | bool
+
+- name: Ensure ClickHouse backup host path exists for native deployments
+  ansible.builtin.file:
+    path: "{{ clickhouse_backup_host_path }}"
+    state: directory
+    owner: clickhouse
+    group: clickhouse
+    mode: "0755"
+  when: not clickhouse_backup_use_docker | bool
+
+- name: Ensure ClickHouse backup config directory exists
+  ansible.builtin.file:
+    path: "{{ clickhouse_backup_config_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure ClickHouse backup disk
+  ansible.builtin.template:
+    src: backup_disk.xml.j2
+    dest: "{{ clickhouse_backup_config_path }}/{{ CLICKHOUSE_BACKUP_CONFIG_FILE }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart ClickHouse for backup disk
+
+- name: Flush handlers to apply backup disk configuration
+  ansible.builtin.meta: flush_handlers

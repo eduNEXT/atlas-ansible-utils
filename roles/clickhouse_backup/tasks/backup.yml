@@ -1,0 +1,58 @@
+---
+- name: Create backup directory on host
+  ansible.builtin.file:
+    path: "{{ clickhouse_backup_location }}"
+    state: directory
+    mode: "0755"
+
+- name: Convert ClickHouse backup databases to list for backwards compatibility
+  ansible.builtin.set_fact:
+    CLICKHOUSE_BACKUP_DATABASES: "{{ CLICKHOUSE_BACKUP_DATABASES | split }}"
+  when: CLICKHOUSE_BACKUP_DATABASES is string
+
+- name: Discover ClickHouse databases to backup
+  ansible.builtin.shell: |
+    {{ clickhouse_backup_client_base }} \
+      --user {{ CLICKHOUSE_BACKUP_USER | quote }} \
+      {% if CLICKHOUSE_BACKUP_PASSWORD | length > 0 %}--password {{ CLICKHOUSE_BACKUP_PASSWORD | quote }}{% endif %} \
+      --query "SELECT name FROM system.databases WHERE name NOT IN ('system', 'INFORMATION_SCHEMA', 'information_schema') FORMAT TabSeparated"
+  register: clickhouse_databases_raw
+  when: CLICKHOUSE_BACKUP_ALL_DATABASES
+  changed_when: false
+
+- name: Set ClickHouse databases list from discovery
+  ansible.builtin.set_fact:
+    clickhouse_backup_databases: "{{ clickhouse_databases_raw.stdout_lines | map('trim') | select('ne', '') | list }}"
+  when: CLICKHOUSE_BACKUP_ALL_DATABASES
+
+- name: Set ClickHouse databases list from inventory
+  ansible.builtin.set_fact:
+    clickhouse_backup_databases: "{{ CLICKHOUSE_BACKUP_DATABASES }}"
+  when: not CLICKHOUSE_BACKUP_ALL_DATABASES
+
+- name: Create ClickHouse database backup
+  ansible.builtin.shell: |
+    {{ clickhouse_backup_client_base }} \
+      --user {{ CLICKHOUSE_BACKUP_USER | quote }} \
+      {% if CLICKHOUSE_BACKUP_PASSWORD | length > 0 %}--password {{ CLICKHOUSE_BACKUP_PASSWORD | quote }}{% endif %} \
+      --query "BACKUP DATABASE {{ item }} TO Disk('{{ CLICKHOUSE_BACKUP_DISK_NAME }}', '{{ CLICKHOUSE_BACKUP_DATE }}_{{ item }}_clickhouse.zip')"
+  loop: "{{ clickhouse_backup_databases }}"
+  register: clickhouse_backup_results
+  changed_when: clickhouse_backup_results.rc == 0
+
+- name: Build ClickHouse backup files list for upload
+  ansible.builtin.set_fact:
+    clickhouse_backup_files_to_upload: "{{ clickhouse_backup_files_to_upload | default([]) + [clickhouse_backup_host_path ~ '/' ~ CLICKHOUSE_BACKUP_DATE ~ '_' ~ item ~ '_clickhouse.zip'] }}"
+  loop: "{{ clickhouse_backup_databases }}"
+
+- name: Give the server time to recover
+  ansible.builtin.pause:
+    minutes: 1
+    prompt: Pausing to give the server time to recover
+
+- name: Upload the backup to a remote storage
+  ansible.builtin.include_role:
+    name: storage_backups
+  vars:
+    STORAGE_BACKUPS_OPTIONS: "{{ CLICKHOUSE_BACKUP_STORAGE_OPTIONS }}"
+    STORAGE_BACKUPS_FILES_TO_UPLOAD: "{{ clickhouse_backup_files_to_upload }}"
