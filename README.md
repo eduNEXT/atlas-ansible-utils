@@ -163,6 +163,19 @@ ansible-playbook playbooks/mongo_backup.yml \
 
 When uploading backups to S3 from the target host, you can omit `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in `MONGO_BACKUP_STORAGE_OPTIONS` if the EC2 instance profile already has access to the backup bucket.
 
+Run ClickHouse backups over SSM:
+
+```bash
+ansible-playbook playbooks/clickhouse_backup.yml \
+  -i /path/to/inventory/hosts.ini \
+  --limit clickhouse_replica_2 \
+  -v
+```
+
+The `clickhouse_backup` role uses ClickHouse native `BACKUP DATABASE ... TO Disk(...)` to write artifacts on the target host, then uploads them with the shared `storage_backups` role. When uploading to S3, you can omit `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in `CLICKHOUSE_BACKUP_STORAGE_OPTIONS` if the EC2 instance profile already has access to the backup bucket.
+
+For Docker deployments managed by the `clickhouse_docker` role, the backup role writes the allowed backup disk configuration under `{{ CLICKHOUSE_BASE_DIR }}/config.d`, stores artifacts in `{{ CLICKHOUSE_DATA_DIR }}/backups` on the host (mounted as `/var/lib/clickhouse/backups` inside the container), and recreates the container with `docker compose` when the backup disk configuration changes. Set `CLICKHOUSE_BACKUP_USE_DOCKER: true` or rely on `CLICKHOUSE_INSTALL_DOCKER: true` from inventory when backups run against a Docker-based ClickHouse cluster.
+
 ---
 
 ## Using in Kubernetes
