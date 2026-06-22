@@ -1,0 +1,35 @@
+---
+CLICKHOUSE_BACKUP_USER: "{{ CLICKHOUSE_ADMIN_USER | default('ch_admin') }}"
+CLICKHOUSE_BACKUP_PASSWORD: "{{ CLICKHOUSE_ADMIN_PASSWORD | default('') }}"
+CLICKHOUSE_BACKUP_ALL_DATABASES: true
+CLICKHOUSE_BACKUP_DATABASES:
+  - prod_xapi
+# Docker layout defaults; override in inventory when paths differ.
+CLICKHOUSE_BASE_DIR: /opt/clickhouse
+CLICKHOUSE_DATA_DIR: /data/clickhouse/data
+CLICKHOUSE_CONTAINER_NAME: clickhouse
+
+CLICKHOUSE_BACKUP_ROOT: /var/edunext_tmp/clickhouse
+CLICKHOUSE_BACKUP_DATE: "{{ ansible_date_time.date }}_{{ '%02d' | format(ansible_date_time.hour | int) }}-{{ '%02d' | format(ansible_date_time.minute | int) }}"
+CLICKHOUSE_BACKUP_LOCATION: "{{ CLICKHOUSE_BACKUP_ROOT }}/{{ CLICKHOUSE_BACKUP_DATE }}.d"
+clickhouse_artifact_path: "{{ CLICKHOUSE_BACKUP_ROOT }}"
+CLICKHOUSE_BACKUP_PRE_CLEAN_ROOT: false
+
+CLICKHOUSE_BACKUP_DISK_NAME: backups
+CLICKHOUSE_BACKUP_CONFIGURE_DISK: true
+CLICKHOUSE_BACKUP_CONFIG_FILE: backup_disk.xml
+
+# Override deployment mode explicitly, or inherit from clickhouse_docker inventory.
+CLICKHOUSE_BACKUP_USE_DOCKER: false
+CLICKHOUSE_BACKUP_CONTAINER_NAME: "{{ CLICKHOUSE_CONTAINER_NAME | default('clickhouse') }}"
+CLICKHOUSE_BACKUP_CLIENT_COMMAND: ""
+CLICKHOUSE_BACKUP_RESTART_ON_CONFIG_CHANGE: true
+
+# ClickHouse backup storage options
+CLICKHOUSE_BACKUP_STORAGE_OPTIONS:
+  EXTERNAL_STORAGE_TYPE: aws
+  EXTERNAL_STORAGE_OPTIONS:
+    S3_BUCKET_NAME: s3_bucket_name
+    S3_BUCKET_PATH: clickhouse
+    AWS_ACCESS_KEY_ID: s3_access_key
+    AWS_SECRET_ACCESS_KEY: s3_secret_key

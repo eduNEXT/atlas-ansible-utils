@@ -1,0 +1,14 @@
+<clickhouse>
+    <storage_configuration>
+        <disks>
+            <{{ CLICKHOUSE_BACKUP_DISK_NAME }}>
+                <type>local</type>
+                <path>{{ clickhouse_backup_server_path }}/</path>
+            </{{ CLICKHOUSE_BACKUP_DISK_NAME }}>
+        </disks>
+    </storage_configuration>
+    <backups>
+        <allowed_disk>{{ CLICKHOUSE_BACKUP_DISK_NAME }}</allowed_disk>
+        <allowed_path>{{ clickhouse_backup_server_path }}/</allowed_path>
+    </backups>
+</clickhouse>

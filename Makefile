@@ -1,5 +1,9 @@
 .DEFAULT_GOAL := help
-.PHONY: help
+.PHONY: help requirements
+
+requirements: ## Install Python dependencies and Ansible collections
+	uv sync --no-dev
+	uv run ansible-galaxy collection install -r requirements.yml
 
 quality: ## Run linters
 	uv run ansible-lint --exclude charts -c .ansible-lint.yml

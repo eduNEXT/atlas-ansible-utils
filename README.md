@@ -104,6 +104,80 @@ In this case, we can override the default variables using:
 
 ---
 
+## Using AWS SSM instead of SSH
+
+When target instances are reachable only through AWS Systems Manager, configure the inventory with the `aws_ssm` connection plugin (provided by the `amazon.aws` collection, installed via `requirements.yml`).
+
+Prerequisites on the controller (CNC, Docker image, or Kubernetes runner):
+
+- AWS credentials with `ssm:StartSession` and related permissions on the target instances.
+- The [Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) installed (included in the Docker image).
+- Target instances registered in SSM with an agent and instance profile.
+
+Example inventory entry:
+
+```ini
+[test_hosts]
+example-db-node ansible_host=i-0123456789abcdef0 ansible_connection=aws_ssm ansible_aws_ssm_region=us-west-2 ansible_remote_tmp=/tmp/ansible-ssm
+```
+
+The `aws_ssm` connection plugin requires an S3 bucket to transfer Ansible modules to the target instance, even for fact gathering. Set a staging bucket in group vars or pass it as an extra var:
+
+```yaml
+ansible_aws_ssm_bucket_name: my-ssm-staging-bucket
+```
+
+Install dependencies locally:
+
+```bash
+make requirements
+```
+
+Run a connectivity smoke test:
+
+```bash
+AWS_PROFILE=my-aws-profile AWS_SSM_BUCKET=my-ssm-staging-bucket \
+  ./scripts/ssm-smoke-test.sh i-0123456789abcdef0
+```
+
+Or run the playbook directly:
+
+```bash
+uv run ansible-playbook playbooks/test_os_info.yml \
+  -i inventories/examples/ssm/hosts.ini \
+  --limit test_hosts \
+  -e "ansible_aws_ssm_profile=my-aws-profile" \
+  -e "ansible_aws_ssm_bucket_name=my-ssm-staging-bucket" \
+  -e "ansible_remote_tmp=/tmp/ansible-ssm" \
+  -v
+```
+
+Run Mongo backups over SSM:
+
+```bash
+ansible-playbook playbooks/mongo_backup.yml \
+  -i /path/to/inventory/hosts.ini \
+  --limit mongo_node_2 \
+  -v
+```
+
+When uploading backups to S3 from the target host, you can omit `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in `MONGO_BACKUP_STORAGE_OPTIONS` if the EC2 instance profile already has access to the backup bucket.
+
+Run ClickHouse backups over SSM:
+
+```bash
+ansible-playbook playbooks/clickhouse_backup.yml \
+  -i /path/to/inventory/hosts.ini \
+  --limit clickhouse_replica_2 \
+  -v
+```
+
+The `clickhouse_backup` role uses ClickHouse native `BACKUP DATABASE ... TO Disk(...)` to write artifacts on the target host, then uploads them with the shared `storage_backups` role. When uploading to S3, you can omit `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in `CLICKHOUSE_BACKUP_STORAGE_OPTIONS` if the EC2 instance profile already has access to the backup bucket.
+
+For Docker deployments managed by the `clickhouse_docker` role, the backup role writes the allowed backup disk configuration under `{{ CLICKHOUSE_BASE_DIR }}/config.d`, stores artifacts in `{{ CLICKHOUSE_DATA_DIR }}/backups` on the host (mounted as `/var/lib/clickhouse/backups` inside the container), and recreates the container with `docker compose` when the backup disk configuration changes. Set `CLICKHOUSE_BACKUP_USE_DOCKER: true` or rely on `CLICKHOUSE_INSTALL_DOCKER: true` from inventory when backups run against a Docker-based ClickHouse cluster.
+
+---
+
 ## Using in Kubernetes
 
 To run the atlas-ansible-utils playbooks to provision external servers from Kubernetes, jobs or cronjobs can be implemented using the atlas-ansible-utils Docker image. Let's look at the following example:
