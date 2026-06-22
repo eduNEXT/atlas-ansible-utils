@@ -34,7 +34,7 @@ spec:
                 - name: ATLAS_ANSIBLE_PLAYBOOK
                   value: {{ printf "%s.yml" .playbook }}
                 - name: ANSIBLE_INVENTORY
-                  value: {{ $.Values.ansible.inventoryPath | quote }}
+                  value: /git/manifests/ansible_inventory/hosts.ini
                 {{- if eq $.Values.connection.type "ssm" }}
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:

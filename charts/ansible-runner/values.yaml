@@ -17,9 +17,6 @@ connection:
   # ssm: Ansible connects to targets over AWS SSM
   type: ssh
 
-ansible:
-  inventoryPath: /git/manifests/ansible_inventory/hosts.ini
-
 aws:
   region: ""
   # reference a Secret created outside the chart
