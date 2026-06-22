@@ -10,7 +10,7 @@ CLICKHOUSE_DATA_DIR: /data/clickhouse/data
 CLICKHOUSE_CONTAINER_NAME: clickhouse
 
 CLICKHOUSE_BACKUP_ROOT: /var/edunext_tmp/clickhouse
-CLICKHOUSE_BACKUP_DATE: "{{ ansible_date_time.date }}"
+CLICKHOUSE_BACKUP_DATE: "{{ ansible_date_time.date }}_{{ '%02d' | format(ansible_date_time.hour | int) }}-{{ '%02d' | format(ansible_date_time.minute | int) }}"
 CLICKHOUSE_BACKUP_LOCATION: "{{ CLICKHOUSE_BACKUP_ROOT }}/{{ CLICKHOUSE_BACKUP_DATE }}.d"
 clickhouse_artifact_path: "{{ CLICKHOUSE_BACKUP_ROOT }}"
 CLICKHOUSE_BACKUP_PRE_CLEAN_ROOT: false
