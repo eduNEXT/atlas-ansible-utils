@@ -60,3 +60,31 @@ Selector labels
 app.kubernetes.io/name: {{ include "ansible-runner.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+AWS credentials Secret name for SSM mode
+*/}}
+{{- define "ansible-runner.awsSecretName" -}}
+{{- if .Values.aws.existingSecret -}}
+{{- .Values.aws.existingSecret -}}
+{{- else -}}
+aws-credentials
+{{- end -}}
+{{- end -}}
+
+{{/*
+Validate connection-specific required configuration
+*/}}
+{{- define "ansible-runner.validateConnectionConfig" -}}
+{{- if eq .Values.connection.type "ssm" -}}
+{{- if and (not .Values.aws.existingSecret) (or (not .Values.awsSecret.accessKeyId) (not .Values.awsSecret.secretAccessKey)) -}}
+{{- fail "connection.type is ssm but neither aws.existingSecret nor awsSecret credentials are configured" -}}
+{{- end -}}
+{{- else if eq .Values.connection.type "ssh" -}}
+{{- if not .Values.sshSecret.key -}}
+{{- fail "connection.type is ssh but sshSecret.key is not configured" -}}
+{{- end -}}
+{{- else -}}
+{{- fail (printf "connection.type must be ssh or ssm, got %q" .Values.connection.type) -}}
+{{- end -}}
+{{- end -}}
