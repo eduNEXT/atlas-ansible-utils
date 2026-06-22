@@ -1,3 +1,4 @@
+{{- include "ansible-runner.validateConnectionConfig" $ -}}
 {{- range $.Values.jobs }}
 ---
 apiVersion: batch/v1
@@ -26,22 +27,44 @@ spec:
               {{- end }}
               name: ansible-runner
               env:
+                {{- if eq $.Values.connection.type "ssh" }}
                 - name: ANSIBLE_PRIVATE_KEY_FILE
                   value: /git/ssh
+                {{- end }}
                 - name: ATLAS_ANSIBLE_PLAYBOOK
                   value: {{ printf "%s.yml" .playbook }}
                 - name: ANSIBLE_INVENTORY
-                  value: /git/manifests/ansible_inventory/hosts.ini
-                  {{- if .extraEnvs }}
-                    {{- toYaml .extraEnvs | nindent 16}}
-                  {{- end }}
+                  value: {{ $.Values.ansible.inventoryPath | quote }}
+                {{- if eq $.Values.connection.type "ssm" }}
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "ansible-runner.awsSecretName" $ }}
+                      key: {{ $.Values.aws.accessKeyIdKey }}
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "ansible-runner.awsSecretName" $ }}
+                      key: {{ $.Values.aws.secretAccessKeyKey }}
+                {{- if $.Values.aws.region }}
+                - name: AWS_REGION
+                  value: {{ $.Values.aws.region | quote }}
+                - name: AWS_DEFAULT_REGION
+                  value: {{ $.Values.aws.region | quote }}
+                {{- end }}
+                {{- end }}
+                {{- if .extraEnvs }}
+                  {{- toYaml .extraEnvs | nindent 16}}
+                {{- end }}
               volumeMounts:
                 - mountPath: /git
                   name: inventory-content
+                {{- if eq $.Values.connection.type "ssh" }}
                 - mountPath: /git/ssh
                   name: ssh-key
                   subPath: ssh-privatekey
                   readOnly: true
+                {{- end }}
           initContainers:
             - image: registry.k8s.io/git-sync/git-sync:v4.0.0
               name: inventory-git-sync
