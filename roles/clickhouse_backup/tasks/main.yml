@@ -5,11 +5,11 @@
 
 - name: Resolve ClickHouse backup paths for Docker deployments
   ansible.builtin.set_fact:
-    clickhouse_backup_host_path: "{{ CLICKHOUSE_DATA_DIR | default('/edx/var/clickhouse/data') }}/backups"
+    clickhouse_backup_host_path: "{{ CLICKHOUSE_DATA_DIR }}/backups"
     clickhouse_backup_server_path: /var/lib/clickhouse/backups
-    clickhouse_backup_config_path: "{{ CLICKHOUSE_BASE_DIR | default('/edx/app/clickhouse') }}/config.d"
+    clickhouse_backup_config_path: "{{ CLICKHOUSE_BASE_DIR }}/config.d"
     clickhouse_backup_container_name: "{{ CLICKHOUSE_BACKUP_CONTAINER_NAME | default(CLICKHOUSE_CONTAINER_NAME | default('clickhouse')) }}"
-    clickhouse_backup_compose_file: "{{ CLICKHOUSE_BASE_DIR | default('/edx/app/clickhouse') }}/docker-compose.yml"
+    clickhouse_backup_compose_file: "{{ CLICKHOUSE_BASE_DIR }}/docker-compose.yml"
   when: clickhouse_backup_use_docker | bool
 
 - name: Resolve ClickHouse backup paths for native deployments
