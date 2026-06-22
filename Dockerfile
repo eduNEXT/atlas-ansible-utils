@@ -7,8 +7,14 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt update
     apt install -y \
         build-essential \
+        curl \
         git \
+        unzip \
     ;
+    curl -fsSL "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" \
+        -o /tmp/session-manager-plugin.deb
+    dpkg -i /tmp/session-manager-plugin.deb
+    rm /tmp/session-manager-plugin.deb
 EOCMD
 
 FROM minimal AS dependencies
@@ -41,10 +47,16 @@ RUN <<EOCMD
     chown -R 1000:1000 /runner;
 EOCMD
 
+COPY requirements.yml .
+RUN mkdir -p /usr/share/ansible/collections \
+    && ansible-galaxy collection install -r requirements.yml -p /usr/share/ansible/collections \
+    && chown -R runner:runner /usr/share/ansible/collections
+
 COPY . .
 
 USER 1000:1000
 
+ENV ANSIBLE_COLLECTIONS_PATHS="/usr/share/ansible/collections"
 # For now, we prefer skipping the host key checking
 ENV ANSIBLE_HOST_KEY_CHECKING="no"
 ENV ATLAS_ANSIBLE_PLAYBOOK="test_os_info.yml"
