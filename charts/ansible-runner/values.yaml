@@ -12,6 +12,31 @@ nameOverride: ""
 fullnameOverride: ""
 imagePullSecrets: []
 
+connection:
+  # ssh: Ansible connects to targets over SSH (default)
+  # ssm: Ansible connects to targets over AWS SSM
+  type: ssh
+
+ansible:
+  inventoryPath: /git/manifests/ansible_inventory/hosts.ini
+
+aws:
+  region: ""
+  # reference a Secret created outside the chart
+  # with keys from a dedicated IAM user:
+  #   kubectl create secret generic backups-runner-aws-credentials \
+  #     --from-literal=AWS_ACCESS_KEY_ID=AKIA... \
+  #     --from-literal=AWS_SECRET_ACCESS_KEY=...
+  existingSecret: ""
+  accessKeyIdKey: AWS_ACCESS_KEY_ID
+  secretAccessKeyKey: AWS_SECRET_ACCESS_KEY
+
+# Inline credentials; only used when connection.type is ssm and aws.existingSecret
+# is empty. 
+awsSecret:
+  accessKeyId: ""
+  secretAccessKey: ""
+
 sshSecret:
   key: ''
 
