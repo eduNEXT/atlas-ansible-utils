@@ -4,6 +4,11 @@ CLICKHOUSE_BACKUP_PASSWORD: "{{ CLICKHOUSE_ADMIN_PASSWORD | default('') }}"
 CLICKHOUSE_BACKUP_ALL_DATABASES: true
 CLICKHOUSE_BACKUP_DATABASES:
   - prod_xapi
+# Docker layout defaults; override in inventory when paths differ.
+CLICKHOUSE_BASE_DIR: /opt/clickhouse
+CLICKHOUSE_DATA_DIR: /data/clickhouse/data
+CLICKHOUSE_CONTAINER_NAME: clickhouse
+
 CLICKHOUSE_BACKUP_ROOT: /var/edunext_tmp/clickhouse
 CLICKHOUSE_BACKUP_DATE: "{{ ansible_date_time.date }}"
 CLICKHOUSE_BACKUP_LOCATION: "{{ CLICKHOUSE_BACKUP_ROOT }}/{{ CLICKHOUSE_BACKUP_DATE }}.d"
