@@ -13,6 +13,15 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.1.3'></a>
+## 21.1.3 — 2026-06-23
+
+### Added
+
+- AWS SSM connectivity support for the ansible-runner Helm chart, including
+  connection type configuration, AWS credentials management, and CronJob
+  integration for SSM-based Ansible runs.
+
 <a id='changelog-21.1.2'></a>
 ## 21.1.2 — 2026-06-23
 
