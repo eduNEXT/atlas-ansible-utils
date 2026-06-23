@@ -13,6 +13,17 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.1.2'></a>
+## 21.1.2 — 2026-06-23
+
+### Added
+
+- AWS SSM connectivity support via the `aws_ssm` Ansible connection plugin, including
+  an example inventory under `inventories/examples/ssm/` and an SSM smoke test script.
+- Session Manager plugin in the Docker image and documentation for running playbooks
+  against instances reachable only through AWS Systems Manager.
+
+
 <a id='changelog-21.1.1'></a>
 ## 21.1.1 — 2026-06-11
 
