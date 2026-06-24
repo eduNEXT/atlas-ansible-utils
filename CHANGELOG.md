@@ -13,6 +13,13 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.1.4'></a>
+## 21.1.4 — 2026-06-24
+
+### Added
+
+- New options to configure `AWS_REQUEST_CHECKSUM_CALCULATION` and `AWS_RESPONSE_CHECKSUM_VALIDATION` on the storage_backups role.
+
 <a id='changelog-21.1.3'></a>
 ## 21.1.3 — 2026-06-23
 
