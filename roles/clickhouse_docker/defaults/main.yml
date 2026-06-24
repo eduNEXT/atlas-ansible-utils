@@ -1,0 +1,73 @@
+---
+# Docker installation and runtime
+CLICKHOUSE_INSTALL_DOCKER: true
+CLICKHOUSE_DOCKER_PACKAGES:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+CLICKHOUSE_CONTAINER_NAME: clickhouse
+CLICKHOUSE_DOCKER_IMAGE: docker.io/clickhouse/clickhouse-server:25.8.11.66
+CLICKHOUSE_TIMEZONE: UTC
+CLICKHOUSE_RESTART_ON_CONFIG_CHANGE: true
+CLICKHOUSE_FAIL_IF_UNHEALTHY: false
+
+# Paths
+CLICKHOUSE_BASE_DIR: "{{ COMMON_APP_DIR | default('/edx/app') }}/clickhouse"
+CLICKHOUSE_DATA_ROOT: "{{ COMMON_DATA_DIR | default('/edx/var') }}/clickhouse"
+CLICKHOUSE_DATA_DIR: "{{ CLICKHOUSE_DATA_ROOT }}/data"
+CLICKHOUSE_LOG_DIR: "{{ COMMON_LOG_DIR | default('/edx/var/log') }}/clickhouse"
+CLICKHOUSE_USER_FILES_DIR: "{{ CLICKHOUSE_DATA_ROOT }}/user_files"
+CLICKHOUSE_FORMAT_SCHEMA_DIR: "{{ CLICKHOUSE_DATA_ROOT }}/format_schemas"
+CLICKHOUSE_ACCESS_DIR: "{{ CLICKHOUSE_DATA_ROOT }}/access"
+CLICKHOUSE_KEEPER_LOG_DIR: "{{ CLICKHOUSE_DATA_DIR }}/coordination/log"
+CLICKHOUSE_KEEPER_SNAPSHOT_DIR: "{{ CLICKHOUSE_DATA_DIR }}/coordination/snapshots"
+CLICKHOUSE_KEEPER_CONTAINER_LOG_DIR: /var/lib/clickhouse/coordination/log
+CLICKHOUSE_KEEPER_CONTAINER_SNAPSHOT_DIR: /var/lib/clickhouse/coordination/snapshots
+
+# Host-side numeric uid/gid used by the official ClickHouse container image.
+CLICKHOUSE_CONTAINER_UID: "101"
+CLICKHOUSE_CONTAINER_GID: "101"
+
+# Network and ports
+CLICKHOUSE_LISTEN_HOSTS:
+  - "0.0.0.0"
+CLICKHOUSE_HTTP_PORT: 8123
+CLICKHOUSE_NATIVE_PORT: 9000
+CLICKHOUSE_INTERSERVER_HTTP_PORT: 9009
+CLICKHOUSE_KEEPER_CLIENT_PORT: 9181
+CLICKHOUSE_KEEPER_RAFT_PORT: 9234
+CLICKHOUSE_KEEPER_ENABLE_IPV6: false
+
+# Cluster topology: one shard with N replicas by default.
+CLICKHOUSE_CLUSTER_NAME: main_cluster
+CLICKHOUSE_SHARD: "01"
+CLICKHOUSE_CLUSTER_NODES: []
+CLICKHOUSE_CURRENT_NODE: ""
+
+# Users. Override these in inventory and preferably encrypt with Ansible Vault.
+CLICKHOUSE_DEFAULT_USER_PASSWORD: CHANGE_ME_DEFAULT_PASSWORD
+CLICKHOUSE_ADMIN_USER: ch_admin
+CLICKHOUSE_ADMIN_PASSWORD: CHANGE_ME_ADMIN_PASSWORD
+CLICKHOUSE_ADMIN_ALLOWED_NETWORKS:
+  - "::/0"
+CLICKHOUSE_READONLY_USER_ENABLED: true
+CLICKHOUSE_READONLY_USER: readonly_user
+CLICKHOUSE_READONLY_PASSWORD: CHANGE_ME_READONLY_PASSWORD
+CLICKHOUSE_READONLY_ALLOWED_NETWORKS:
+  - "::/0"
+
+# Logging
+CLICKHOUSE_LOG_LEVEL: information
+CLICKHOUSE_LOG_MAX_SIZE: 1000M
+CLICKHOUSE_LOG_MAX_FILES: 10
+
+# Optional extra config rendered into config.d/zz-extra.xml.
+CLICKHOUSE_EXTRA_CONFIG_XML: ""
+
+# Optional SQL example output only; not executed by the role.
+CLICKHOUSE_RENDER_SCHEMA_EXAMPLE: true
+
+# EBS mounting. The mount_ebs dependency consumes this per host.
+CLICKHOUSE_VOLUMES: []
