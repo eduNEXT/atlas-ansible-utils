@@ -117,6 +117,16 @@ def reconfig_replset(rs_config):
     except OperationFailure as e:
         module.fail_json(msg="Failed to reconfigure replSet: {}".format(e.message))
 
+def set_default_write_concern_if_needed(rs_config):
+    members = rs_config.get('members', [])
+    has_arbiter = any(m.get('arbiterOnly') for m in members)
+    if has_arbiter:
+        try:
+            client.admin.command("setDefaultRWConcern", 1,
+                                 defaultWriteConcern={"w": 1})
+        except OperationFailure as e:
+            module.fail_json(msg="Failed to set default write concern (required for PSA): {}".format(e.message))
+
 def get_rs_config_id():
     try:
         return client.admin.command('getCmdLineOpts')['parsed']['replication']['replSetName']
@@ -261,6 +271,7 @@ def update_replset(rs_config):
 
             set_member_ids(rs_config['members'], old_rs_config['members'])  #Noop if all _ids are set
 
+            set_default_write_concern_if_needed(rs_config)
             reconfig_replset(rs_config)
 
     #Validate it worked
