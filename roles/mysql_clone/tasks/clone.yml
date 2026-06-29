@@ -26,12 +26,12 @@
     new_clone_db_name: "{{ item + MYSQL_CLONE_RESTORE_SUFFIX }}"
 
 - name: Drop database if exists
-  community.mysql.mysql_db:
+  ansible.mysql.mysql_db:
     name: "{{ new_clone_db_name }}"
     state: absent
 
 - name: Create new database
-  community.mysql.mysql_db:
+  ansible.mysql.mysql_db:
     name: "{{ new_clone_db_name }}"
     state: present
 

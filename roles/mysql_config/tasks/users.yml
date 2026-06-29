@@ -1,6 +1,6 @@
 ---
 - name: Adding extra MySQL users
-  community.mysql.mysql_user:
+  ansible.mysql.mysql_user:
     name: "{{ item.name }}"
     host: "{{ item.host | default(MYSQL_CONFIG_DEFAULT_ALLOWED_HOSTS) }}"
     password: "{{ item.password }}"
