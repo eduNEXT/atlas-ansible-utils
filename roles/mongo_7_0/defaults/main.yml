@@ -27,6 +27,7 @@ mongodb_debian_pkgs:
   - mongodb-org-tools={{ MONGO_VERSION }}
 
 mongo_configure_replica_set: true
+mongo_configure_arbiter: false
 
 # Vars Meant to be overridden
 MONGO_ADMIN_USER: admin

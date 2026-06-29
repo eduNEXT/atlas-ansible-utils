@@ -95,7 +95,18 @@
     - "{{ mongo_data_dir }}"
     - "{{ mongo_dbpath }}"
     - "{{ mongo_log_dir }}"
-    - "{{ mongo_journal_dir }}"
+  tags:
+    - install
+    - install:app-configuration
+
+- name: Create mongo journal dir
+  ansible.builtin.file:
+    path: "{{ mongo_journal_dir }}"
+    state: directory
+    owner: "{{ mongo_user }}"
+    group: "{{ mongo_user }}"
+    mode: "0755"
+  when: not mongo_configure_arbiter
   tags:
     - install
     - install:app-configuration
@@ -253,7 +264,7 @@
     password: "{{ MONGO_ADMIN_PASSWORD }}"
     database: admin
     roles: root
-  when: initialize_replica_set
+  when: initialize_replica_set and not mongo_configure_arbiter
   run_once: true
   tags:
     - manage
@@ -367,7 +378,7 @@
     state: present
   with_items: "{{ MONGO_USERS }}"
   run_once: true
-  when: not mongo_configure_replica_set
+  when: not mongo_configure_replica_set and not mongo_configure_arbiter
   tags:
     - manage
     - manage:db
