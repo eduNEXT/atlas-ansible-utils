@@ -1,0 +1,9 @@
+<clickhouse>
+    <logger>
+        <level>{{ CLICKHOUSE_LOG_LEVEL }}</level>
+        <log>{{ CLICKHOUSE_LOG_DIR }}/clickhouse-server.log</log>
+        <errorlog>{{ CLICKHOUSE_LOG_DIR }}/clickhouse-server.err.log</errorlog>
+        <size>{{ CLICKHOUSE_LOG_MAX_SIZE }}</size>
+        <count>{{ CLICKHOUSE_LOG_MAX_FILES }}</count>
+    </logger>
+</clickhouse>
