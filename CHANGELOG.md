@@ -13,6 +13,13 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.1.5'></a>
+## 21.1.5 — 2026-07-27
+
+### Changed
+
+- Add `--collector.systemd` and `--collector.systemd.unit-include` options to the node_exporter role to enable systemd unit metrics collection for mongod, mysqld, redis-server, and clickhouse-server services.
+
 <a id='changelog-21.1.4'></a>
 ## 21.1.4 — 2026-06-24
 
