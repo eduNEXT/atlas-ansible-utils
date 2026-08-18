@@ -1,6 +1,6 @@
 ---
 - name: Ensure MySQL databases are present.
-  community.mysql.mysql_db:
+  ansible.mysql.mysql_db:
     name: "{{ item.name }}"
     collation: "{{ item.collation | default('') }}"
     encoding: "{{ item.encoding | default('') }}"

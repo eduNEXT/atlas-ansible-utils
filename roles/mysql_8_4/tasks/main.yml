@@ -58,7 +58,7 @@
   when: not mysql_installed.stat.exists
 
 - name: Ensure Anonymous user(s) does not exist
-  community.mysql.mysql_user:
+  ansible.mysql.mysql_user:
     name: ""
     host: "{{ item }}"
     state: absent

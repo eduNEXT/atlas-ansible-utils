@@ -1,7 +1,8 @@
+---
 node_exporter_bin_path: "/usr/local/bin/"
-node_exporter_checksum: "sha256:9f5ea48e5bc7b656f8a91a32e7d7deb89f70f73dabd0d974418aca15f37d6810"  # Retrieved from the sha256sums.txt on the releases page
+node_exporter_checksum: "sha256:9f5ea48e5bc7b656f8a91a32e7d7deb89f70f73dabd0d974418aca15f37d6810" # Retrieved from the sha256sums.txt on the releases page
 node_exporter_listen_port: "9100"
 node_exporter_options: "--collector.textfile.directory {{ node_exporter_textfile_dir }}"
-node_exporter_release_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"  # yamllint disable-line rule:line-length
+node_exporter_release_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz" # yamllint disable-line rule:line-length
 node_exporter_textfile_dir: "/var/lib/node_exporter/textfile_collector"
 node_exporter_version: "1.11.1"
