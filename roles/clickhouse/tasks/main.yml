@@ -35,6 +35,17 @@
     dest: /etc/clickhouse-server/config.d/host.xml
     mode: preserve
 
+- name: Determine admin and bootstrap default password
+  ansible.builtin.set_fact:
+    ch_admin_user: "{{ CLICKHOUSE_ADMIN_USER | default('default') }}"
+    ch_is_custom_admin: "{{ (CLICKHOUSE_ADMIN_USER | default('default')) != 'default' }}"
+    ch_default_password: >-
+      {{
+        lookup('ansible.builtin.password', '/dev/null chars=ascii_letters,digits length=32')
+        if ((CLICKHOUSE_ADMIN_USER | default('default')) != 'default')
+        else CLICKHOUSE_DEFAULT_USER_PASSWORD
+      }}
+
 # - name: Grant default user permissions to create users and groups
 - name: Edit /etc/clickhouse-server/users.xml
   ansible.builtin.template:
@@ -42,29 +53,55 @@
     dest: /etc/clickhouse-server/users.xml
     mode: preserve
 
+- name: Configure backup disk
+  ansible.builtin.template:
+    src: backup_disk.xml.j2
+    dest: /etc/clickhouse-server/config.d/backup_disk.xml
+    mode: preserve
+  notify: Restart clickhouse
+
+- name: Apply pending ClickHouse configuration changes
+  ansible.builtin.meta: flush_handlers
+
 - name: Start clickhouse service
   ansible.builtin.service:
     name: clickhouse-server
     state: started
     enabled: true
 
+- name: Create custom admin user
+  when: (CLICKHOUSE_ADMIN_USER | default('default')) != 'default'
+  no_log: true
+  ansible.builtin.shell: |
+    clickhouse-client --user "default" --password="{{ ch_default_password }}" --multiquery <<'EOF'
+    CREATE USER IF NOT EXISTS {{ CLICKHOUSE_ADMIN_USER }} IDENTIFIED WITH sha256_password BY '{{ CLICKHOUSE_ADMIN_PASSWORD }}';
+    GRANT ALL ON *.* TO {{ CLICKHOUSE_ADMIN_USER }} WITH GRANT OPTION;
+    EOF
+
 - name: Create SQL Roles, Users and grant permissions
   loop: "{{ CLICKHOUSE_USERS }}"
+  no_log: false
   register: clickhouse_client
   tags:
     - molecule-idempotence-notest
+  vars:
+    active_user: "{{ ch_admin_user }}"
+    active_password: "{{ CLICKHOUSE_ADMIN_PASSWORD if ch_is_custom_admin | bool else ch_default_password }}"
   ansible.builtin.shell: |
-    clickhouse-client --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
+    clickhouse-client --user "{{ active_user }}" --password="{{ active_password }}" --multiquery <<'EOF'
 
     CREATE ROLE IF NOT EXISTS '{{ item.name }}_admin';
 
     GRANT ALL ON system.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_vector.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON openedx.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT CREATE USER ON *.* to '{{ item.name }}_admin';
     GRANT ALTER USER ON *.* to '{{ item.name }}_admin';
     GRANT DROP FUNCTION ON *.* to '{{ item.name }}_admin';
@@ -75,3 +112,13 @@
     GRANT {{ item.name }}_admin to {{ item.name }};
 
     EOF
+
+- name: Remove default user configuration
+  when: ch_is_custom_admin | bool
+  ansible.builtin.copy:
+    dest: /etc/clickhouse-server/users.d/remove_default_user.yaml
+    content: |
+      users:
+        default:
+          "@remove": remove
+    mode: '0644'
