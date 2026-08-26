@@ -1,0 +1,24 @@
+services:
+  clickhouse:
+    container_name: "{{ CLICKHOUSE_CONTAINER_NAME }}"
+    image: "{{ CLICKHOUSE_DOCKER_IMAGE }}"
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TZ: "{{ CLICKHOUSE_TIMEZONE }}"
+    volumes:
+      - "{{ CLICKHOUSE_BASE_DIR }}/config.d:/etc/clickhouse-server/config.d:ro"
+      - "{{ CLICKHOUSE_BASE_DIR }}/users.d:/etc/clickhouse-server/users.d:ro"
+      - "{{ CLICKHOUSE_DATA_DIR }}:/var/lib/clickhouse"
+      - "{{ CLICKHOUSE_LOG_DIR }}:/var/log/clickhouse-server"
+      - "{{ CLICKHOUSE_USER_FILES_DIR }}:/var/lib/clickhouse/user_files"
+      - "{{ CLICKHOUSE_FORMAT_SCHEMA_DIR }}:/var/lib/clickhouse/format_schemas"
+      - "{{ CLICKHOUSE_ACCESS_DIR }}:/var/lib/clickhouse/access"
+      - "{{ CLICKHOUSE_KEEPER_LOG_DIR }}:{{ CLICKHOUSE_KEEPER_CONTAINER_LOG_DIR }}"
+      - "{{ CLICKHOUSE_KEEPER_SNAPSHOT_DIR }}:{{ CLICKHOUSE_KEEPER_CONTAINER_SNAPSHOT_DIR }}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:{{ CLICKHOUSE_HTTP_PORT }}/ping | grep -q 'Ok.'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s

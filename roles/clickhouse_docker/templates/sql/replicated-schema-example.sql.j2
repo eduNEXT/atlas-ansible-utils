@@ -1,0 +1,15 @@
+-- Example replicated database/table for the current ClickHouse cluster.
+CREATE DATABASE IF NOT EXISTS example_replicated
+ENGINE = Replicated('/clickhouse/databases/{shard}/example_replicated', '{replica}');
+
+CREATE TABLE IF NOT EXISTS example_replicated.events
+(
+    id UInt64,
+    created_at DateTime,
+    payload String
+)
+ENGINE = ReplicatedMergeTree(
+    '/clickhouse/tables/{shard}/example_replicated/events',
+    '{replica}'
+)
+ORDER BY (id, created_at);

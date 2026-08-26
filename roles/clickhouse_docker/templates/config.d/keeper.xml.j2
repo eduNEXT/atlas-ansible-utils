@@ -1,0 +1,23 @@
+<clickhouse>
+    <keeper_server>
+        <tcp_port>{{ CLICKHOUSE_KEEPER_CLIENT_PORT }}</tcp_port>
+        <enable_ipv6>{{ 'true' if CLICKHOUSE_KEEPER_ENABLE_IPV6 else 'false' }}</enable_ipv6>
+        <server_id>{{ clickhouse_current_node_config.id }}</server_id>
+        <log_storage_path>{{ CLICKHOUSE_KEEPER_CONTAINER_LOG_DIR }}</log_storage_path>
+        <snapshot_storage_path>{{ CLICKHOUSE_KEEPER_CONTAINER_SNAPSHOT_DIR }}</snapshot_storage_path>
+        <coordination_settings>
+            <operation_timeout_ms>10000</operation_timeout_ms>
+            <session_timeout_ms>30000</session_timeout_ms>
+            <raft_logs_level>{{ CLICKHOUSE_LOG_LEVEL }}</raft_logs_level>
+        </coordination_settings>
+        <raft_configuration>
+{% for node in CLICKHOUSE_CLUSTER_NODES %}
+            <server>
+                <id>{{ node.id }}</id>
+                <hostname>{{ node.host }}</hostname>
+                <port>{{ CLICKHOUSE_KEEPER_RAFT_PORT }}</port>
+            </server>
+{% endfor %}
+        </raft_configuration>
+    </keeper_server>
+</clickhouse>
