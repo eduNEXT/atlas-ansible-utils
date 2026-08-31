@@ -13,6 +13,11 @@ MONGO_RESTORE_NUM_PARALLEL_COLLECTIONS: 4
 MONGO_RESTORE_ORIGINAL_DATABASE_NAME: ""
 MONGO_RESTORE_TARGET_DATABASE_NAME: ""
 
+# Name of the archive to restore, without the date prefix and the extension.
+# mongo_backup names an archive holding a single database after that database,
+# so restoring one means asking for "mongo_<database>" here.
+MONGO_RESTORE_ARCHIVE_NAME: mongo
+
 # Backup folders
 MONGO_RESTORE_BACKUP_ROOT: /var/edunext_tmp/mongo
 MONGO_RESTORE_BACKUP_DATE: "{{ ansible_date_time.date }}"

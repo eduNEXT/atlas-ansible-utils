@@ -2,7 +2,17 @@
 MONGO_BACKUP_USER: admin
 MONGO_BACKUP_PASSWORD: mongo_password
 MONGO_BACKUP_ALL_DATABASES: true
+# Kept for the inventories that back up a single database. Prefer
+# MONGO_BACKUP_DATABASES, which takes any number of them.
 MONGO_BACKUP_DATABASE: edxapp
+# mongodump only takes a single --db, so the role runs one dump per entry in
+# this list and uploads one artifact per database. Ignored when
+# MONGO_BACKUP_ALL_DATABASES is true. It defaults to whatever
+# MONGO_BACKUP_DATABASE holds, so an inventory that backs up a subset of the
+# databases has to list them here.
+MONGO_BACKUP_DATABASES: "{{ [MONGO_BACKUP_DATABASE] if MONGO_BACKUP_DATABASE else [] }}"
+# The list the role actually iterates.
+mongo_backup_database_list: "{{ MONGO_BACKUP_DATABASES | split if MONGO_BACKUP_DATABASES is string else MONGO_BACKUP_DATABASES }}"
 MONGO_BACKUP_ROOT: /var/edunext_tmp/mongo
 MONGO_BACKUP_DATE: "{{ ansible_date_time.date }}"
 MONGO_BACKUP_LOCATION: "{{ MONGO_BACKUP_ROOT }}/{{ MONGO_BACKUP_DATE }}.d"
