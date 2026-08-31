@@ -13,6 +13,26 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.1.0'></a>
+## 22.1.0 — 2026-08-31
+
+### Added
+
+- New `MONGO_BACKUP_DATABASES` variable on the `mongo_backup` role, taking any
+  number of databases. `mongodump` only accepts a single `--db`, so the role now
+  runs one dump per database and uploads one artifact for each, which makes
+  backing up a subset of the databases possible without one job per database.
+  `MONGO_BACKUP_DATABASE` keeps working and is read as a single element list.
+- New `MONGO_RESTORE_ARCHIVE_NAME` variable on the `mongo_restore` role, to pick
+  the archive to restore when it holds a single database.
+
+### Changed
+
+- An archive holding a single mongo database is now named after that database,
+  as in `<date>_mongo_edxapp.gz`, so several databases can be backed up to the
+  same remote storage path without overwriting each other. Backups taken with
+  `MONGO_BACKUP_ALL_DATABASES` set to true keep the `<date>_mongo.gz` name.
+
 <a id='changelog-22.0.0'></a>
 ## 22.0.0 — 2026-06-29
 

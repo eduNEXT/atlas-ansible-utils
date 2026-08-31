@@ -1,33 +1,30 @@
 # Description: Playbook to launch Mongo backups
 # It is compatible with the S3 API and Azure Blob Storage.
 ---
+- name: Check that a database is selected when not backing up all of them
+  ansible.builtin.fail:
+    msg: |
+      MONGO_BACKUP_ALL_DATABASES is false but MONGO_BACKUP_DATABASES is empty, so there is nothing to back up. List the databases to back up in
+      MONGO_BACKUP_DATABASES.
+  when: not MONGO_BACKUP_ALL_DATABASES and mongo_backup_database_list | length == 0
+
 - name: Create backup directory
   ansible.builtin.file:
     path: "{{ MONGO_BACKUP_LOCATION }}"
     state: directory
     mode: "0755"
 
-# To clone the databases, we use the commands recommended by MongoDB:
-# https://www.mongodb.com/docs/database-tools/mongodump/#copy-and-clone-databases
-- name: Create mongo database backup
-  ansible.builtin.shell: >
-    mongodump
-    --authenticationDatabase admin
-    -u {{ MONGO_BACKUP_USER }} -p '{{ MONGO_BACKUP_PASSWORD }}'
-    --gzip
-    --archive={{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.gz
-    {% if not MONGO_BACKUP_ALL_DATABASES %}
-    --db={{ MONGO_BACKUP_DATABASE }}
-    {% endif %}
-- name: Give the server time to recover
-  ansible.builtin.pause:
-    minutes: 1
-    prompt: Pausing to give the server time to recover
-
-- name: Upload the backup to a remote storage
-  ansible.builtin.include_role:
-    name: storage_backups
+- name: Back up every mongo database in a single archive
+  ansible.builtin.include_tasks: dump.yml
   vars:
-    STORAGE_BACKUPS_OPTIONS: "{{ MONGO_BACKUP_STORAGE_OPTIONS }}"
-    STORAGE_BACKUPS_FILES_TO_UPLOAD:
-      - "{{ MONGO_BACKUP_LOCATION }}/{{ MONGO_BACKUP_DATE }}_mongo.gz"
+    mongo_backup_database: ""
+  when: MONGO_BACKUP_ALL_DATABASES
+
+# mongodump takes a single --db, so each database needs its own run and its own
+# archive.
+- name: Back up the selected mongo databases
+  ansible.builtin.include_tasks: dump.yml
+  loop: "{{ mongo_backup_database_list }}"
+  loop_control:
+    loop_var: mongo_backup_database
+  when: not MONGO_BACKUP_ALL_DATABASES
