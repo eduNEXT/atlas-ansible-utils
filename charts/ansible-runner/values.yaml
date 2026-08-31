@@ -65,6 +65,10 @@ podSecurityContext:
 
 jobs:
   - playbook: test_os_info
+    # Suffix for the CronJob name, defaults to the playbook name. Set it when
+    # the same playbook has to run in more than one job, otherwise both jobs
+    # render a CronJob with the same name and only one of them survives.
+    # name: test_os_info_verbose
     # extraEnvs:
     #   - name: ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS
     #     value: -vvv

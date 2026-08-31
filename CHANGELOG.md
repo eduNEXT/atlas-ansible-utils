@@ -13,6 +13,17 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.1.0'></a>
+## 22.1.0 — 2026-08-31
+
+### Added
+
+- New optional `name` field for `ansible-runner` chart jobs, used as the
+  CronJob name suffix. It defaults to the playbook name, so existing jobs keep
+  the name they have, and it lets the same playbook run in several jobs. Needed
+  for `mongo_backup`, since `mongodump` takes a single `--db` and backing up
+  more than one database requires one job per database.
+
 <a id='changelog-22.0.0'></a>
 ## 22.0.0 — 2026-06-29
 
