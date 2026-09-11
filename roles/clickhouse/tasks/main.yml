@@ -65,6 +65,7 @@
   loop:
     - { src: 'host.xml.j2', dest: '/etc/clickhouse-server/config.d/host.xml', notify: 'clickhouse restart' }
     - { src: 'users.xml.j2', dest: '/etc/clickhouse-server/users.xml', notify: 'clickhouse reload users' }
+    - { src: 'system_logs.xml.j2', dest: '/etc/clickhouse-server/config.d/system_logs.xml', notify: 'clickhouse reload config' }
   notify: "{{ item.notify }}"
   tags: [configure, clickhouse, config]
 
