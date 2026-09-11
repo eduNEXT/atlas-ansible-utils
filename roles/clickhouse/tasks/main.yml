@@ -1,4 +1,27 @@
 ---
+- name: Validate ClickHouse configuration
+  ansible.builtin.assert:
+    that:
+      - CLICKHOUSE_VERSION is match('^\d+\.\d+$')
+      - CLICKHOUSE_BACKUP_ROOT is defined and CLICKHOUSE_BACKUP_ROOT != ""
+      - CLICKHOUSE_DEFAULT_USER_PASSWORD | length >= 12
+      - CLICKHOUSE_LISTEN_HOSTS | type_debug == 'list'
+      - CLICKHOUSE_SYSTEM_LOG_TABLES | type_debug == 'list'
+      - CLICKHOUSE_LOG_LEVEL in ['trace', 'debug', 'information', 'warning', 'error', 'fatal']
+      - CLICKHOUSE_ADMIN_USER is defined
+      - (CLICKHOUSE_ADMIN_USER == 'default') or (CLICKHOUSE_ADMIN_PASSWORD | length >= 12)
+    fail_msg: "Invalid ClickHouse config"
+    quiet: true
+  tags: [validate, clickhouse]
+
+- name: Mount ClickHouse volumes
+  ansible.builtin.include_role:
+    name: mount_ebs
+  vars:
+    volumes: "{{ CLICKHOUSE_VOLUMES }}"
+  when: CLICKHOUSE_VOLUMES | length > 0
+  tags: [storage, clickhouse, mount]
+
 - name: Install ClickHouse dependencies
   ansible.builtin.apt:
     name:
@@ -8,12 +31,14 @@
       - gpg-agent
     state: present
     update_cache: true
+  tags: [install, clickhouse, packages]
 
 - name: Add ClickHouse GPG key
   ansible.builtin.apt_key:
     url: "{{ CLICKHOUSE_GPG_KEY_URL }}"
     keyring: "{{ CLICKHOUSE_KEYRING_PATH }}"
     state: present
+  tags: [install, clickhouse, packages]
 
 - name: Add ClickHouse repository
   ansible.builtin.apt_repository:
@@ -21,6 +46,7 @@
     filename: clickhouse
     state: present
     update_cache: true
+  tags: [install, clickhouse, packages]
 
 - name: Install ClickHouse
   ansible.builtin.apt:
@@ -28,33 +54,42 @@
     state: present
     update_cache: true
   become: true
+  notify: Restart clickhouse
+  tags: [install, clickhouse, packages]
 
 - name: Create /etc/clickhouse-server/config.d/host.xml
   ansible.builtin.template:
     src: host.xml.j2
     dest: /etc/clickhouse-server/config.d/host.xml
     mode: preserve
+  notify: Restart clickhouse
+  tags: [configure, clickhouse, config]
 
-# - name: Grant default user permissions to create users and groups
-- name: Edit /etc/clickhouse-server/users.xml
+- name: Configure bootstrap users before starting ClickHouse
   ansible.builtin.template:
     src: users.xml.j2
     dest: /etc/clickhouse-server/users.xml
     mode: preserve
+  notify: Restart clickhouse
+  tags: [configure, clickhouse, config]
 
 - name: Start clickhouse service
   ansible.builtin.service:
     name: clickhouse-server
     state: started
     enabled: true
+  tags: [bootstrap, clickhouse, service]
 
 - name: Create SQL Roles, Users and grant permissions
   loop: "{{ CLICKHOUSE_USERS }}"
   register: clickhouse_client
   tags:
+    - bootstrap
+    - clickhouse
+    - users
     - molecule-idempotence-notest
   ansible.builtin.shell: |
-    clickhouse-client --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
+    clickhouse-client --port {{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }} --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
 
     CREATE ROLE IF NOT EXISTS '{{ item.name }}_admin';
 
@@ -65,6 +100,10 @@
     GRANT ALL ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_vector.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON openedx.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
+    GRANT ALL ON event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT CREATE USER ON *.* to '{{ item.name }}_admin';
     GRANT ALTER USER ON *.* to '{{ item.name }}_admin';
     GRANT DROP FUNCTION ON *.* to '{{ item.name }}_admin';
