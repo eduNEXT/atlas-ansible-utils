@@ -54,23 +54,22 @@
     state: present
     update_cache: true
   become: true
-  notify: Restart clickhouse
+  notify: clickhouse restart
   tags: [install, clickhouse, packages]
 
-- name: Create /etc/clickhouse-server/config.d/host.xml
+- name: Deploy ClickHouse configuration
   ansible.builtin.template:
-    src: host.xml.j2
-    dest: /etc/clickhouse-server/config.d/host.xml
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     mode: preserve
-  notify: Restart clickhouse
+  loop:
+    - { src: 'host.xml.j2', dest: '/etc/clickhouse-server/config.d/host.xml', notify: 'clickhouse restart' }
+    - { src: 'users.xml.j2', dest: '/etc/clickhouse-server/users.xml', notify: 'clickhouse reload users' }
+  notify: "{{ item.notify }}"
   tags: [configure, clickhouse, config]
 
-- name: Configure bootstrap users before starting ClickHouse
-  ansible.builtin.template:
-    src: users.xml.j2
-    dest: /etc/clickhouse-server/users.xml
-    mode: preserve
-  notify: Restart clickhouse
+- name: Apply pending ClickHouse configuration changes
+  ansible.builtin.meta: flush_handlers
   tags: [configure, clickhouse, config]
 
 - name: Start clickhouse service
