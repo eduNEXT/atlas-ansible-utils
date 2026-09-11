@@ -28,50 +28,72 @@
     state: present
     update_cache: true
   become: true
+  notify: Restart clickhouse
 
 - name: Create /etc/clickhouse-server/config.d/host.xml
   ansible.builtin.template:
     src: host.xml.j2
     dest: /etc/clickhouse-server/config.d/host.xml
     mode: preserve
+  notify: Restart clickhouse
 
-# - name: Grant default user permissions to create users and groups
-- name: Edit /etc/clickhouse-server/users.xml
+- name: Configure bootstrap users before starting ClickHouse
   ansible.builtin.template:
     src: users.xml.j2
     dest: /etc/clickhouse-server/users.xml
     mode: preserve
+  notify: Restart clickhouse
 
-- name: Start clickhouse service
+- name: Configure backup disk
+  ansible.builtin.template:
+    src: backup_disk.xml.j2
+    dest: /etc/clickhouse-server/config.d/backup_disk.xml
+    mode: preserve
+  notify: Restart clickhouse
+
+- name: Configure system log retention, enablement and verbosity
+  ansible.builtin.template:
+    src: system_logs.xml.j2
+    dest: /etc/clickhouse-server/config.d/system_logs.xml
+    mode: preserve
+  notify: Restart clickhouse
+
+- name: Restart clickhouse service
   ansible.builtin.service:
     name: clickhouse-server
-    state: started
+    state: restarted
     enabled: true
 
-- name: Create SQL Roles, Users and grant permissions
-  loop: "{{ CLICKHOUSE_USERS }}"
-  register: clickhouse_client
-  tags:
-    - molecule-idempotence-notest
-  ansible.builtin.shell: |
-    clickhouse-client --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
+- name: Wait for authenticated bootstrap access
+  ansible.builtin.command:
+    argv:
+      - clickhouse-client
+      - --port
+      - "{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT | string }}"
+      - --user
+      - default
+      - "--password={{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}"
+    stdin: SELECT 1
+  register: ch_bootstrap_ready
+  until: ch_bootstrap_ready.rc == 0 and ch_bootstrap_ready.stdout | trim == '1'
+  retries: 30
+  delay: 2
+  changed_when: false
+  no_log: true
 
-    CREATE ROLE IF NOT EXISTS '{{ item.name }}_admin';
-
-    GRANT ALL ON system.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_vector.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT CREATE USER ON *.* to '{{ item.name }}_admin';
-    GRANT ALTER USER ON *.* to '{{ item.name }}_admin';
-    GRANT DROP FUNCTION ON *.* to '{{ item.name }}_admin';
-    GRANT CREATE FUNCTION ON *.* to '{{ item.name }}_admin';
-
-    CREATE USER IF NOT EXISTS {{ item.name }} identified with plaintext_password by '{{ item.password }}';
-
-    GRANT {{ item.name }}_admin to {{ item.name }};
-
-    EOF
+- name: Verify admin access after final configuration
+  ansible.builtin.command:
+    argv:
+      - clickhouse-client
+      - --port
+      - "{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT | string }}"
+      - --user
+      - default
+      - "--password={{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}"
+    stdin: SELECT 1
+  register: ch_admin_ready
+  until: ch_admin_ready.rc == 0 and ch_admin_ready.stdout | trim == '1'
+  retries: 30
+  delay: 2
+  changed_when: false
+  no_log: true

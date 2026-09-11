@@ -1,0 +1,16 @@
+<clickhouse>
+    <logger>
+        <level>{{ CLICKHOUSE_LOG_LEVEL }}</level>
+    </logger>
+{% if CLICKHOUSE_SYSTEM_LOGS_ENABLED | bool %}
+{% for system_log in CLICKHOUSE_SYSTEM_LOG_TABLES %}
+    <{{ system_log.name }}>
+        <ttl>event_date + INTERVAL {{ system_log.retention_days }} DAY</ttl>
+    </{{ system_log.name }}>
+{% endfor %}
+{% else %}
+{% for system_log in CLICKHOUSE_SYSTEM_LOG_TABLES %}
+    <{{ system_log.name }} remove="1"/>
+{% endfor %}
+{% endif %}
+</clickhouse>

@@ -25,3 +25,25 @@ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT: 9000
 CLICKHOUSE_GPG_KEY_URL: https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key
 CLICKHOUSE_KEYRING_PATH: /usr/share/keyrings/clickhouse-keyring.gpg
 CLICKHOUSE_REPO: "deb [signed-by={{ CLICKHOUSE_KEYRING_PATH }} arch=amd64] https://packages.clickhouse.com/deb stable main"
+
+CLICKHOUSE_BACKUP_DISK_NAME: backups
+CLICKHOUSE_BACKUP_ROOT: /backups/clickhouse
+
+CLICKHOUSE_SYSTEM_LOG_TABLES:
+  - name: trace_log
+    retention_days: 7
+  - name: text_log
+    retention_days: 7
+  - name: metric_log
+    retention_days: 7
+  - name: asynchronous_metric_log
+    retention_days: 7
+  - name: query_metric_log
+    retention_days: 7
+  - name: query_thread_log
+    retention_days: 7
+  - name: part_log
+    retention_days: 7
+  - name: query_log
+    retention_days: 14
+CLICKHOUSE_SYSTEM_LOGS_ENABLED: false

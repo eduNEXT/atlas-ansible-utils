@@ -1,0 +1,23 @@
+---
+CLICKHOUSE_BACKUP_USER: default
+CLICKHOUSE_BACKUP_PASSWORD: ""
+CLICKHOUSE_BACKUP_ROOT: /backups
+CLICKHOUSE_BACKUP_DATE: "{{ ansible_date_time.date }}"
+CLICKHOUSE_BACKUP_DISK_NAME: backups
+CLICKHOUSE_BACKUP_ARTIFACT: "{{ CLICKHOUSE_BACKUP_ROOT }}/{{ CLICKHOUSE_BACKUP_DATE }}_clickhouse.zip"
+CLICKHOUSE_BACKUP_PRE_CLEAN_ROOT: true
+CLICKHOUSE_BACKUP_DATABASES:
+  - default
+  - openedx
+  - reporting
+  - xapi
+  - event_sink
+
+# ClickHouse backup storage options (compatible with aws and azure)
+CLICKHOUSE_BACKUP_STORAGE_OPTIONS:
+  EXTERNAL_STORAGE_TYPE: azure
+  EXTERNAL_STORAGE_OPTIONS:
+    AZURE_CONTAINER_NAME: azure_container_name
+    AZURE_PATH: clickhouse
+    AZURE_CONTAINER_SAS_TOKEN: azure_container_sas_token
+    AZURE_ACCOUNT_NAME: azure_account_name
