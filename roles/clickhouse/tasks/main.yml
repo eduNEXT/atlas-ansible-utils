@@ -66,6 +66,7 @@
     - { src: 'host.xml.j2', dest: '/etc/clickhouse-server/config.d/host.xml', notify: 'clickhouse restart' }
     - { src: 'users.xml.j2', dest: '/etc/clickhouse-server/users.xml', notify: 'clickhouse reload users' }
     - { src: 'system_logs.xml.j2', dest: '/etc/clickhouse-server/config.d/system_logs.xml', notify: 'clickhouse reload config' }
+    - { src: 'backup_disk.xml.j2', dest: '/etc/clickhouse-server/config.d/backup_disk.xml', notify: 'clickhouse restart' }
   notify: "{{ item.notify }}"
   tags: [configure, clickhouse, config]
 
@@ -114,3 +115,12 @@
     GRANT {{ item.name }}_admin to {{ item.name }};
 
     EOF
+
+- name: Include clickhouse_backup role for backup policies
+  ansible.builtin.include_role:
+    name: clickhouse_backup
+  vars:
+    clickhouse_backup_disk: "{{ CLICKHOUSE_BACKUP_DISK_NAME }}"
+    clickhouse_backup_root: "{{ CLICKHOUSE_BACKUP_ROOT }}"
+  when: CLICKHOUSE_BACKUP_ENABLED | bool
+  tags: [backup, clickhouse]

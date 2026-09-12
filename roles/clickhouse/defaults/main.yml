@@ -26,7 +26,7 @@ CLICKHOUSE_GPG_KEY_URL: https://packages.clickhouse.com/rpm/lts/repodata/repomd.
 CLICKHOUSE_KEYRING_PATH: /usr/share/keyrings/clickhouse-keyring.gpg
 CLICKHOUSE_REPO: "deb [signed-by={{ CLICKHOUSE_KEYRING_PATH }} arch=amd64] https://packages.clickhouse.com/deb stable main"
 
-# System Logs (NUEVO en este PR)
+# System Logs
 CLICKHOUSE_LOG_LEVEL: warning
 CLICKHOUSE_SYSTEM_LOGS_ENABLED: false
 CLICKHOUSE_SYSTEM_LOG_TABLES:
@@ -46,3 +46,8 @@ CLICKHOUSE_SYSTEM_LOG_TABLES:
     retention_days: 7
   - name: query_log
     retention_days: 14
+
+# Backup Disk (NUEVO en este PR)
+CLICKHOUSE_BACKUP_DISK_NAME: backups
+CLICKHOUSE_BACKUP_ROOT: /backups/clickhouse
+CLICKHOUSE_BACKUP_ENABLED: false
