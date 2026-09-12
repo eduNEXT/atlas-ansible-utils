@@ -48,11 +48,48 @@
     update_cache: true
   tags: [install, clickhouse, packages]
 
-- name: Install ClickHouse
+- name: Get installed ClickHouse version
+  ansible.builtin.command: clickhouse-server --version
+  register: ch_installed_version
+  changed_when: false
+  failed_when: false
+  tags: [upgrade, clickhouse, packages]
+
+- name: Parse installed version components
+  ansible.builtin.set_fact:
+    ch_installed_major: "{{ ch_installed_version.stdout | regex_search('^(\\d+)\\.(\\d+)', '\\1') | first | default('0') }}"
+    ch_installed_minor: "{{ ch_installed_version.stdout | regex_search('^(\\d+)\\.(\\d+)', '\\2') | first | default('0') }}"
+    ch_desired_major: "{{ CLICKHOUSE_VERSION.split('.')[0] }}"
+    ch_desired_minor: "{{ CLICKHOUSE_VERSION.split('.')[1] }}"
+  tags: [upgrade, clickhouse, packages]
+
+- name: Validate upgrade safety
+  ansible.builtin.assert:
+    that:
+      - not (ch_installed_major != ch_desired_major and not CLICKHOUSE_ALLOW_MAJOR_UPGRADE)
+    fail_msg: |
+      Major version upgrade detected ({{ ch_installed_major }} -> {{ ch_desired_major }}).
+      Set CLICKHOUSE_ALLOW_MAJOR_UPGRADE=true and run backup manually first.
+  tags: [upgrade, clickhouse, packages]
+
+- name: Upgrade ClickHouse packages (patch/minor only)
   ansible.builtin.apt:
-    name: "{{ CLICKHOUSE_PACKAGES | map('regex_replace', '$', '=' + CLICKHOUSE_VERSION) | list }}"
+    name: "{{ CLICKHOUSE_PACKAGES | map('regex_replace', '$', '=' + CLICKHOUSE_VERSION + '*') | list }}"
     state: present
     update_cache: true
+    policy_rc_d: 101
+  when:
+    - ch_installed_major == ch_desired_major
+    - ch_installed_minor != ch_desired_minor
+  notify: clickhouse restart
+  tags: [upgrade, clickhouse, packages]
+
+- name: Install ClickHouse
+  ansible.builtin.apt:
+    name: "{{ CLICKHOUSE_PACKAGES | map('regex_replace', '$', '=' + CLICKHOUSE_VERSION + '*') | list }}"
+    state: present
+    update_cache: true
+    policy_rc_d: 101
   become: true
   notify: clickhouse restart
   tags: [install, clickhouse, packages]
