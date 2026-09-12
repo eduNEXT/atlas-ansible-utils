@@ -57,6 +57,20 @@
   notify: clickhouse restart
   tags: [install, clickhouse, packages]
 
+- name: Determine admin user and password
+  ansible.builtin.set_fact:
+    ch_admin_user: "{{ CLICKHOUSE_ADMIN_USER }}"
+    ch_is_custom_admin: "{{ CLICKHOUSE_ADMIN_USER != 'default' }}"
+    ch_admin_password: "{{ CLICKHOUSE_ADMIN_PASSWORD if CLICKHOUSE_ADMIN_USER != 'default' else CLICKHOUSE_DEFAULT_USER_PASSWORD }}"
+  no_log: true
+  tags: [configure, clickhouse, bootstrap]
+
+- name: Check whether default user was retired by a previous run
+  ansible.builtin.stat:
+    path: /etc/clickhouse-server/users.d/remove_default_user.yaml
+  register: default_user_removed
+  tags: [configure, clickhouse, bootstrap]
+
 - name: Deploy ClickHouse configuration
   ansible.builtin.template:
     src: "{{ item.src }}"
@@ -81,22 +95,53 @@
     enabled: true
   tags: [bootstrap, clickhouse, service]
 
+- name: Create custom admin user
+  when: ch_is_custom_admin | bool
+  no_log: true
+  ansible.builtin.shell: |
+    clickhouse-client --port {{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }} --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
+    CREATE USER IF NOT EXISTS {{ CLICKHOUSE_ADMIN_USER }} IDENTIFIED WITH sha256_password BY '{{ CLICKHOUSE_ADMIN_PASSWORD }}';
+    GRANT ALL ON *.* TO {{ CLICKHOUSE_ADMIN_USER }} WITH GRANT OPTION;
+    EOF
+  tags: [bootstrap, clickhouse, users]
+
+- name: Wait for ClickHouse and verify admin access (SINGLE VERIFICATION)
+  ansible.builtin.command:
+    argv:
+      - clickhouse-client
+      - --port
+      - "{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT | string }}"
+      - --user
+      - "{{ ch_admin_user }}"
+      - "--password={{ ch_admin_password }}"
+    stdin: SELECT 1
+  register: ch_admin_ready
+  until: ch_admin_ready.rc == 0 and ch_admin_ready.stdout | trim == '1'
+  retries: 30
+  delay: 2
+  changed_when: false
+  no_log: true
+  tags: [bootstrap, clickhouse, verify]
+
 - name: Create SQL Roles, Users and grant permissions
   loop: "{{ CLICKHOUSE_USERS }}"
+  no_log: true
   register: clickhouse_client
   tags:
     - bootstrap
     - clickhouse
     - users
     - molecule-idempotence-notest
+  vars:
+    active_user: "{{ ch_admin_user }}"
+    active_password: "{{ ch_admin_password }}"
   ansible.builtin.shell: |
-    clickhouse-client --port {{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }} --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
+    clickhouse-client --port {{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }} --user "{{ active_user }}" --password="{{ active_password }}" --multiquery <<'EOF'
 
     CREATE ROLE IF NOT EXISTS '{{ item.name }}_admin';
 
     GRANT ALL ON system.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
     GRANT ALL ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
@@ -115,6 +160,23 @@
     GRANT {{ item.name }}_admin to {{ item.name }};
 
     EOF
+
+- name: Remove default user configuration
+  when: ch_is_custom_admin | bool
+  ansible.builtin.copy:
+    dest: /etc/clickhouse-server/users.d/remove_default_user.yaml
+    content: |
+      users:
+        default:
+          "@remove": remove
+    mode: '0644'
+  notify: clickhouse reload users
+  tags: [bootstrap, clickhouse, users]
+
+- name: Apply default user retirement
+  when: ch_is_custom_admin | bool
+  ansible.builtin.meta: flush_handlers
+  tags: [bootstrap, clickhouse, users]
 
 - name: Include clickhouse_backup role for backup policies
   ansible.builtin.include_role:
