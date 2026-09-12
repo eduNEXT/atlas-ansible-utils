@@ -1,0 +1,83 @@
+---
+- name: Clean the backup root path before starting the routine
+  ansible.builtin.file:
+    state: absent
+    path: "{{ CLICKHOUSE_BACKUP_ROOT }}"
+  when: |
+    CLICKHOUSE_BACKUP_PRE_CLEAN_ROOT
+    and CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+
+- name: Set backup directory ownership for clickhouse user
+  ansible.builtin.file:
+    path: "{{ CLICKHOUSE_BACKUP_ROOT }}"
+    state: directory
+    owner: clickhouse
+    group: clickhouse
+    mode: "0755"
+
+- name: Launch ClickHouse backups (per database)
+  ansible.builtin.shell: >
+    clickhouse-client
+    --user {{ CLICKHOUSE_BACKUP_USER }}
+    {% if CLICKHOUSE_BACKUP_PASSWORD %}--password '{{ CLICKHOUSE_BACKUP_PASSWORD }}'{% endif %}
+    --query "BACKUP DATABASE {{ item }} TO Disk('{{ CLICKHOUSE_BACKUP_DISK_NAME }}', '{{ CLICKHOUSE_BACKUP_DATE }}/{{ item }}_clickhouse')"
+  no_log: true
+  loop: "{{ CLICKHOUSE_BACKUP_DATABASES }}"
+  register: clickhouse_backup_results
+  changed_when: true
+
+- name: Check all backup artifacts exist
+  ansible.builtin.stat:
+    path: "{{ CLICKHOUSE_BACKUP_ROOT }}/{{ CLICKHOUSE_BACKUP_DATE }}/{{ item }}_clickhouse"
+  loop: "{{ CLICKHOUSE_BACKUP_DATABASES }}"
+  register: clickhouse_backup_artifacts
+
+- name: Fail if any backup artifact missing
+  ansible.builtin.fail:
+    msg: "Backup artifact not found for {{ item }}"
+  loop: "{{ clickhouse_backup_artifacts.results }}"
+  when: not item.stat.exists
+
+- name: Create single tar.gz archive of all backup directories
+  community.general.archive:
+    path:
+      - "{{ CLICKHOUSE_BACKUP_ROOT }}/{{ CLICKHOUSE_BACKUP_DATE }}"
+    dest: "{{ CLICKHOUSE_BACKUP_ROOT }}/clickhouse_backup_{{ CLICKHOUSE_BACKUP_DATE }}.tar.gz"
+    format: gz
+    mode: "0600"
+  register: clickhouse_tar_result
+
+- name: Verify tar.gz archive exists
+  ansible.builtin.stat:
+    path: "{{ CLICKHOUSE_BACKUP_ROOT }}/clickhouse_backup_{{ CLICKHOUSE_BACKUP_DATE }}.tar.gz"
+  register: clickhouse_tar_stat
+
+- name: Fail if tar.gz archive not created
+  ansible.builtin.fail:
+    msg: "Tar.gz archive not created"
+  when: not clickhouse_tar_stat.stat.exists
+
+- name: Upload single tar.gz to Azure Blob Storage
+  ansible.builtin.include_role:
+    name: storage_backups
+  vars:
+    STORAGE_BACKUPS_TYPE: "azure"
+    STORAGE_BACKUPS_AZURE_ACCOUNT_NAME: "{{ AZURE_ACCOUNT_NAME }}"
+    STORAGE_BACKUPS_AZURE_CONTAINER_NAME: "{{ AZURE_CONTAINER_NAME }}"
+    STORAGE_BACKUPS_AZURE_PATH: "{{ AZURE_PATH }}"
+    STORAGE_BACKUPS_AZURE_CONTAINER_SAS_TOKEN: "{{ AZURE_BLOB_SAS_TOKEN }}"
+    STORAGE_BACKUPS_FILES_TO_UPLOAD:
+      - "{{ CLICKHOUSE_BACKUP_ROOT }}/clickhouse_backup_{{ CLICKHOUSE_BACKUP_DATE }}.tar.gz"
+  when: CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+
+- name: Clean tar.gz archive after upload
+  ansible.builtin.file:
+    state: absent
+    path: "{{ CLICKHOUSE_BACKUP_ROOT }}/clickhouse_backup_{{ CLICKHOUSE_BACKUP_DATE }}.tar.gz"
+  when: CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
+
+- name: Clean artifact path
+  ansible.builtin.file:
+    state: absent
+    path: "{{ CLICKHOUSE_BACKUP_ROOT }}/{{ CLICKHOUSE_BACKUP_DATE }}"
+  when: CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE != ""
