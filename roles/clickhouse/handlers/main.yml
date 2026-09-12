@@ -1,0 +1,17 @@
+---
+- name: Restart clickhouse
+  ansible.builtin.service:
+    name: clickhouse-server
+    state: restarted
+    enabled: true
+  listen: "clickhouse restart"
+
+- name: Reload clickhouse users
+  ansible.builtin.command: clickhouse-client --query "SYSTEM RELOAD USERS"
+  listen: "clickhouse reload users"
+  changed_when: false
+
+- name: Reload clickhouse config
+  ansible.builtin.command: clickhouse-client --query "SYSTEM RELOAD CONFIG"
+  listen: "clickhouse reload config"
+  changed_when: false
