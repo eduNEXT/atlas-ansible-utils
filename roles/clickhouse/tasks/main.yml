@@ -121,6 +121,16 @@
   notify: "{{ item.notify }}"
   tags: [configure, clickhouse, config]
 
+- name: Deploy custom ClickHouse configs
+  ansible.builtin.copy:
+    content: "{{ item.value }}"
+    dest: "/etc/clickhouse-server/config.d/{{ item.key }}"
+    mode: '0644'
+  loop: "{{ CLICKHOUSE_CUSTOM_CONFIGS | dict2items }}"
+  notify: clickhouse reload config
+  when: CLICKHOUSE_CUSTOM_CONFIGS | length > 0
+  tags: [configure, clickhouse, config]
+
 - name: Apply pending ClickHouse configuration changes
   ansible.builtin.meta: flush_handlers
   tags: [configure, clickhouse, config]
