@@ -1,17 +1,32 @@
 ---
-DOCKER_HAPROXY_IMAGE: docker.io/haproxy:3.1
+DOCKER_HAPROXY_IMAGE: docker.io/haproxy:3.4.7
 
-# Bind adress and ports exposed by the docker container.
-# We keep the default port and bind address inside the container and instead
-# configure the address and port used by the host using the docker port mapping
-# feature.
+# Address on the host interfaces where HAProxy listens. The container uses the
 DOCKER_HAPROXY_BIND_ADDRESS: 0.0.0.0
 
-# Name of the network used by the containers. User created networks allow
-# containers to communicate using Docker's Name resolution (i.e. using the
-# container name as the hostname).
-DOCKER_HAPROXY_NETWORK: proxy
-
+# Backend servers to forward web traffic to and the web ports exposed by the
+# ingress controller.
 DOCKER_HAPROXY_BACKENDS: []
 DOCKER_HAPROXY_HTTP_PORT: 32080
 DOCKER_HAPROXY_HTTPS_PORT: 32443
+
+# Kubernetes API TCP passthrough. When the hostname is set, HAProxy matches it
+# against TLS SNI on port 443 and routes to the control plane nodes defined in
+# DOCKER_HAPROXY_K8S_API_BACKENDS other connections go to ingress. The hostname
+# must be in the API certificate.
+DOCKER_HAPROXY_K8S_API_BACKENDS: []
+DOCKER_HAPROXY_K8S_API_PORT: 6443
+# Source CIDRs allowed to reach the Kubernetes API. An empty list rejects
+# every connection.
+DOCKER_HAPROXY_K8S_API_ALLOWED_CIDRS: []
+DOCKER_HAPROXY_K8S_API_HOSTNAME: ""
+
+# Enables the Prometheus metrics endpoint on port 9100.
+DOCKER_HAPROXY_STATS_ENABLED: false
+
+# Optional raw HAProxy sections appended after the built-in sections.
+#   - |
+#     listen mysql
+#       bind 127.0.0.1:3306
+#       server mysql1 10.0.2.10:3306 check
+DOCKER_HAPROXY_ADDITIONAL_SECTIONS: []

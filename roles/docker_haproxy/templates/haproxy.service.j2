@@ -1,0 +1,31 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=HAProxy (Docker container)
+Requires=docker.service
+Wants=network-online.target
+After=docker.service network-online.target
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+
+[Service]
+Type=exec
+ExecStartPre=-/usr/bin/docker rm -f haproxy
+ExecStart=/usr/bin/docker run --rm \
+  --name haproxy \
+  --user root \
+  --cap-drop ALL \
+  --cap-add NET_BIND_SERVICE \
+  --cap-add SETUID \
+  --cap-add SETGID \
+  --network host \
+  --mount type=bind,source=/etc/haproxy/,target=/usr/local/etc/haproxy \
+  {{ DOCKER_HAPROXY_IMAGE }}
+ExecStop=/usr/bin/docker stop --time 20 haproxy
+TimeoutStopSec=30s
+ExecReload=/usr/bin/docker kill --signal HUP haproxy
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
