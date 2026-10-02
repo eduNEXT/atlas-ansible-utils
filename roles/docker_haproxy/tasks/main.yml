@@ -28,9 +28,17 @@
     networks:
       - name: "{{ DOCKER_HAPROXY_NETWORK }}"
     state: started
-    published_ports:
-      - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:80:80"
-      - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:443:443"
+    published_ports: >-
+      {{
+        [
+          DOCKER_HAPROXY_BIND_ADDRESS ~ ':80:80',
+          DOCKER_HAPROXY_BIND_ADDRESS ~ ':443:443',
+        ]
+        + (
+          [DOCKER_HAPROXY_BIND_ADDRESS ~ ':' ~ DOCKER_HAPROXY_K8S_API_PORT ~ ':' ~ DOCKER_HAPROXY_K8S_API_PORT]
+          if DOCKER_HAPROXY_K8S_API_ENABLED | bool else []
+        )
+      }}
     mounts:
       - source: /etc/haproxy/
         target: /usr/local/etc/haproxy

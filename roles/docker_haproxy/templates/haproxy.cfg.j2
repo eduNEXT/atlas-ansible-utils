@@ -44,6 +44,31 @@ frontend https
   default_backend https_k8s_servers
   mode tcp
 
+{% if DOCKER_HAPROXY_K8S_API_ENABLED | bool %}
+# The kube-apiserver does not speak the PROXY protocol, so no send-proxy here.
+backend k8s_api_servers
+  balance roundrobin
+  {% for backend in DOCKER_HAPROXY_K8S_API_BACKENDS %}
+  server cp{{ loop.index }} {{ backend }}:{{ DOCKER_HAPROXY_K8S_API_PORT }} check
+  {% endfor %}
+  mode tcp
+  # Long timeouts keep idle streams (logs -f, exec, watch) open.
+  timeout server 1h
+
+frontend k8s_api
+  bind *:{{ DOCKER_HAPROXY_K8S_API_PORT }}
+  mode tcp
+  option tcplog
+  timeout client 1h
+  {% if DOCKER_HAPROXY_K8S_API_ALLOWED_CIDRS %}
+  tcp-request connection reject unless { src {{ DOCKER_HAPROXY_K8S_API_ALLOWED_CIDRS | join(' ') }} }
+  {% else %}
+  tcp-request connection reject
+  {% endif %}
+  default_backend k8s_api_servers
+
+{% endif %}
+
 # frontend stats
 #   bind *:8404
 #   stats enable
