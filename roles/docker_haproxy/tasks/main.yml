@@ -1,4 +1,26 @@
 ---
+- name: Check HAProxy configuration directory
+  ansible.builtin.stat:
+    path: /etc/haproxy
+  register: docker_haproxy_config_dir
+  tags:
+    - haproxy
+    - config
+
+# Only created when missing, so an existing directory keeps its ownership and permissions.
+- name: Create HAProxy configuration directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/haproxy
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  when: not docker_haproxy_config_dir.stat.exists
+  tags:
+    - haproxy
+    - config
+
 - name: Render HAProxy configuration
   become: true
   ansible.builtin.template:
