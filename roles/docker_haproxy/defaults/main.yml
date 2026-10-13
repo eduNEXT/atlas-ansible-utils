@@ -26,3 +26,8 @@ DOCKER_HAPROXY_K8S_API_BACKENDS: []
 # Source CIDRs allowed to reach the Kubernetes API. An empty list rejects
 # every connection.
 DOCKER_HAPROXY_K8S_API_ALLOWED_CIDRS: []
+# When set, the Kubernetes API shares port 443 with the web traffic: connections
+# whose TLS SNI matches this name go to the API servers and everything else to
+# the web backends. No dedicated API port is exposed in this mode. The name must
+# be part of the API server certificate (e.g. `tls-san` in RKE2).
+DOCKER_HAPROXY_K8S_API_SNI: ""

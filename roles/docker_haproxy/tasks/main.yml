@@ -58,13 +58,18 @@
         ]
         + (
           [DOCKER_HAPROXY_BIND_ADDRESS ~ ':' ~ DOCKER_HAPROXY_K8S_API_PORT ~ ':' ~ DOCKER_HAPROXY_K8S_API_PORT]
-          if DOCKER_HAPROXY_K8S_API_ENABLED | bool else []
+          if DOCKER_HAPROXY_K8S_API_ENABLED | bool and DOCKER_HAPROXY_K8S_API_SNI | length == 0 else []
         )
       }}
     mounts:
       - source: /etc/haproxy/
         target: /usr/local/etc/haproxy
         type: bind
+    # By default only missing ports trigger a recreation. Strict comparison also
+    # recreates the container when a port is no longer published (e.g. 6443 when
+    # switching the Kubernetes API to SNI mode).
+    comparisons:
+      published_ports: strict
   tags:
     - haproxy
     - container

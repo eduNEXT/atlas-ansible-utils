@@ -1,3 +1,5 @@
+{% set k8s_api_enabled = DOCKER_HAPROXY_K8S_API_ENABLED | bool %}
+{% set k8s_api_sni = k8s_api_enabled and DOCKER_HAPROXY_K8S_API_SNI | length > 0 %}
 global
   # stats socket /var/run/api.sock user haproxy group haproxy mode 660 level admin expose-fd listeners
   log stdout format raw local0 info
@@ -43,8 +45,21 @@ frontend https
   bind *:443
   default_backend https_k8s_servers
   mode tcp
+{% if k8s_api_sni %}
+  # Route the Kubernetes API by TLS SNI. TLS is not terminated: only the
+  # ClientHello is inspected. Reject rules must come before the accept rule.
+  tcp-request inspect-delay 5s
+  acl k8s_api_sni req.ssl_sni -i {{ DOCKER_HAPROXY_K8S_API_SNI }}
+  {% if DOCKER_HAPROXY_K8S_API_ALLOWED_CIDRS %}
+  tcp-request content reject if k8s_api_sni !{ src {{ DOCKER_HAPROXY_K8S_API_ALLOWED_CIDRS | join(' ') }} }
+  {% else %}
+  tcp-request content reject if k8s_api_sni
+  {% endif %}
+  tcp-request content accept if { req.ssl_hello_type 1 }
+  use_backend k8s_api_servers if k8s_api_sni
+{% endif %}
 
-{% if DOCKER_HAPROXY_K8S_API_ENABLED | bool %}
+{% if k8s_api_enabled %}
 # The kube-apiserver does not speak the PROXY protocol, so no send-proxy here.
 backend k8s_api_servers
   balance roundrobin
@@ -52,9 +67,12 @@ backend k8s_api_servers
   server cp{{ loop.index }} {{ backend }}:{{ DOCKER_HAPROXY_K8S_API_PORT }} check
   {% endfor %}
   mode tcp
-  # Long timeouts keep idle streams (logs -f, exec, watch) open.
+  # Long timeouts keep idle streams (logs -f, exec, watch) open. The tunnel
+  # timeout also covers the shared 443 frontend, whose client timeout is short.
   timeout server 1h
+  timeout tunnel 1h
 
+{% if not k8s_api_sni %}
 frontend k8s_api
   bind *:{{ DOCKER_HAPROXY_K8S_API_PORT }}
   mode tcp
@@ -67,6 +85,7 @@ frontend k8s_api
   {% endif %}
   default_backend k8s_api_servers
 
+{% endif %}
 {% endif %}
 
 # frontend stats
