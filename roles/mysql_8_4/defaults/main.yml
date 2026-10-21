@@ -14,11 +14,14 @@ mysql_8_4_socket: /var/run/mysqld/mysqld.sock
 MYSQL_8_4_APT_KEYSERVER: keyserver.ubuntu.com
 # FROM: https://repo.mysql.com/apt/ubuntu/conf/distributions
 MYSQL_8_4_APT_KEY: B7B3B788A8D3785C
-MYSQL_8_4_REPO: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
+MYSQL_8_4_GPG_KEY_URL: https://{{ MYSQL_8_4_APT_KEYSERVER }}/pks/lookup?op=get&search=0x{{ MYSQL_8_4_APT_KEY }}
+MYSQL_8_4_KEYRING_PATH: /etc/apt/keyrings/mysql.asc
+MYSQL_8_4_REPO: deb [signed-by={{ MYSQL_8_4_KEYRING_PATH }}] http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
 
 MYSQL_8_4_SUPPORTED_DISTRIBUTIONS:
   - jammy
   - noble
+  - resolute
 
 # List of dictionaries as described in the mount_ebs role's default
 # for the volumes.

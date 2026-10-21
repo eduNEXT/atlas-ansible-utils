@@ -28,8 +28,16 @@ redis_group: redis
 # OS packages
 #
 
-REDIS_REPO: deb https://packages.redis.io/deb {{ ansible_distribution_release }} main
-REDIS_VERSION: 6:7.4.5-1rl1~{{ ansible_distribution_release }}1
+# packages.redis.io does not publish Redis 7.x for Ubuntu 26.04 (resolute),
+# so those hosts install the noble (24.04) build.
+redis_distribution_release_overrides:
+  resolute: noble
+REDIS_DISTRIBUTION_RELEASE: "{{ redis_distribution_release_overrides[ansible_distribution_release] | default(ansible_distribution_release) }}"
+
+REDIS_GPG_KEY_URL: https://packages.redis.io/gpg
+REDIS_KEYRING_PATH: /etc/apt/keyrings/redis.asc
+REDIS_REPO: deb [signed-by={{ REDIS_KEYRING_PATH }}] https://packages.redis.io/deb {{ REDIS_DISTRIBUTION_RELEASE }} main
+REDIS_VERSION: 6:7.4.5-1rl1~{{ REDIS_DISTRIBUTION_RELEASE }}1
 
 redis_debian_pkgs:
   - redis-tools={{ REDIS_VERSION }}

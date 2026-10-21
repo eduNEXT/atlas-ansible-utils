@@ -16,11 +16,34 @@
     update_cache: true
     state: present
 
+# apt-key is not available on Ubuntu 26.04, so the key goes to a keyring
+# referenced with signed-by in the repo entry.
+- name: Ensure the apt keyrings directory exists
+  ansible.builtin.file:
+    path: "{{ MYSQL_8_4_KEYRING_PATH | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Add MySQL repository key
-  ansible.builtin.apt_key:
-    keyserver: "{{ MYSQL_8_4_APT_KEYSERVER }}"
-    id: "{{ MYSQL_8_4_APT_KEY }}"
-    state: present
+  ansible.builtin.get_url:
+    url: "{{ MYSQL_8_4_GPG_KEY_URL }}"
+    dest: "{{ MYSQL_8_4_KEYRING_PATH }}"
+    owner: root
+    group: root
+    mode: "0644"
+  retries: 3
+  register: add_mysql_signing_key
+  until: add_mysql_signing_key is succeeded
+
+# Hosts provisioned before the keyring change have the same repo without
+# signed-by. apt refuses to work if both entries exist, so remove the old one.
+- name: Remove the legacy MySQL repo entry
+  ansible.builtin.apt_repository:
+    repo: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
+    state: absent
+    update_cache: false
 
 - name: Update APT cache
   ansible.builtin.apt:
