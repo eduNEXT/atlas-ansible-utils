@@ -17,8 +17,8 @@ platforms:
     pre_build_image: true
     groups:
       - meilisearch_servers
-  - name: meilisearch-ubuntu2204
-    image: geerlingguy/docker-ubuntu2204-ansible:latest
+  - name: meilisearch-ubuntu2604
+    image: geerlingguy/docker-ubuntu2604-ansible:latest
     command: ""
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
