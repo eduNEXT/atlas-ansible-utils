@@ -38,12 +38,14 @@
   until: add_mysql_signing_key is succeeded
 
 # Hosts provisioned before the keyring change have the same repo without
-# signed-by. apt refuses to work if both entries exist, so remove the old one.
+# signed-by. apt warns about the duplicated entry, so remove the old one.
+# Skipped when an inventory still sets MYSQL_8_4_REPO to that same entry.
 - name: Remove the legacy MySQL repo entry
   ansible.builtin.apt_repository:
-    repo: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
+    repo: "{{ mysql_8_4_legacy_repo }}"
     state: absent
     update_cache: false
+  when: MYSQL_8_4_REPO != mysql_8_4_legacy_repo
 
 - name: Update APT cache
   ansible.builtin.apt:

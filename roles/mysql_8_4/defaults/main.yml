@@ -17,6 +17,8 @@ MYSQL_8_4_APT_KEY: B7B3B788A8D3785C
 MYSQL_8_4_GPG_KEY_URL: https://{{ MYSQL_8_4_APT_KEYSERVER }}/pks/lookup?op=get&search=0x{{ MYSQL_8_4_APT_KEY }}
 MYSQL_8_4_KEYRING_PATH: /etc/apt/keyrings/mysql.asc
 MYSQL_8_4_REPO: deb [signed-by={{ MYSQL_8_4_KEYRING_PATH }}] http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
+# Repo entry written by older versions of this role (apt-key, no signed-by).
+mysql_8_4_legacy_repo: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
 
 MYSQL_8_4_SUPPORTED_DISTRIBUTIONS:
   - jammy

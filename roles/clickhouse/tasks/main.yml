@@ -32,12 +32,14 @@
 
 # Hosts provisioned before the keyring change point signed-by at the old
 # apt-key keyring. apt refuses to work if both entries exist, so remove it.
+# Skipped when an inventory still sets CLICKHOUSE_REPO to that same entry.
 - name: Remove the legacy ClickHouse repo entry
   ansible.builtin.apt_repository:
-    repo: deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=amd64] https://packages.clickhouse.com/deb stable main
+    repo: "{{ clickhouse_legacy_repo }}"
     filename: clickhouse
     state: absent
     update_cache: false
+  when: CLICKHOUSE_REPO != clickhouse_legacy_repo
 
 - name: Add ClickHouse repository
   ansible.builtin.apt_repository:

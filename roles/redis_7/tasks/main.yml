@@ -56,12 +56,14 @@
     - install:app-requirements
 
 # Hosts provisioned before the keyring change have the same repo without
-# signed-by. apt refuses to work if both entries exist, so remove the old one.
+# signed-by. apt warns about the duplicated entry, so remove the old one.
+# Skipped when an inventory still sets REDIS_REPO to that same entry.
 - name: Remove the legacy redis repo entry
   ansible.builtin.apt_repository:
-    repo: deb https://packages.redis.io/deb {{ REDIS_DISTRIBUTION_RELEASE }} main
+    repo: "{{ redis_legacy_repo }}"
     state: absent
     update_cache: false
+  when: REDIS_REPO != redis_legacy_repo
   tags:
     - install
     - install:app-requirements
