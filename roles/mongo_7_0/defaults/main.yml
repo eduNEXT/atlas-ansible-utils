@@ -25,6 +25,8 @@ mongodb_legacy_repo: deb http://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/{{
 
 mongodb_debian_pkgs:
   - mongodb-org={{ MONGO_VERSION }}
+  - mongodb-org-database={{ MONGO_VERSION }}
+  - mongodb-org-database-tools-extra={{ MONGO_VERSION }}
   - mongodb-org-server={{ MONGO_VERSION }}
   - mongodb-org-shell={{ MONGO_VERSION }}
   - mongodb-org-mongos={{ MONGO_VERSION }}
