@@ -21,7 +21,6 @@ MYSQL_8_4_REPO: deb [signed-by={{ MYSQL_8_4_KEYRING_PATH }}] http://repo.mysql.c
 mysql_8_4_legacy_repo: deb http://repo.mysql.com/apt//ubuntu/ {{ ansible_distribution_release }} mysql-8.4-lts
 
 MYSQL_8_4_SUPPORTED_DISTRIBUTIONS:
-  - jammy
   - noble
   - resolute
 

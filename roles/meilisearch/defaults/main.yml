@@ -4,7 +4,6 @@
 meilisearch_stable_os:
   - Debian 11
   - Debian 12
-  - Ubuntu 22
   - Ubuntu 24
   - Ubuntu 26
 
