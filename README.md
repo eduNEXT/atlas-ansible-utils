@@ -18,7 +18,7 @@ This repository follows the same versioning scheme as the Tutor project, where e
 
 The following is the list of supported operating systems for playbooks in the latest version (Teak):
 
-| Playbook           | Ubuntu 22.04 | Ubuntu 24.04 |
+| Playbook           | Ubuntu 24.04 | Ubuntu 26.04 |
 |--------------------|--------------|--------------|
 | redis_7            |      x       |       x      |
 | mysql_8_4          |      x       |       x      |

@@ -13,6 +13,43 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.1.0'></a>
+## 22.1.0 — 2026-10-23
+
+### Added
+
+- Support for Ubuntu 26.04 (resolute) in the `redis_7`, `mysql_8_4`,
+  `mongo_7_0`, `clickhouse` and `meilisearch` roles. Molecule scenarios now test
+  Ubuntu 24.04 and 26.04.
+- `redis_7`: Redis does not publish 7.x packages for Ubuntu 26.04, so those
+  hosts install the noble (24.04) build. Controlled by
+  `REDIS_DISTRIBUTION_RELEASE`.
+
+### Changed
+
+- `redis_7`, `mysql_8_4`, `mongo_7_0` and `clickhouse` no longer use `apt-key`,
+  which is not available on Ubuntu 26.04. Signing keys are downloaded to
+  `/etc/apt/keyrings/` and referenced with `signed-by` in the repo entry. The
+  repo entry written by previous versions is removed automatically.
+- **Action required if your inventory overrides `REDIS_REPO`, `MYSQL_8_4_REPO`,
+  `MONGODB_REPO` or `CLICKHOUSE_REPO`:** add `[signed-by=<keyring path>]` to the
+  entry (see `*_KEYRING_PATH` in each role's defaults). Without it, existing
+  hosts keep working with the old `apt-key` key, but new hosts fail with
+  `NO_PUBKEY`. Do not run the role on the same host with both the old and the
+  new entry: apt fails with `Conflicting values set for option Signed-By` until
+  the old line is removed.
+
+### Fixed
+
+- `mongo_7_0`: all MongoDB packages are now pinned to `MONGO_VERSION`.
+  Previously `mongodb-org-database` and its dependencies (including
+  `mongodb-org-server`) were installed at the latest 7.0.x. **On existing
+  hosts this downgrades `mongod` to `MONGO_VERSION` and restarts it.**
+- `storage_backups`: S3 uploads failed with recent awscli versions when
+  `AWS_REQUEST_CHECKSUM_CALCULATION` and `AWS_RESPONSE_CHECKSUM_VALIDATION` were
+  not set, because they were exported as empty strings. They now default to
+  `when_supported`, the AWS default.
+
 <a id='changelog-22.0.0'></a>
 ## 22.0.0 — 2026-06-29
 
