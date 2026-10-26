@@ -35,10 +35,10 @@ redis_distribution_release_overrides:
 REDIS_DISTRIBUTION_RELEASE: "{{ redis_distribution_release_overrides[ansible_distribution_release] | default(ansible_distribution_release) }}"
 
 REDIS_GPG_KEY_URL: https://packages.redis.io/gpg
-REDIS_KEYRING_PATH: /etc/apt/keyrings/redis.asc
-REDIS_REPO: deb [signed-by={{ REDIS_KEYRING_PATH }}] https://packages.redis.io/deb {{ REDIS_DISTRIBUTION_RELEASE }} main
-# Repo entry written by older versions of this role (apt-key, no signed-by).
-redis_legacy_repo: deb https://packages.redis.io/deb {{ REDIS_DISTRIBUTION_RELEASE }} main
+REDIS_REPO_URI: https://packages.redis.io/deb
+REDIS_REPO_SUITE: "{{ REDIS_DISTRIBUTION_RELEASE }}"
+REDIS_REPO_COMPONENTS: main
+redis_legacy_repo_file: /etc/apt/sources.list.d/packages_redis_io_deb.list
 REDIS_VERSION: 6:7.4.5-1rl1~{{ REDIS_DISTRIBUTION_RELEASE }}1
 
 redis_debian_pkgs:

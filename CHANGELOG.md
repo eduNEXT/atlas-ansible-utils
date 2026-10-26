@@ -27,17 +27,16 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 ### Changed
 
-- `redis_7`, `mysql_8_4`, `mongo_7_0` and `clickhouse` no longer use `apt-key`,
-  which is not available on Ubuntu 26.04. Signing keys are downloaded to
-  `/etc/apt/keyrings/` and referenced with `signed-by` in the repo entry. The
-  repo entry written by previous versions is removed automatically.
+- `redis_7`, `mysql_8_4`, `mongo_7_0` and `clickhouse` no longer use `apt-key`
+  (not available on Ubuntu 26.04) nor `apt_repository` (removed in
+  ansible-core 2.25). Repositories are added with `deb822_repository`, which
+  downloads the signing key to `/etc/apt/keyrings/` and writes a
+  `/etc/apt/sources.list.d/<name>.sources` file with `Signed-By`. The one-line
+  `.list` file written by previous versions is removed automatically.
 - **Action required if your inventory overrides `REDIS_REPO`, `MYSQL_8_4_REPO`,
-  `MONGODB_REPO` or `CLICKHOUSE_REPO`:** add `[signed-by=<keyring path>]` to the
-  entry (see `*_KEYRING_PATH` in each role's defaults). Without it, existing
-  hosts keep working with the old `apt-key` key, but new hosts fail with
-  `NO_PUBKEY`. Do not run the role on the same host with both the old and the
-  new entry: apt fails with `Conflicting values set for option Signed-By` until
-  the old line is removed.
+  `MONGODB_REPO` or `CLICKHOUSE_REPO`:** these variables no longer exist.
+  Use `*_REPO_URI`, `*_REPO_SUITE` and `*_REPO_COMPONENTS` instead (and
+  `*_GPG_KEY_URL` for the key). See each role's defaults.
 
 ### Fixed
 

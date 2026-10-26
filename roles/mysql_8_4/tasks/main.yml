@@ -16,45 +16,26 @@
     update_cache: true
     state: present
 
-# apt-key is not available on Ubuntu 26.04, so the key goes to a keyring
-# referenced with signed-by in the repo entry.
-- name: Ensure the apt keyrings directory exists
+- name: Remove the legacy MySQL repo file
   ansible.builtin.file:
-    path: "{{ MYSQL_8_4_KEYRING_PATH | dirname }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-
-- name: Add MySQL repository key
-  ansible.builtin.get_url:
-    url: "{{ MYSQL_8_4_GPG_KEY_URL }}"
-    dest: "{{ MYSQL_8_4_KEYRING_PATH }}"
-    owner: root
-    group: root
-    mode: "0644"
-  retries: 3
-  register: add_mysql_signing_key
-  until: add_mysql_signing_key is succeeded
-
-# Hosts provisioned before the keyring change have the same repo without
-# signed-by. apt warns about the duplicated entry, so remove the old one.
-# Skipped when an inventory still sets MYSQL_8_4_REPO to that same entry.
-- name: Remove the legacy MySQL repo entry
-  ansible.builtin.apt_repository:
-    repo: "{{ mysql_8_4_legacy_repo }}"
+    path: "{{ mysql_8_4_legacy_repo_file }}"
     state: absent
-    update_cache: false
-  when: MYSQL_8_4_REPO != mysql_8_4_legacy_repo
 
 - name: Update APT cache
   ansible.builtin.apt:
     update_cache: true
 
-- name: Add MySQL repository to sources list
-  ansible.builtin.apt_repository:
-    repo: "{{ MYSQL_8_4_REPO }}"
-    state: present
+- name: Add MySQL repository
+  ansible.builtin.deb822_repository:
+    name: mysql
+    types: deb
+    uris: "{{ MYSQL_8_4_REPO_URI }}"
+    suites: "{{ MYSQL_8_4_REPO_SUITE }}"
+    components: "{{ MYSQL_8_4_REPO_COMPONENTS }}"
+    signed_by: "{{ MYSQL_8_4_GPG_KEY_URL }}"
+  retries: 3
+  register: add_mysql_repo
+  until: add_mysql_repo is succeeded
 
 # Installing mysql-8.4-client, mysql-8.4-community-server
 # and mysql-8.4-server in separate tasks to resolve dependencies

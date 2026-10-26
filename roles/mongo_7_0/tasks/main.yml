@@ -46,54 +46,31 @@
   ansible.builtin.apt:
     name:
       - gnupg2
+      - python3-debian
     state: present
     update_cache: true
 
-# apt-key is not available on Ubuntu 26.04, so the key goes to a keyring
-# referenced with signed-by in the repo entry.
-- name: Ensure the apt keyrings directory exists
+- name: Remove the legacy mongodb repo files
   ansible.builtin.file:
-    path: "{{ MONGODB_KEYRING_PATH | dirname }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  tags:
-    - install
-    - install:app-requirements
-
-- name: Add the mongodb signing key
-  ansible.builtin.get_url:
-    url: "{{ MONGODB_GPG_KEY_URL }}"
-    dest: "{{ MONGODB_KEYRING_PATH }}"
-    owner: root
-    group: root
-    mode: "0644"
-  retries: 3
-  register: add_mongo_signing_key
-  tags:
-    - install
-    - install:app-requirements
-  until: add_mongo_signing_key is succeeded
-
-# Hosts provisioned before the keyring change have the same repo without
-# signed-by. apt warns about the duplicated entry, so remove the old one.
-# Skipped when an inventory still sets MONGODB_REPO to that same entry.
-- name: Remove the legacy mongodb repo entry
-  ansible.builtin.apt_repository:
-    repo: "{{ mongodb_legacy_repo }}"
+    path: "{{ item }}"
     state: absent
-    update_cache: false
-  when: MONGODB_REPO != mongodb_legacy_repo
+  loop: "{{ mongodb_legacy_repo_files }}"
   tags:
     - install
     - install:app-requirements
     - mongo_packages
 
-- name: Add the mongodb repo to the sources list
-  ansible.builtin.apt_repository:
-    repo: "{{ MONGODB_REPO }}"
-    state: present
+- name: Add the mongodb repository
+  ansible.builtin.deb822_repository:
+    name: mongodb-org
+    types: deb
+    uris: "{{ MONGODB_REPO_URI }}"
+    suites: "{{ MONGODB_REPO_SUITE }}"
+    components: "{{ MONGODB_REPO_COMPONENTS }}"
+    signed_by: "{{ MONGODB_GPG_KEY_URL }}"
+  retries: 3
+  register: add_mongo_repo
+  until: add_mongo_repo is succeeded
   tags:
     - install
     - install:app-requirements

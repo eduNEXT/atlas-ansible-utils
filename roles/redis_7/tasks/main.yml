@@ -25,53 +25,29 @@
   ansible.builtin.apt:
     name:
       - gnupg2
+      - python3-debian
     state: present
     update_cache: true
 
-# apt-key is not available on Ubuntu 26.04, so the key goes to a keyring
-# referenced with signed-by in the repo entry.
-- name: Ensure the apt keyrings directory exists
+- name: Remove the legacy redis repo file
   ansible.builtin.file:
-    path: "{{ REDIS_KEYRING_PATH | dirname }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  tags:
-    - install
-    - install:app-requirements
-
-- name: Add the redis repo signing key
-  ansible.builtin.get_url:
-    url: "{{ REDIS_GPG_KEY_URL }}"
-    dest: "{{ REDIS_KEYRING_PATH }}"
-    owner: root
-    group: root
-    mode: "0644"
-  retries: 3
-  register: add_redis_signing_key
-  until: add_redis_signing_key is succeeded
-  tags:
-    - install
-    - install:app-requirements
-
-# Hosts provisioned before the keyring change have the same repo without
-# signed-by. apt warns about the duplicated entry, so remove the old one.
-# Skipped when an inventory still sets REDIS_REPO to that same entry.
-- name: Remove the legacy redis repo entry
-  ansible.builtin.apt_repository:
-    repo: "{{ redis_legacy_repo }}"
+    path: "{{ redis_legacy_repo_file }}"
     state: absent
-    update_cache: false
-  when: REDIS_REPO != redis_legacy_repo
   tags:
     - install
     - install:app-requirements
 
-- name: Add the redis repo to the sources list
-  ansible.builtin.apt_repository:
-    repo: "{{ REDIS_REPO }}"
-    state: present
+- name: Add the redis repository
+  ansible.builtin.deb822_repository:
+    name: redis
+    types: deb
+    uris: "{{ REDIS_REPO_URI }}"
+    suites: "{{ REDIS_REPO_SUITE }}"
+    components: "{{ REDIS_REPO_COMPONENTS }}"
+    signed_by: "{{ REDIS_GPG_KEY_URL }}"
+  retries: 3
+  register: add_redis_repo
+  until: add_redis_repo is succeeded
   tags:
     - install
     - install:app-requirements

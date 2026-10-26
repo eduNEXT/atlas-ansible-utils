@@ -6,47 +6,27 @@
       - ca-certificates
       - dirmngr
       - gpg-agent
+      - python3-debian
     state: present
     update_cache: true
 
-# apt-key is not available on Ubuntu 26.04, so the key is downloaded as-is
-# (ASCII-armored, hence .asc) and referenced with signed-by in the repo entry.
-- name: Ensure the apt keyrings directory exists
+- name: Remove the legacy ClickHouse repo file
   ansible.builtin.file:
-    path: "{{ CLICKHOUSE_KEYRING_PATH | dirname }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-
-- name: Add ClickHouse GPG key
-  ansible.builtin.get_url:
-    url: "{{ CLICKHOUSE_GPG_KEY_URL }}"
-    dest: "{{ CLICKHOUSE_KEYRING_PATH }}"
-    owner: root
-    group: root
-    mode: "0644"
-  retries: 3
-  register: add_clickhouse_signing_key
-  until: add_clickhouse_signing_key is succeeded
-
-# Hosts provisioned before the keyring change point signed-by at the old
-# apt-key keyring. apt refuses to work if both entries exist, so remove it.
-# Skipped when an inventory still sets CLICKHOUSE_REPO to that same entry.
-- name: Remove the legacy ClickHouse repo entry
-  ansible.builtin.apt_repository:
-    repo: "{{ clickhouse_legacy_repo }}"
-    filename: clickhouse
+    path: "{{ clickhouse_legacy_repo_file }}"
     state: absent
-    update_cache: false
-  when: CLICKHOUSE_REPO != clickhouse_legacy_repo
 
 - name: Add ClickHouse repository
-  ansible.builtin.apt_repository:
-    repo: "{{ CLICKHOUSE_REPO }}"
-    filename: clickhouse
-    state: present
-    update_cache: true
+  ansible.builtin.deb822_repository:
+    name: clickhouse
+    types: deb
+    uris: "{{ CLICKHOUSE_REPO_URI }}"
+    suites: "{{ CLICKHOUSE_REPO_SUITE }}"
+    components: "{{ CLICKHOUSE_REPO_COMPONENTS }}"
+    architectures: amd64
+    signed_by: "{{ CLICKHOUSE_GPG_KEY_URL }}"
+  retries: 3
+  register: add_clickhouse_repo
+  until: add_clickhouse_repo is succeeded
 
 - name: Install ClickHouse
   ansible.builtin.apt:
