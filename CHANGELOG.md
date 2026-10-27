@@ -21,9 +21,9 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 - Support for Ubuntu 26.04 (resolute) in the `redis_7`, `mysql_8_4`,
   `mongo_7_0`, `clickhouse` and `meilisearch` roles. Molecule scenarios now test
   Ubuntu 24.04 and 26.04.
-- `redis_7`: Redis does not publish 7.x packages for Ubuntu 26.04, so those
-  hosts install the noble (24.04) build. Controlled by
-  `REDIS_DISTRIBUTION_RELEASE`.
+- `redis_7`: Redis does not publish 7.x packages for Ubuntu 26.04, so every
+  supported release installs the noble (24.04) build. Set `REDIS_REPO_SUITE`
+  and `REDIS_VERSION` to change it.
 
 ### Changed
 

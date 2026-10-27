@@ -19,6 +19,9 @@ mongo_user: mongodb
 
 MONGODB_GPG_KEY_URL: https://www.mongodb.org/static/pgp/server-{{ MONGO_VERSION_MAJOR_MINOR }}.asc
 MONGODB_REPO_URI: http://repo.mongodb.org/apt/ubuntu
+# MongoDB only publishes 7.0 packages for focal and jammy (noble and resolute
+# repos start at 8.0), so the jammy build is used on every supported Ubuntu
+# release. Tested on Ubuntu 24.04 and 26.04.
 MONGODB_REPO_SUITE: jammy/mongodb-org/{{ MONGO_VERSION_MAJOR_MINOR }}
 MONGODB_REPO_COMPONENTS: multiverse
 mongodb_legacy_repo_files:
