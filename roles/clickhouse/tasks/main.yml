@@ -24,9 +24,6 @@
     components: "{{ CLICKHOUSE_REPO_COMPONENTS }}"
     architectures: amd64
     signed_by: "{{ CLICKHOUSE_GPG_KEY_URL }}"
-  retries: 3
-  register: add_clickhouse_repo
-  until: add_clickhouse_repo is succeeded
 
 - name: Install ClickHouse
   ansible.builtin.apt:

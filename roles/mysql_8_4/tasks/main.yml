@@ -33,9 +33,6 @@
     suites: "{{ MYSQL_8_4_REPO_SUITE }}"
     components: "{{ MYSQL_8_4_REPO_COMPONENTS }}"
     signed_by: "{{ MYSQL_8_4_GPG_KEY_URL }}"
-  retries: 3
-  register: add_mysql_repo
-  until: add_mysql_repo is succeeded
 
 # Installing mysql-8.4-client, mysql-8.4-community-server
 # and mysql-8.4-server in separate tasks to resolve dependencies

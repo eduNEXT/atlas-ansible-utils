@@ -45,9 +45,6 @@
     suites: "{{ REDIS_REPO_SUITE }}"
     components: "{{ REDIS_REPO_COMPONENTS }}"
     signed_by: "{{ REDIS_GPG_KEY_URL }}"
-  retries: 3
-  register: add_redis_repo
-  until: add_redis_repo is succeeded
   tags:
     - install
     - install:app-requirements

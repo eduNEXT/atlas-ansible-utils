@@ -68,9 +68,6 @@
     suites: "{{ MONGODB_REPO_SUITE }}"
     components: "{{ MONGODB_REPO_COMPONENTS }}"
     signed_by: "{{ MONGODB_GPG_KEY_URL }}"
-  retries: 3
-  register: add_mongo_repo
-  until: add_mongo_repo is succeeded
   tags:
     - install
     - install:app-requirements
