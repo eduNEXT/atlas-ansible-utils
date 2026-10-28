@@ -1,17 +1,34 @@
 ---
-- name: Render HAProxy configuration
-  become: true
-  ansible.builtin.template:
-    src: haproxy.cfg.j2
-    dest: /etc/haproxy/haproxy.cfg
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0644"
+- name: Check HAProxy configuration directory
+  ansible.builtin.stat:
+    path: /etc/haproxy
+  register: docker_haproxy_config_dir
   tags:
     - haproxy
     - config
-  notify:
-    - Restart HAProxy Container
+
+# Only created when missing, so an existing directory keeps its ownership and permissions.
+- name: Create HAProxy configuration directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/haproxy
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  when: not docker_haproxy_config_dir.stat.exists
+  tags:
+    - haproxy
+    - config
+
+- name: Ensure the Docker daemon starts on boot
+  become: true
+  ansible.builtin.systemd_service:
+    name: docker
+    enabled: true
+    state: started
+  tags:
+    - docker
 
 - name: Configure HAProxy Network
   community.docker.docker_network:
@@ -20,21 +37,57 @@
     - docker
     - network
 
-- name: Start HAProxy Container
-  community.docker.docker_container:
+- name: Pull HAProxy image
+  community.docker.docker_image:
+    name: "{{ DOCKER_HAPROXY_IMAGE }}"
+    source: pull
+  tags:
+    - haproxy
+    - container
+
+# The configuration is checked with the same image before it is written, so an
+# invalid file never reaches the running HAProxy. The temporary file is only
+# readable by root, hence --user root.
+- name: Render HAProxy configuration
+  become: true
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+    validate: >-
+      docker run --rm --user root --network {{ DOCKER_HAPROXY_NETWORK }}
+      --volume %s:/usr/local/etc/haproxy/haproxy.cfg:ro
+      {{ DOCKER_HAPROXY_IMAGE }} haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
+  tags:
+    - haproxy
+    - config
+  notify:
+    - Reload HAProxy
+
+- name: Render HAProxy systemd unit
+  become: true
+  ansible.builtin.template:
+    src: haproxy.service.j2
+    dest: /etc/systemd/system/haproxy.service
+    owner: root
+    group: root
+    mode: "0644"
+  register: docker_haproxy_unit
+  tags:
+    - haproxy
+    - container
+
+# Any existing container named haproxy is removed by the unit (ExecStartPre)
+# before the service starts its own.
+- name: Start HAProxy service
+  become: true
+  ansible.builtin.systemd_service:
     name: haproxy
-    image: "{{ DOCKER_HAPROXY_IMAGE }}"
-    restart_policy: unless-stopped
-    networks:
-      - name: "{{ DOCKER_HAPROXY_NETWORK }}"
-    state: started
-    published_ports:
-      - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:80:80"
-      - "{{ DOCKER_HAPROXY_BIND_ADDRESS }}:443:443"
-    mounts:
-      - source: /etc/haproxy/
-        target: /usr/local/etc/haproxy
-        type: bind
+    enabled: true
+    daemon_reload: "{{ docker_haproxy_unit is changed }}"
+    state: "{{ 'restarted' if docker_haproxy_unit is changed else 'started' }}"
   tags:
     - haproxy
     - container
