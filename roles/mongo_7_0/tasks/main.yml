@@ -46,24 +46,28 @@
   ansible.builtin.apt:
     name:
       - gnupg2
+      - python3-debian
     state: present
     update_cache: true
 
-- name: Add the mongodb signing key
-  ansible.builtin.apt_key:
-    url: https://www.mongodb.org/static/pgp/server-{{ MONGO_VERSION_MAJOR_MINOR }}.asc
-    state: present
-  retries: 3
-  register: add_mongo_signing_key
+- name: Remove the legacy mongodb repo files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ mongodb_legacy_repo_files }}"
   tags:
     - install
     - install:app-requirements
-  until: add_mongo_signing_key is succeeded
+    - mongo_packages
 
-- name: Add the mongodb repo to the sources list
-  ansible.builtin.apt_repository:
-    repo: "{{ MONGODB_REPO }}"
-    state: present
+- name: Add the mongodb repository
+  ansible.builtin.deb822_repository:
+    name: mongodb-org
+    types: deb
+    uris: "{{ MONGODB_REPO_URI }}"
+    suites: "{{ MONGODB_REPO_SUITE }}"
+    components: "{{ MONGODB_REPO_COMPONENTS }}"
+    signed_by: "{{ MONGODB_GPG_KEY_URL }}"
   tags:
     - install
     - install:app-requirements
@@ -71,13 +75,12 @@
 
 - name: Install mongo server and recommends
   ansible.builtin.apt:
-    pkg: "{{ item }}"
+    name: "{{ mongodb_debian_pkgs }}"
     state: present
     install_recommends: true
     force: true
     update_cache: true
   register: install_mongo_package
-  with_items: "{{ mongodb_debian_pkgs }}"
   tags:
     - install
     - install:app-requirements

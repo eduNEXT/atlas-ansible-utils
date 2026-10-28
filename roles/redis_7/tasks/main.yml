@@ -25,22 +25,26 @@
   ansible.builtin.apt:
     name:
       - gnupg2
+      - python3-debian
     state: present
     update_cache: true
 
-- name: Add the redis repo signing key
-  ansible.builtin.apt_key:
-    url: https://packages.redis.io/gpg
-    state: present
-  retries: 3
+- name: Remove the legacy redis repo file
+  ansible.builtin.file:
+    path: "{{ redis_legacy_repo_file }}"
+    state: absent
   tags:
     - install
     - install:app-requirements
 
-- name: Add the redis repo to the sources list
-  ansible.builtin.apt_repository:
-    repo: "{{ REDIS_REPO }}"
-    state: present
+- name: Add the redis repository
+  ansible.builtin.deb822_repository:
+    name: redis
+    types: deb
+    uris: "{{ REDIS_REPO_URI }}"
+    suites: "{{ REDIS_REPO_SUITE }}"
+    components: "{{ REDIS_REPO_COMPONENTS }}"
+    signed_by: "{{ REDIS_GPG_KEY_URL }}"
   tags:
     - install
     - install:app-requirements

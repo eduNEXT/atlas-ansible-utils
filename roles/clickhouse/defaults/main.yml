@@ -23,5 +23,7 @@ CLICKHOUSE_HOST_INSECURE_HTTP_PORT: 8123
 CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT: 9000
 
 CLICKHOUSE_GPG_KEY_URL: https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key
-CLICKHOUSE_KEYRING_PATH: /usr/share/keyrings/clickhouse-keyring.gpg
-CLICKHOUSE_REPO: "deb [signed-by={{ CLICKHOUSE_KEYRING_PATH }} arch=amd64] https://packages.clickhouse.com/deb stable main"
+CLICKHOUSE_REPO_URI: https://packages.clickhouse.com/deb
+CLICKHOUSE_REPO_SUITE: stable
+CLICKHOUSE_REPO_COMPONENTS: main
+clickhouse_legacy_repo_file: /etc/apt/sources.list.d/clickhouse.list

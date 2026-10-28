@@ -16,20 +16,23 @@
     update_cache: true
     state: present
 
-- name: Add MySQL repository key
-  ansible.builtin.apt_key:
-    keyserver: "{{ MYSQL_8_4_APT_KEYSERVER }}"
-    id: "{{ MYSQL_8_4_APT_KEY }}"
-    state: present
+- name: Remove the legacy MySQL repo file
+  ansible.builtin.file:
+    path: "{{ mysql_8_4_legacy_repo_file }}"
+    state: absent
 
 - name: Update APT cache
   ansible.builtin.apt:
     update_cache: true
 
-- name: Add MySQL repository to sources list
-  ansible.builtin.apt_repository:
-    repo: "{{ MYSQL_8_4_REPO }}"
-    state: present
+- name: Add MySQL repository
+  ansible.builtin.deb822_repository:
+    name: mysql
+    types: deb
+    uris: "{{ MYSQL_8_4_REPO_URI }}"
+    suites: "{{ MYSQL_8_4_REPO_SUITE }}"
+    components: "{{ MYSQL_8_4_REPO_COMPONENTS }}"
+    signed_by: "{{ MYSQL_8_4_GPG_KEY_URL }}"
 
 # Installing mysql-8.4-client, mysql-8.4-community-server
 # and mysql-8.4-server in separate tasks to resolve dependencies

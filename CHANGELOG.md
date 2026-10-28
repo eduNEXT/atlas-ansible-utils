@@ -13,6 +13,42 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.1.0'></a>
+## 22.1.0 — 2026-10-23
+
+### Added
+
+- Support for Ubuntu 26.04 (resolute) in the `redis_7`, `mysql_8_4`,
+  `mongo_7_0`, `clickhouse` and `meilisearch` roles. Molecule scenarios now test
+  Ubuntu 24.04 and 26.04.
+- `redis_7`: Redis does not publish 7.x packages for Ubuntu 26.04, so every
+  supported release installs the noble (24.04) build. Set `REDIS_REPO_SUITE`
+  and `REDIS_VERSION` to change it.
+
+### Changed
+
+- `redis_7`, `mysql_8_4`, `mongo_7_0` and `clickhouse` no longer use `apt-key`
+  (not available on Ubuntu 26.04) nor `apt_repository` (removed in
+  ansible-core 2.25). Repositories are added with `deb822_repository`, which
+  downloads the signing key to `/etc/apt/keyrings/` and writes a
+  `/etc/apt/sources.list.d/<name>.sources` file with `Signed-By`. The one-line
+  `.list` file written by previous versions is removed automatically.
+- **Action required if your inventory overrides `REDIS_REPO`, `MYSQL_8_4_REPO`,
+  `MONGODB_REPO` or `CLICKHOUSE_REPO`:** these variables no longer exist.
+  Use `*_REPO_URI`, `*_REPO_SUITE` and `*_REPO_COMPONENTS` instead (and
+  `*_GPG_KEY_URL` for the key). See each role's defaults.
+
+### Fixed
+
+- `mongo_7_0`: all MongoDB packages are now pinned to `MONGO_VERSION`.
+  Previously `mongodb-org-database` and its dependencies (including
+  `mongodb-org-server`) were installed at the latest 7.0.x. **On existing
+  hosts this downgrades `mongod` to `MONGO_VERSION` and restarts it.**
+- `storage_backups`: S3 uploads failed with recent awscli versions when
+  `AWS_REQUEST_CHECKSUM_CALCULATION` and `AWS_RESPONSE_CHECKSUM_VALIDATION` were
+  not set, because they were exported as empty strings. They now default to
+  `when_supported`, the AWS default.
+
 <a id='changelog-22.0.0'></a>
 ## 22.0.0 — 2026-06-29
 

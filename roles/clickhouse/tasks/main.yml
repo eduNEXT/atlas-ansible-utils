@@ -6,21 +6,24 @@
       - ca-certificates
       - dirmngr
       - gpg-agent
+      - python3-debian
     state: present
     update_cache: true
 
-- name: Add ClickHouse GPG key
-  ansible.builtin.apt_key:
-    url: "{{ CLICKHOUSE_GPG_KEY_URL }}"
-    keyring: "{{ CLICKHOUSE_KEYRING_PATH }}"
-    state: present
+- name: Remove the legacy ClickHouse repo file
+  ansible.builtin.file:
+    path: "{{ clickhouse_legacy_repo_file }}"
+    state: absent
 
 - name: Add ClickHouse repository
-  ansible.builtin.apt_repository:
-    repo: "{{ CLICKHOUSE_REPO }}"
-    filename: clickhouse
-    state: present
-    update_cache: true
+  ansible.builtin.deb822_repository:
+    name: clickhouse
+    types: deb
+    uris: "{{ CLICKHOUSE_REPO_URI }}"
+    suites: "{{ CLICKHOUSE_REPO_SUITE }}"
+    components: "{{ CLICKHOUSE_REPO_COMPONENTS }}"
+    architectures: amd64
+    signed_by: "{{ CLICKHOUSE_GPG_KEY_URL }}"
 
 - name: Install ClickHouse
   ansible.builtin.apt:
