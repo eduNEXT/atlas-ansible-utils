@@ -21,19 +21,14 @@
     - haproxy
     - config
 
-- name: Render HAProxy configuration
+- name: Ensure the Docker daemon starts on boot
   become: true
-  ansible.builtin.template:
-    src: haproxy.cfg.j2
-    dest: /etc/haproxy/haproxy.cfg
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: "0644"
+  ansible.builtin.systemd_service:
+    name: docker
+    enabled: true
+    state: started
   tags:
-    - haproxy
-    - config
-  notify:
-    - Restart HAProxy Container
+    - docker
 
 - name: Configure HAProxy Network
   community.docker.docker_network:
@@ -42,34 +37,57 @@
     - docker
     - network
 
-- name: Start HAProxy Container
-  community.docker.docker_container:
+- name: Pull HAProxy image
+  community.docker.docker_image:
+    name: "{{ DOCKER_HAPROXY_IMAGE }}"
+    source: pull
+  tags:
+    - haproxy
+    - container
+
+# The configuration is checked with the same image before it is written, so an
+# invalid file never reaches the running HAProxy. The temporary file is only
+# readable by root, hence --user root.
+- name: Render HAProxy configuration
+  become: true
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+    validate: >-
+      docker run --rm --user root --network {{ DOCKER_HAPROXY_NETWORK }}
+      --volume %s:/usr/local/etc/haproxy/haproxy.cfg:ro
+      {{ DOCKER_HAPROXY_IMAGE }} haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
+  tags:
+    - haproxy
+    - config
+  notify:
+    - Reload HAProxy
+
+- name: Render HAProxy systemd unit
+  become: true
+  ansible.builtin.template:
+    src: haproxy.service.j2
+    dest: /etc/systemd/system/haproxy.service
+    owner: root
+    group: root
+    mode: "0644"
+  register: docker_haproxy_unit
+  tags:
+    - haproxy
+    - container
+
+# Any existing container named haproxy is removed by the unit (ExecStartPre)
+# before the service starts its own.
+- name: Start HAProxy service
+  become: true
+  ansible.builtin.systemd_service:
     name: haproxy
-    image: "{{ DOCKER_HAPROXY_IMAGE }}"
-    restart_policy: unless-stopped
-    networks:
-      - name: "{{ DOCKER_HAPROXY_NETWORK }}"
-    state: started
-    published_ports: >-
-      {{
-        [
-          DOCKER_HAPROXY_BIND_ADDRESS ~ ':80:80',
-          DOCKER_HAPROXY_BIND_ADDRESS ~ ':443:443',
-        ]
-        + (
-          [DOCKER_HAPROXY_BIND_ADDRESS ~ ':' ~ DOCKER_HAPROXY_K8S_API_PORT ~ ':' ~ DOCKER_HAPROXY_K8S_API_PORT]
-          if DOCKER_HAPROXY_K8S_API_ENABLED | bool and DOCKER_HAPROXY_K8S_API_SNI | length == 0 else []
-        )
-      }}
-    mounts:
-      - source: /etc/haproxy/
-        target: /usr/local/etc/haproxy
-        type: bind
-    # By default only missing ports trigger a recreation. Strict comparison also
-    # recreates the container when a port is no longer published (e.g. 6443 when
-    # switching the Kubernetes API to SNI mode).
-    comparisons:
-      published_ports: strict
+    enabled: true
+    daemon_reload: "{{ docker_haproxy_unit is changed }}"
+    state: "{{ 'restarted' if docker_haproxy_unit is changed else 'started' }}"
   tags:
     - haproxy
     - container

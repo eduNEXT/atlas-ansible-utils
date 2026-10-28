@@ -1,0 +1,34 @@
+# {{ ansible_managed }}
+#
+# systemd is the only supervisor of the HAProxy container: the container has no
+# Docker restart policy and is removed when it stops (--rm), so this file is the
+# single source of truth for how it runs.
+{% set k8s_api_dedicated_port = DOCKER_HAPROXY_K8S_API_ENABLED | bool and DOCKER_HAPROXY_K8S_API_SNI | length == 0 %}
+
+[Unit]
+Description=HAProxy (Docker container)
+Requires=docker.service
+Wants=network-online.target
+After=docker.service network-online.target
+
+[Service]
+# Removes a container left behind by an unclean shutdown.
+ExecStartPre=-/usr/bin/docker rm -f haproxy
+ExecStart=/usr/bin/docker run --rm --name haproxy \
+  --network {{ DOCKER_HAPROXY_NETWORK }} \
+  --publish {{ DOCKER_HAPROXY_BIND_ADDRESS }}:80:80 \
+  --publish {{ DOCKER_HAPROXY_BIND_ADDRESS }}:443:443 \
+{% if k8s_api_dedicated_port %}
+  --publish {{ DOCKER_HAPROXY_BIND_ADDRESS }}:{{ DOCKER_HAPROXY_K8S_API_PORT }}:{{ DOCKER_HAPROXY_K8S_API_PORT }} \
+{% endif %}
+  --mount type=bind,source=/etc/haproxy/,target=/usr/local/etc/haproxy \
+  {{ DOCKER_HAPROXY_IMAGE }}
+ExecStop=/usr/bin/docker stop haproxy
+# The official image runs HAProxy in master-worker mode: SIGHUP reloads the
+# configuration without dropping established connections.
+ExecReload=/usr/bin/docker kill --signal HUP haproxy
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
