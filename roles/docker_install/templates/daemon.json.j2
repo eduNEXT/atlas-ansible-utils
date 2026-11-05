@@ -1,3 +1,4 @@
 {
-  "log-driver": "local"
+  "log-driver": "local"{% if DOCKER_STORAGE_DRIVER | length > 0 %},
+  "storage-driver": "{{ DOCKER_STORAGE_DRIVER }}"{% endif %}
 }
