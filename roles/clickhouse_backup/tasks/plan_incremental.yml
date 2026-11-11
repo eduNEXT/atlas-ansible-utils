@@ -1,0 +1,35 @@
+---
+# The first run of a cycle creates the base backup. The next runs of the same
+# cycle are incrementals against that base ("star" layout): each incremental
+# only needs the base to be restored.
+#
+# A base is complete when its .backup file exists (ClickHouse writes it last).
+# A failed base leaves files without .backup: they are ignored, the next run
+# creates a new base with a new path, and the lifecycle rule removes them.
+
+- name: Find the complete bases of the current cycle
+  no_log: "{{ _chb_sensitive }}"
+  ansible.builtin.command:
+    argv:
+      - clickhouse-client
+      - --config-file
+      - "{{ _chb_client_config }}"
+      - --format
+      - TSV
+      - --query
+      - >-
+        SELECT DISTINCT extract(_path, '/(base-[0-9]{8}T[0-9]{6}Z)/\\.backup$') AS base
+        FROM {{ _chb_list_prefix }}incremental/{{ _chb_cycle }}/base-*/.backup{{ _chb_list_suffix }}
+        WHERE base != ''
+        ORDER BY base DESC
+        LIMIT 1
+  register: _chb_bases
+  changed_when: false
+
+- name: Plan the incremental backup
+  ansible.builtin.set_fact:
+    _chb_mode: "{{ 'incremental' if _chb_base_name else 'base' }}"
+    _chb_target_path: "incremental/{{ _chb_cycle }}/{{ 'incr' if _chb_base_name else 'base' }}-{{ _chb_run_id }}"
+    _chb_base_path: "{{ ('incremental/' ~ _chb_cycle ~ '/' ~ _chb_base_name) if _chb_base_name else '' }}"
+  vars:
+    _chb_base_name: "{{ _chb_bases.stdout | trim }}"

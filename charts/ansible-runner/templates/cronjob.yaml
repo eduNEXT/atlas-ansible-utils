@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: "{{ include "ansible-runner.fullname" $ }}-{{ .playbook | replace "_" "-"}}"
+  name: "{{ include "ansible-runner.fullname" $ }}-{{ .name | default .playbook | replace "_" "-"}}"
   namespace: {{ include "ansible-runner.namespace" $ }}
   labels:
     {{- include "ansible-runner.labels" $ | nindent 4 }}
@@ -13,7 +13,10 @@ spec:
   successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit | default 1 }}
   failedJobsHistoryLimit: {{ .failedJobsHistoryLimit | default 1 }}
   startingDeadlineSeconds: {{ .startingDeadlineSeconds | default 900 }}
-  suspend: true
+  suspend: {{ hasKey . "suspend" | ternary .suspend true }}
+  {{- with .concurrencyPolicy }}
+  concurrencyPolicy: {{ . }}
+  {{- end }}
   jobTemplate:
     spec:
       backoffLimit: 1

@@ -1,0 +1,41 @@
+---
+- name: Validate the backup options
+  ansible.builtin.assert:
+    that:
+      - CLICKHOUSE_BACKUP_KIND in ['incremental', 'full']
+      - CLICKHOUSE_BACKUP_CYCLE in ['weekly', 'monthly']
+      - CLICKHOUSE_BACKUP_SCOPE in ['all', 'databases']
+      - CLICKHOUSE_BACKUP_SCOPE != 'databases' or (CLICKHOUSE_BACKUP_DATABASES | length > 0)
+      - CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE in ['aws', 'azure']
+    fail_msg: Invalid ClickHouse backup configuration. Check the role defaults for the allowed values.
+    quiet: true
+
+- name: Validate the AWS storage options
+  when: CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE == 'aws'
+  ansible.builtin.assert:
+    that:
+      - _opts.S3_BUCKET_NAME | default('') | length > 0
+      - _opts.S3_REGION | default('') | length > 0
+      - _opts.AWS_CREDENTIALS_SOURCE | default('instance') in ['instance', 'static']
+      - >-
+        _opts.AWS_CREDENTIALS_SOURCE | default('instance') == 'instance'
+        or (_opts.AWS_ACCESS_KEY_ID | default('') | length > 0
+            and _opts.AWS_SECRET_ACCESS_KEY | default('') | length > 0)
+    fail_msg: >-
+      Set S3_BUCKET_NAME and S3_REGION. With AWS_CREDENTIALS_SOURCE=static,
+      also set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
+    quiet: true
+  vars:
+    _opts: "{{ CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_OPTIONS }}"
+
+- name: Validate the Azure storage options
+  when: CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE == 'azure'
+  ansible.builtin.assert:
+    that:
+      - _opts.AZURE_ACCOUNT_NAME | default('') | length > 0
+      - _opts.AZURE_ACCOUNT_KEY | default('') | length > 0
+      - _opts.AZURE_CONTAINER_NAME | default('') | length > 0
+    fail_msg: Set AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY and AZURE_CONTAINER_NAME.
+    quiet: true
+  vars:
+    _opts: "{{ CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_OPTIONS }}"
