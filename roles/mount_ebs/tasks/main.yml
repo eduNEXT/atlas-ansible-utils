@@ -1,97 +1,120 @@
 ---
-# Tasks for role mount_dbs
+# Role: mount_ebs
 #
-# Overview:
+# Mounts and formats disk devices to a target directory.
 #
-# This role ensures that the correct EBS volumes are mounted to the right locations.
-# If the volumes are already mounted to the correct place, this role does nothing.
+# The role performs some sanity checks, ensuring the filesystem and mount point
+# of devices didn't change between invocations. This guards against device name
+# changes that might happen in subsequent instance starts.
+#
+# The role can also resolve symlinks such as /dev/disk/by-id/ paths that can
+# map an EBS volume by id directly to the correct device consistently
 
-# Newer AWS EC2 instances sometimes swap the order of the disks, resulting in a very small data volume and a very large
-# journal volume. This prevents that by confirming that the disk sizes are correct before proceeding. Rebooting seems to
-# fix the ordering
-- name: Check disk size
+- name: Validate volume definitions
   ansible.builtin.assert:
     that:
-      - "{{ ansible_devices[item.device.split('/')[-1]]['size'] == item.size }}"
-    fail_msg: |
-      Actual size {{ ansible_devices[item.device.split('/')[-1]]['size'] }} != Expected size {{ item.size }}. Rebooting the instance may fix the ordering
-      issue
-  with_items: "{{ volumes }}"
+      - item.device is defined
+      - item.mount is defined
+      - item.options is defined
+      - item.fstype is defined
+      - item.size is defined
+    fail_msg: "Each volume requires device, mount, options, fstype, and size: {{ item }}"
+  loop: "{{ volumes }}"
+  loop_control:
+    label: "{{ item.device | default('<undefined>') }}"
+  tags: [always, mount_ebs, validate]
 
-# This task will be skipped if UNMOUNT_DISKS is false, causing the next task
-# to error if the disk has the wrong fstype but is already mounted
-- name: Unmount disk if fstype is wrong
+# Resolve symlinks such as /dev/disk/by-id to the kernel device path.
+# Resolved symlink targets stored in mount_ebs_device_stats.results[*].stat.lnk_source.
+- name: Resolve device symlinks
+  ansible.builtin.stat:
+    path: "{{ item.device }}"
+    follow: false
+  register: mount_ebs_device_stats
+  loop: "{{ volumes }}"
+  loop_control:
+    label: "{{ item.device | default('<undefined>') }}"
+  tags: [always, mount_ebs, validate]
+
+- name: Verify volume devices and sizes
+  ansible.builtin.assert:
+    that:
+      - device_path | basename in ansible_facts.devices
+      - ansible_facts.devices[device_path | basename].size == item.item.size
+    fail_msg: >-
+      {{ device_path }} has size
+      {{ ansible_facts.devices[device_path | basename].size | default('unknown') }};
+      expected {{ item.item.size }}. Rebooting may correct device ordering.
+  loop: "{{ mount_ebs_device_stats.results }}"
+  loop_control:
+    label: "{{ item.item.device }}"
+  vars:
+    device_path: "{{ item.stat.lnk_source | default(item.item.device) }}"
+  tags: [always, mount_ebs, validate]
+
+- name: Check whether mounted volumes can be changed
+  ansible.builtin.assert:
+    that:
+      - UNMOUNT_DISKS | bool or current_mount.mount is not defined or current_mount.mount == item.item.mount
+      - UNMOUNT_DISKS | bool or current_mount.fstype is not defined or current_mount.fstype == item.item.fstype
+    fail_msg: >-
+      {{ device_path }} is mounted at {{ current_mount.mount | default('an unknown path') }}
+      with {{ current_mount.fstype | default('an unknown filesystem') }}.
+      Set UNMOUNT_DISKS=true to change it.
+  loop: "{{ mount_ebs_device_stats.results }}"
+  loop_control:
+    label: "{{ item.item.device }}"
+  vars:
+    device_path: "{{ item.stat.lnk_source | default(item.item.device) }}"
+    current_mount: >-
+      {{ ansible_facts.mounts | selectattr('device', 'equalto', device_path)
+      | list | first | default({}) }}
+  tags: [always, mount_ebs, validate]
+
+- name: Unmount volumes with configuration changes
   ansible.posix.mount:
-    name: "{{ (ansible_mounts | selectattr('device', 'equalto', item.device) | first | default({'mount': None})).mount }}"
-    fstype: "{{ (ansible_mounts | selectattr('device', 'equalto', item.device) | first | default({'fstype': None})).fstype }}"
-    state: unmounted
-  when: "UNMOUNT_DISKS and (ansible_mounts | selectattr('device', 'equalto', item.device) | first | default({'fstype': None})).fstype != item.fstype"
-  with_items: "{{ volumes }}"
+    name: "{{ current_mount.mount }}"
+    fstype: "{{ current_mount.fstype }}"
+    state: absent
+  loop: "{{ mount_ebs_device_stats.results }}"
+  loop_control:
+    label: "{{ item.item.device }}"
+  vars:
+    device_path: "{{ item.stat.lnk_source | default(item.item.device) }}"
+    current_mount: >-
+      {{ ansible_facts.mounts | selectattr('device', 'equalto', device_path)
+      | list | first | default({}) }}
+  when:
+    - UNMOUNT_DISKS | bool
+    - current_mount.mount is defined
+    - current_mount.mount != item.item.mount or current_mount.fstype != item.item.fstype
+  tags: [mount_ebs, prepare]
 
-# If there are disks we want to be unmounting, but we can't because UNMOUNT_DISKS is false
-# that is an errorable condition, since it will cause the format step to fail
-- name: Check that we don't want to unmount disks to change fstype when UNMOUNT_DISKS is false
-  ansible.builtin.fail:
-    msg: |
-      Found disks mounted with the wrong filesystem type, but can't unmount them. This role will need to be re-run with -e 'UNMOUNT_DISKS=True' if you believe
-      that is safe
-  when: |
-    not UNMOUNT_DISKS
-    and volumes
-    | selectattr('device', 'equalto', item.device) | list | length != 0 and (volumes | selectattr('device', 'equalto', item.device)
-    | first).fstype != item.fstype
-  with_items: "{{ ansible_mounts }}"
-
-# Noop & reports "ok" if fstype is correct
-# Errors if fstype is wrong and disk is mounted (hence above task)
-- name: Create filesystem
+- name: Ensure volume filesystems
   community.general.filesystem:
-    dev: "{{ item.device }}"
-    fstype: "{{ item.fstype }}"
-    # Necessary because AWS gives some ephemeral disks the wrong fstype by default
-    force: "{{ FORCE_REFORMAT_DISKS }}"
-  with_items: "{{ volumes }}"
+    dev: "{{ item.stat.lnk_source | default(item.item.device) }}"
+    fstype: "{{ item.item.fstype }}"
+    force: "{{ FORCE_REFORMAT_DISKS | bool }}"
+  loop: "{{ mount_ebs_device_stats.results }}"
+  loop_control:
+    label: "{{ item.item.device }}"
+  tags: [mount_ebs, prepare]
 
-- name: Regather facts to get UUIDs of freshly formatted disks
-  ansible.builtin.setup: ""
+- name: Refresh facts after filesystem creation
+  ansible.builtin.setup:
+  when: mount_ebs_device_stats.results | length > 0
+  tags: [mount_ebs, prepare, mount]
 
-# This can fail if one volume is mounted on a child directory as another volume
-# and it attempts to unmount the parent first.  This is generally fixable by rerunning.
-# Order is super dependent here, but we're iterating ansible_mounts (in order to identify
-# all current mounts in the system) not volumes, which would be reversible.
-# Possibly fixable by saving this list of unmounts off and comparing it to volumes, but this
-# task rarely runs, since on server setup, the disks are unmounted, and in we won't
-# be unmounting disks unless you set UNMOUNT_DISKS to true.
-- name: Unmount disks mounted to the wrong place
+- name: Mount volumes by UUID
   ansible.posix.mount:
-    name: "{{ item.mount }}"
-    fstype: "{{ item.fstype }}"
-    state: unmounted
-  when: |
-    UNMOUNT_DISKS and volumes
-    | selectattr('device', 'equalto', item.device) | list | length != 0 and (volumes | selectattr('device', 'equalto', item.device)
-    | first).mount != item.mount
-  with_items: "{{ ansible_mounts }}"
-
-# If there are disks we want to be unmounting, but we can't because UNMOUNT_DISKS is false
-# that is an errorable condition, since it can easily allow us to double mount a disk.
-- name: Check that we don't want to unmount disks to change mountpoint when UNMOUNT_DISKS is false
-  ansible.builtin.fail:
-    msg: |
-      Found disks mounted in the wrong place, but can't unmount them.  This role will need to be re-run with -e 'UNMOUNT_DISKS=True' if you believe that is
-      safe
-  when: |
-    not UNMOUNT_DISKS
-    and volumes | selectattr('device', 'equalto', item.device) | list | length != 0 and (volumes | selectattr('device', 'equalto', item.device)
-    | first).mount != item.mount
-  with_items: "{{ ansible_mounts }}"
-
-# Use UUID to prevent issues with AWS EC2 swapping device order
-- name: Mount disks
-  ansible.posix.mount:
-    name: "{{ item.mount }}"
-    src: UUID={{ ansible_devices[item.device.split('/')[-1]]['links']['uuids'][0] }}
+    name: "{{ item.item.mount }}"
+    src: UUID={{ ansible_facts.devices[device_path | basename].links.uuids[0] }}
     state: mounted
-    fstype: "{{ item.fstype }}"
-    opts: "{{ item.options }}"
-  with_items: "{{ volumes }}"
+    fstype: "{{ item.item.fstype }}"
+    opts: "{{ item.item.options }}"
+  loop: "{{ mount_ebs_device_stats.results }}"
+  loop_control:
+    label: "{{ item.item.device }}"
+  vars:
+    device_path: "{{ item.stat.lnk_source | default(item.item.device) }}"
+  tags: [mount_ebs, mount]
