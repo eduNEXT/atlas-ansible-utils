@@ -2,22 +2,54 @@
 CLICKHOUSE_VERSION: 25.8.11.66
 
 CLICKHOUSE_VOLUMES: []
-CLICKHOUSE_DEFAULT_USER_PASSWORD: password
+CLICKHOUSE_DEFAULT_USER_NAME: default
+CLICKHOUSE_DEFAULT_USER_PASSWORD: null
 
 CLICKHOUSE_PACKAGES:
   - clickhouse-client
   - clickhouse-server
   - clickhouse-common-static
 
-CLICKHOUSE_USERS:
-  - name: prod
-    password: prod
-  - name: stage
-    password: stage
+CLICKHOUSE_USERS: []
+  # Each permissions entry uses the community.clickhouse.clickhouse_grants format.
+  # - name: stage
+  #   password: passstage
+  #   role: stage_admin
+  #   permissions:
+  #     - object: system.*
+  #       privs:
+  #         ALL: true
+  #     - object: stage_xapi.*
+  #       privs:
+  #         ALL: true
+  #     - object: stage_xapi_events_all.*
+  #       privs:
+  #         ALL: true
+  #     - object: stage_reporting.*
+  #       privs:
+  #         ALL: true
+  #     - object: stage_event_sink.*
+  #       privs:
+  #         ALL: true
+  #     - object: stage_vector.*
+  #       privs:
+  #         ALL: true
+  #     - object: '*.*'
+  #       privs:
+  #         CREATE USER: false
+  #         ALTER USER: false
+  #         DROP FUNCTION: false
+  #         CREATE FUNCTION: false
 
 CLICKHOUSE_LISTEN_HOSTS:
   - "::"
   - 0.0.0.0
+
+CLICKHOUSE_LOG_LEVEL: warning
+CLICKHOUSE_TEXT_LOG_LEVEL: warning
+CLICKHOUSE_LOG_RETENTION_DAYS: 30
+CLICKHOUSE_LOG_QUERIES_MIN_DURATION_MS: 1000
+CLICKHOUSE_SERVER_CONFIG_OVERRIDE: ""
 
 CLICKHOUSE_HOST_INSECURE_HTTP_PORT: 8123
 CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT: 9000
