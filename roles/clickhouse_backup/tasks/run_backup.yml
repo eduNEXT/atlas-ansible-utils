@@ -1,0 +1,107 @@
+---
+- name: Build the BACKUP query
+  no_log: "{{ _chb_sensitive }}"
+  ansible.builtin.set_fact:
+    _chb_scope_sql: >-
+      {{ ('ALL EXCEPT DATABASES ' ~ (CLICKHOUSE_BACKUP_EXCLUDED_DATABASES | map('regex_replace', '^(.*)$', '`\1`') | join(', ')))
+         if CLICKHOUSE_BACKUP_SCOPE == 'all'
+         else (CLICKHOUSE_BACKUP_DATABASES | map('regex_replace', '^(.*)$', 'DATABASE `\1`') | join(', ')) }}
+    _chb_settings_sql: >-
+      {%- set settings = [] -%}
+      {%- for key, value in CLICKHOUSE_BACKUP_EXTRA_SETTINGS.items() -%}
+      {%- if value is boolean -%}
+      {%- set _ = settings.append(key ~ ' = ' ~ (value | int)) -%}
+      {%- elif value is number -%}
+      {%- set _ = settings.append(key ~ ' = ' ~ value) -%}
+      {%- else -%}
+      {%- set _ = settings.append(key ~ " = '" ~ value ~ "'") -%}
+      {%- endif -%}
+      {%- endfor -%}
+      {%- if _chb_base_path -%}
+      {%- set _ = settings.append('base_backup = ' ~ _chb_engine_prefix ~ _chb_base_path ~ _chb_engine_suffix) -%}
+      {%- endif -%}
+      {{ ('SETTINGS ' ~ (settings | join(', '))) if settings else '' }}
+
+- name: Show the backup plan
+  ansible.builtin.debug:
+    msg:
+      - "Kind: {{ CLICKHOUSE_BACKUP_KIND }} ({{ _chb_mode }})"
+      - "Target: {{ _chb_root }}/{{ _chb_target_path }}"
+      - "Base: {{ (_chb_root ~ '/' ~ _chb_base_path) if _chb_base_path else '-' }}"
+      - "Scope: {{ _chb_scope_sql }}"
+
+- name: Start the backup
+  no_log: "{{ _chb_sensitive }}"
+  ansible.builtin.command:
+    argv:
+      - clickhouse-client
+      - --config-file
+      - "{{ _chb_client_config }}"
+      - --format
+      - TSV
+      - --query
+      - >-
+        BACKUP {{ _chb_scope_sql }}
+        TO {{ _chb_engine_prefix }}{{ _chb_target_path }}{{ _chb_engine_suffix }}
+        {{ _chb_settings_sql }}
+        ASYNC
+  register: _chb_backup_start
+  changed_when: true
+
+- name: Get the backup id
+  ansible.builtin.set_fact:
+    _chb_backup_id: "{{ _chb_backup_start.stdout.split('\t')[0] }}"
+
+# system.backups only lives in memory: if ClickHouse restarts during the
+# backup, the row disappears and the status comes back empty (failure).
+- name: Wait for the backup to finish
+  ansible.builtin.command:
+    argv:
+      - clickhouse-client
+      - --config-file
+      - "{{ _chb_client_config }}"
+      - --format
+      - TSV
+      - --query
+      - "SELECT status FROM system.backups WHERE id = '{{ _chb_backup_id }}'"
+  register: _chb_backup_status
+  until: _chb_backup_status.stdout != 'CREATING_BACKUP'
+  retries: "{{ ((CLICKHOUSE_BACKUP_TIMEOUT_SECONDS | int) / (CLICKHOUSE_BACKUP_POLL_INTERVAL_SECONDS | int)) | round(0, 'ceil') | int }}"
+  delay: "{{ CLICKHOUSE_BACKUP_POLL_INTERVAL_SECONDS | int }}"
+  changed_when: false
+
+- name: Get the backup result
+  ansible.builtin.command:
+    argv:
+      - clickhouse-client
+      - --config-file
+      - "{{ _chb_client_config }}"
+      - --format
+      - JSONEachRow
+      - --query
+      - >-
+        SELECT status, error, num_files,
+        formatReadableSize(compressed_size) AS size,
+        dateDiff('second', start_time, end_time) AS seconds
+        FROM system.backups WHERE id = '{{ _chb_backup_id }}'
+  register: _chb_backup_result_raw
+  changed_when: false
+
+- name: Parse the backup result
+  ansible.builtin.set_fact:
+    _chb_backup_result: >-
+      {{ (_chb_backup_result_raw.stdout | from_json)
+         if _chb_backup_result_raw.stdout
+         else {'status': 'NOT_FOUND', 'error': 'The backup is not in system.backups (was ClickHouse restarted?)'} }}
+
+- name: Fail if the backup did not finish successfully
+  when: _chb_backup_result.status != 'BACKUP_CREATED'
+  ansible.builtin.fail:
+    msg: "Backup {{ _chb_backup_id }} ended with {{ _chb_backup_result.status }}: {{ _chb_backup_result.error }}"
+
+- name: Show the backup result
+  ansible.builtin.debug:
+    msg: >-
+      {{ _chb_mode }} backup {{ _chb_root }}/{{ _chb_target_path }} created:
+      {{ _chb_backup_result.num_files }} files, {{ _chb_backup_result.size }},
+      {{ _chb_backup_result.seconds }}s

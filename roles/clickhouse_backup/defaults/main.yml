@@ -1,0 +1,87 @@
+---
+# ClickHouse native BACKUP to object storage.
+# See roles/clickhouse_backup/README.md for the full description.
+#
+# The role never deletes backups: retention is done by lifecycle rules on the
+# bucket (see the README).
+
+# Connection to the ClickHouse server (from the ClickHouse host itself).
+CLICKHOUSE_BACKUP_HOST: localhost
+CLICKHOUSE_BACKUP_PORT: 9000
+CLICKHOUSE_BACKUP_USER: default
+CLICKHOUSE_BACKUP_PASSWORD: "{{ CLICKHOUSE_DEFAULT_USER_PASSWORD | default('') }}"
+
+# Which backup to run:
+# - incremental: base (full) backup + incrementals against it, grouped by
+#   cycle. Frequent restore points using little storage.
+# - full: a standalone full backup on every run, never incrementals. Does not
+#   depend on any other backup.
+CLICKHOUSE_BACKUP_KIND: incremental
+
+# Length of an incremental cycle: weekly (ISO week) or monthly. The first run of a
+# new cycle creates its base backup; the next runs are incrementals against it.
+# The lifecycle rule of the incremental/ prefix must match it (see the README).
+CLICKHOUSE_BACKUP_CYCLE: weekly
+
+# What to back up:
+# - all: every database except CLICKHOUSE_BACKUP_EXCLUDED_DATABASES.
+# - databases: only CLICKHOUSE_BACKUP_DATABASES.
+CLICKHOUSE_BACKUP_SCOPE: all
+CLICKHOUSE_BACKUP_DATABASES: []
+CLICKHOUSE_BACKUP_EXCLUDED_DATABASES:
+  - system
+  - INFORMATION_SCHEMA
+  - information_schema
+
+# Extra BACKUP settings, e.g.:
+#   s3_storage_class: STANDARD_IA
+#   max_backup_bandwidth: 104857600
+CLICKHOUSE_BACKUP_EXTRA_SETTINGS: {}
+
+# How long to wait for the backup to finish, and how often to check it.
+CLICKHOUSE_BACKUP_TIMEOUT_SECONDS: 21600
+CLICKHOUSE_BACKUP_POLL_INTERVAL_SECONDS: 30
+
+# Where the backups are stored.
+#
+# AWS S3 (or S3-compatible):
+# CLICKHOUSE_BACKUP_STORAGE_OPTIONS:
+#   EXTERNAL_STORAGE_TYPE: aws
+#   EXTERNAL_STORAGE_OPTIONS:
+#     S3_BUCKET_NAME: my-bucket
+#     S3_REGION: us-west-2
+#     S3_BUCKET_PATH: clickhouse
+#     # instance: use the IAM role attached to the instance (no keys).
+#     # static: use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY.
+#     # NOTE: static is untested.
+#     # Temporary credentials (session token) are NOT supported by
+#     # BACKUP ... TO S3() in ClickHouse 25.3.
+#     AWS_CREDENTIALS_SOURCE: instance
+#     AWS_ACCESS_KEY_ID: ""
+#     AWS_SECRET_ACCESS_KEY: ""
+#     # Optional, for S3-compatible storage (path-style URLs).
+#     # NOTE: untested.
+#     S3_ENDPOINT_URL: ""
+#
+# Azure Blob Storage:
+# NOTE: Azure support is untested. It needs validation before production use.
+# CLICKHOUSE_BACKUP_STORAGE_OPTIONS:
+#   EXTERNAL_STORAGE_TYPE: azure
+#   EXTERNAL_STORAGE_OPTIONS:
+#     AZURE_ACCOUNT_NAME: myaccount
+#     AZURE_ACCOUNT_KEY: ""
+#     AZURE_CONTAINER_NAME: backups
+#     AZURE_PATH: clickhouse
+CLICKHOUSE_BACKUP_STORAGE_OPTIONS:
+  EXTERNAL_STORAGE_TYPE: aws
+  EXTERNAL_STORAGE_OPTIONS:
+    S3_BUCKET_NAME: s3_bucket_name
+    S3_REGION: us-east-1
+    S3_BUCKET_PATH: clickhouse
+    AWS_CREDENTIALS_SOURCE: instance
+    AWS_ACCESS_KEY_ID: ""
+    AWS_SECRET_ACCESS_KEY: ""
+    S3_ENDPOINT_URL: ""
+
+# Directory for the clickhouse-client configuration written by the role.
+CLICKHOUSE_BACKUP_CONFIG_DIR: /etc/clickhouse-backup

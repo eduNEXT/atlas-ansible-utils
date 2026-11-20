@@ -1,0 +1,7 @@
+---
+# A full backup is always standalone: no base, no incrementals.
+- name: Plan the full backup
+  ansible.builtin.set_fact:
+    _chb_mode: full
+    _chb_target_path: "full/{{ _chb_run_id }}"
+    _chb_base_path: ""

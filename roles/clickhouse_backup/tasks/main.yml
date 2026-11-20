@@ -1,0 +1,15 @@
+---
+# Native ClickHouse BACKUP to object storage. Only ClickHouse is used: the
+# role never deletes backups, retention is done by bucket lifecycle rules.
+
+- name: Validate the backup configuration
+  ansible.builtin.include_tasks: validate.yml
+
+- name: Set the backup facts
+  ansible.builtin.include_tasks: facts.yml
+
+- name: Plan the backup
+  ansible.builtin.include_tasks: "plan_{{ CLICKHOUSE_BACKUP_KIND }}.yml"
+
+- name: Run the backup
+  ansible.builtin.include_tasks: run_backup.yml

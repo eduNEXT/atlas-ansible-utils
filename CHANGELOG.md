@@ -13,6 +13,21 @@ See the fragment files in the [changelog.d/ directory](./changelog.d).
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.2.0'></a>
+## 22.2.0 — 2026-11-11
+
+### Added
+
+- `clickhouse_backup` role and `clickhouse_backup.yml` playbook: native
+  ClickHouse `BACKUP` straight to AWS S3, with two kinds of backup.
+  `incremental` keeps a base backup per cycle (`weekly` or `monthly`) plus
+  incrementals against it; `full` takes a standalone full backup on every run.
+  Only ClickHouse is used and the role never deletes backups: retention is done
+  by bucket lifecycle rules. AWS S3 with an instance IAM role is tested; static
+  keys, S3-compatible storage and Azure Blob Storage are included but untested.
+- `ansible-runner` chart: optional `name`, `suspend` and `concurrencyPolicy`
+  per job. `name` allows several CronJobs running the same playbook.
+
 <a id='changelog-22.1.0'></a>
 ## 22.1.0 — 2026-10-23
 

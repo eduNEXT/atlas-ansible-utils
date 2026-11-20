@@ -65,6 +65,12 @@ podSecurityContext:
 
 jobs:
   - playbook: test_os_info
+    # Optional CronJob name suffix. Defaults to the playbook name; set it to run
+    # the same playbook in several CronJobs.
+    # name: test-os-info
+    # CronJobs are created suspended unless suspend is set to false.
+    # suspend: false
+    # concurrencyPolicy: Forbid
     # extraEnvs:
     #   - name: ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS
     #     value: -vvv

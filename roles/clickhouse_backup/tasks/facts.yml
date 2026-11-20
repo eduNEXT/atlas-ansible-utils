@@ -1,0 +1,89 @@
+---
+# Every backup location is "<root>/<path>", where <path> is one of:
+#   incremental/<cycle>/base-<run_id>
+#   incremental/<cycle>/incr-<run_id>
+#   full/<run_id>
+# Paths are never reused, so a failed backup never blocks the next one.
+#
+# The ClickHouse expressions for a path are:
+#   BACKUP engine:          _chb_engine_prefix ~ <path> ~ _chb_engine_suffix
+#   table function (list):  _chb_list_prefix ~ <glob> ~ _chb_list_suffix
+# The table function reads no data: the One format only returns the virtual
+# columns (_path, _file) of the matching objects.
+
+- name: Set the common backup facts
+  ansible.builtin.set_fact:
+    _chb_storage_type: "{{ CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_TYPE }}"
+    _chb_opts: "{{ CLICKHOUSE_BACKUP_STORAGE_OPTIONS.EXTERNAL_STORAGE_OPTIONS }}"
+    _chb_run_id: "{{ now(utc=true, fmt='%Y%m%dT%H%M%SZ') }}"
+    _chb_cycle: "{{ now(utc=true, fmt=('%G-W%V' if CLICKHOUSE_BACKUP_CYCLE == 'weekly' else '%Y-%m')) }}"
+    _chb_client_config: "{{ CLICKHOUSE_BACKUP_CONFIG_DIR }}/clickhouse-client.xml"
+
+- name: Set the AWS S3 location facts
+  when: _chb_storage_type == 'aws'
+  ansible.builtin.set_fact:
+    _chb_root: "{{ _chb_opts.S3_BUCKET_PATH | default('') | regex_replace('^/+|/+$', '') }}"
+    _chb_static_credentials: "{{ _chb_opts.AWS_CREDENTIALS_SOURCE | default('instance') == 'static' }}"
+    _chb_base_url: >-
+      {{
+        (_chb_opts.S3_ENDPOINT_URL | regex_replace('/+$', '') ~ '/' ~ _chb_opts.S3_BUCKET_NAME)
+        if (_chb_opts.S3_ENDPOINT_URL | default('') | length > 0)
+        else ('https://' ~ _chb_opts.S3_BUCKET_NAME ~ '.s3.' ~ _chb_opts.S3_REGION ~ '.amazonaws.com')
+      }}
+
+# BACKUP ... TO S3('<url>'[, '<key id>', '<secret>'])
+# SELECT ... FROM s3('<url>'[, '<key id>', '<secret>'], 'One')
+- name: Set the AWS S3 ClickHouse expressions
+  when: _chb_storage_type == 'aws'
+  no_log: true
+  ansible.builtin.set_fact:
+    _chb_engine_prefix: "S3('{{ _chb_location }}"
+    _chb_engine_suffix: "{{ _chb_credentials }})"
+    _chb_list_prefix: "s3('{{ _chb_location }}"
+    _chb_list_suffix: "{{ _chb_credentials }}, 'One')"
+    _chb_sensitive: "{{ _chb_static_credentials }}"
+  vars:
+    _chb_location: "{{ _chb_base_url }}/{{ (_chb_root ~ '/') if _chb_root else '' }}"
+    _chb_credentials: >-
+      {{
+        ("', '" ~ (_chb_opts.AWS_ACCESS_KEY_ID | replace("'", "\\'")) ~ "', '"
+         ~ (_chb_opts.AWS_SECRET_ACCESS_KEY | replace("'", "\\'")) ~ "'")
+        if _chb_static_credentials
+        else "'"
+      }}
+
+# NOTE: Azure support is untested. It needs validation before production use.
+# BACKUP ... TO AzureBlobStorage('<storage url>', '<container>', '<path>', '<account name>', '<account key>')
+# SELECT ... FROM azureBlobStorage('<storage url>', '<container>', '<path>', '<account name>', '<account key>', 'One')
+- name: Set the Azure Blob Storage ClickHouse expressions
+  when: _chb_storage_type == 'azure'
+  no_log: true
+  ansible.builtin.set_fact:
+    _chb_root: "{{ _chb_root_path }}"
+    _chb_engine_prefix: "AzureBlobStorage({{ _chb_container }}, '{{ (_chb_root_path ~ '/') if _chb_root_path else '' }}"
+    _chb_engine_suffix: "{{ _chb_credentials }})"
+    _chb_list_prefix: "azureBlobStorage({{ _chb_container }}, '{{ (_chb_root_path ~ '/') if _chb_root_path else '' }}"
+    _chb_list_suffix: "{{ _chb_credentials }}, 'One')"
+    _chb_sensitive: true
+  vars:
+    _chb_root_path: "{{ _chb_opts.AZURE_PATH | default('') | regex_replace('^/+|/+$', '') }}"
+    _chb_container: "'https://{{ _chb_opts.AZURE_ACCOUNT_NAME }}.blob.core.windows.net', '{{ _chb_opts.AZURE_CONTAINER_NAME }}'"
+    _chb_credentials: "', '{{ _chb_opts.AZURE_ACCOUNT_NAME }}', '{{ _chb_opts.AZURE_ACCOUNT_KEY | replace(\"'\", \"\\\\'\") }}'"
+
+- name: Create the backup configuration directory
+  ansible.builtin.file:
+    path: "{{ CLICKHOUSE_BACKUP_CONFIG_DIR }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+# Keeps the ClickHouse password out of the process list and the task output.
+- name: Write the clickhouse-client configuration
+  no_log: true
+  ansible.builtin.template:
+    src: clickhouse-client.xml.j2
+    dest: "{{ _chb_client_config }}"
+    owner: root
+    group: root
+    mode: "0600"
