@@ -1,0 +1,7 @@
+---
+- name: Back up ClickHouse databases
+  hosts: clickhouse_servers
+  become: true
+  gather_facts: true
+  roles:
+    - role: clickhouse_backup
