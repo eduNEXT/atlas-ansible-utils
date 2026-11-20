@@ -10,7 +10,27 @@
       status_code: 200
       timeout: 1
       return_content: yes
+  - name: Verify ClickHouse logging level
+    ansible.builtin.command:
+      cmd: grep -Fq '<level>warning</level>' /etc/clickhouse-server/config.d/20-logging.xml
+    changed_when: false
+  - name: Verify ClickHouse log retention
+    ansible.builtin.command:
+      cmd: grep -Fq '<ttl>event_date + INTERVAL 30 DAY DELETE</ttl>' /etc/clickhouse-server/config.d/20-logging.xml
+    changed_when: false
+  - name: Verify ClickHouse slow-query threshold
+    ansible.builtin.command:
+      cmd: "grep -Fq '<log_queries_min_query_duration_ms>{{ CLICKHOUSE_LOG_QUERIES_MIN_DURATION_MS }}</log_queries_min_query_duration_ms>' /etc/clickhouse-server/users.d/00-admin-user.xml"
+    changed_when: false
+  - name: Verify ClickHouse server configuration override
+    ansible.builtin.command:
+      cmd: grep -Fq '<max_concurrent_queries>1000</max_concurrent_queries>' /etc/clickhouse-server/config.d/99-server-override.xml
+    changed_when: false
   - name: Verify ClickHouse installation
     register: clickhouse_client
     shell: |
-      clickhouse-client --user "default" --password="password" --query "SELECT 1"
+      clickhouse-client --user "{{ CLICKHOUSE_DEFAULT_USER_NAME }}" --password="password" --query "SELECT 1"
+  - name: Verify configured ClickHouse user permissions
+    loop: "{{ CLICKHOUSE_USERS }}"
+    shell: |
+      clickhouse-client --user "{{ item.name }}" --password="{{ item.password }}" --query "SELECT count() FROM system.tables"

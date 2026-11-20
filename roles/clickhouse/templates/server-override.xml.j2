@@ -1,0 +1,5 @@
+<clickhouse>
+{% if CLICKHOUSE_SERVER_CONFIG_OVERRIDE | trim %}
+{{ CLICKHOUSE_SERVER_CONFIG_OVERRIDE | indent(4, true) }}
+{% endif %}
+</clickhouse>

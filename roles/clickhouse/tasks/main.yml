@@ -1,4 +1,13 @@
 ---
+- name: Validate the ClickHouse administrator password
+  ansible.builtin.assert:
+    that:
+      - CLICKHOUSE_DEFAULT_USER_PASSWORD | trim | length > 7
+    fail_msg: CLICKHOUSE_DEFAULT_USER_PASSWORD must contain at least 8 characters and cannot be whitespace-only.
+    quiet: true
+  tags:
+    - always
+
 - name: Install ClickHouse dependencies
   ansible.builtin.apt:
     name:
@@ -7,13 +16,18 @@
       - dirmngr
       - gpg-agent
       - python3-debian
+      - python3-clickhouse-driver
     state: present
     update_cache: true
+  tags:
+    - clickhouse_install
 
 - name: Remove the legacy ClickHouse repo file
   ansible.builtin.file:
     path: "{{ clickhouse_legacy_repo_file }}"
     state: absent
+  tags:
+    - clickhouse_install
 
 - name: Add ClickHouse repository
   ansible.builtin.deb822_repository:
@@ -24,6 +38,8 @@
     components: "{{ CLICKHOUSE_REPO_COMPONENTS }}"
     architectures: amd64
     signed_by: "{{ CLICKHOUSE_GPG_KEY_URL }}"
+  tags:
+    - clickhouse_install
 
 - name: Install ClickHouse
   ansible.builtin.apt:
@@ -31,50 +47,101 @@
     state: present
     update_cache: true
   become: true
+  tags:
+    - clickhouse_install
 
-- name: Create /etc/clickhouse-server/config.d/host.xml
+- name: Create Hosts configuration file
   ansible.builtin.template:
     src: host.xml.j2
-    dest: /etc/clickhouse-server/config.d/host.xml
+    dest: /etc/clickhouse-server/config.d/10-host.xml
     mode: preserve
+  tags:
+    - clickhouse_configure
 
-# - name: Grant default user permissions to create users and groups
-- name: Edit /etc/clickhouse-server/users.xml
+- name: Create logging configuration file
+  ansible.builtin.template:
+    src: logging.xml.j2
+    dest: /etc/clickhouse-server/config.d/20-logging.xml
+    mode: preserve
+  tags:
+    - clickhouse_configure
+
+- name: Create overrides configuration file
+  ansible.builtin.template:
+    src: server-override.xml.j2
+    dest: /etc/clickhouse-server/config.d/99-server-override.xml
+    mode: preserve
+  tags:
+    - clickhouse_configure
+
+- name: Configure the admin user
   ansible.builtin.template:
     src: users.xml.j2
-    dest: /etc/clickhouse-server/users.xml
+    dest: /etc/clickhouse-server/users.d/00-admin-user.xml
     mode: preserve
+  tags:
+    - clickhouse_configure
+    - clickhouse_users
 
 - name: Start clickhouse service
   ansible.builtin.service:
     name: clickhouse-server
     state: started
     enabled: true
-
-- name: Create SQL Roles, Users and grant permissions
-  loop: "{{ CLICKHOUSE_USERS }}"
-  register: clickhouse_client
   tags:
-    - molecule-idempotence-notest
-  ansible.builtin.shell: |
-    clickhouse-client --user "default" --password="{{ CLICKHOUSE_DEFAULT_USER_PASSWORD }}" --multiquery <<'EOF'
+    - clickhouse_configure
+    - clickhouse_users
 
-    CREATE ROLE IF NOT EXISTS '{{ item.name }}_admin';
+- name: Create ClickHouse roles
+  community.clickhouse.clickhouse_role:
+    name: "{{ item.role }}"
+    state: present
+    login_host: localhost
+    login_port: "{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }}"
+    login_user: "{{ CLICKHOUSE_DEFAULT_USER_NAME }}"
+    login_password: "{{ CLICKHOUSE_DEFAULT_USER_PASSWORD | default(omit, true) }}"
+  loop: "{{ CLICKHOUSE_USERS }}"
+  loop_control:
+    label: "{{ item | ansible.utils.remove_keys(target=['password']) }}"
+  tags:
+    - clickhouse_users
 
-    GRANT ALL ON system.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_xapi_events_all.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_reporting.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_event_sink.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT ALL ON {{ item.name }}_vector.* TO '{{ item.name }}_admin' WITH GRANT OPTION;
-    GRANT CREATE USER ON *.* to '{{ item.name }}_admin';
-    GRANT ALTER USER ON *.* to '{{ item.name }}_admin';
-    GRANT DROP FUNCTION ON *.* to '{{ item.name }}_admin';
-    GRANT CREATE FUNCTION ON *.* to '{{ item.name }}_admin';
+- name: Grant permissions to roles
+  community.clickhouse.clickhouse_grants:
+    exclusive: true
+    grantee: "{{ item.role }}"
+    privileges: "{{ item.permissions }}"
+    state: present
+    login_host: localhost
+    login_port: "{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }}"
+    login_user: "{{ CLICKHOUSE_DEFAULT_USER_NAME }}"
+    login_password: "{{ CLICKHOUSE_DEFAULT_USER_PASSWORD | default(omit, true) }}"
+  loop: "{{ CLICKHOUSE_USERS }}"
+  loop_control:
+    label: "{{ item | ansible.utils.remove_keys(target=['password']) }}"
+  when: item.permissions | default([]) | length > 0
+  tags:
+    - clickhouse_users
 
-    CREATE USER IF NOT EXISTS {{ item.name }} identified with plaintext_password by '{{ item.password }}';
-
-    GRANT {{ item.name }}_admin to {{ item.name }};
-
-    EOF
+- name: Create users and bind to the roles
+  community.clickhouse.clickhouse_user:
+    name: "{{ item.name }}"
+    authentication:
+      type: plaintext_password
+      password: "{{ item.password }}"
+    roles:
+      - "{{ item.role }}"
+    roles_mode: append
+    update_password: on_create
+    user_hosts:
+      - type: ANY
+    state: present
+    login_host: localhost
+    login_port: "{{ CLICKHOUSE_INTERNAL_INSECURE_NATIVE_PORT }}"
+    login_user: "{{ CLICKHOUSE_DEFAULT_USER_NAME }}"
+    login_password: "{{ CLICKHOUSE_DEFAULT_USER_PASSWORD | default(omit, true) }}"
+  loop: "{{ CLICKHOUSE_USERS }}"
+  loop_control:
+    label: "{{ item | ansible.utils.remove_keys(target=['password']) }}"
+  tags:
+    - clickhouse_users
