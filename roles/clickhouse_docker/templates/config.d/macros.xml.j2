@@ -1,0 +1,7 @@
+<clickhouse>
+    <macros>
+        <cluster>{{ CLICKHOUSE_CLUSTER_NAME }}</cluster>
+        <shard>{{ clickhouse_current_node_config.shard }}</shard>
+        <replica>{{ clickhouse_current_node_config.name }}</replica>
+    </macros>
+</clickhouse>

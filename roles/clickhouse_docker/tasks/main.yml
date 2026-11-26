@@ -1,0 +1,222 @@
+---
+- name: Validate ClickHouse cluster topology
+  ansible.builtin.assert:
+    that:
+      - CLICKHOUSE_CLUSTER_NODES | length > 0
+      - CLICKHOUSE_CLUSTER_NAME | length > 0
+      - (CLICKHOUSE_CURRENT_NODE | default('') | string | length) > 0 or true
+    fail_msg: "CLICKHOUSE_CLUSTER_NODES and CLICKHOUSE_CLUSTER_NAME must be defined."
+
+- name: Validate ClickHouse users
+  ansible.builtin.assert:
+    that:
+      - CLICKHOUSE_DEFAULT_USER_PASSWORD != "CHANGE_ME_DEFAULT_PASSWORD"
+      - CLICKHOUSE_ADMIN_PASSWORD != "CHANGE_ME_ADMIN_PASSWORD"
+      - (not CLICKHOUSE_READONLY_USER_ENABLED) or (CLICKHOUSE_READONLY_PASSWORD != "CHANGE_ME_READONLY_PASSWORD")
+    fail_msg: "You must override the default ClickHouse passwords."
+  no_log: true
+
+- name: Auto-detect current ClickHouse node from local private IP or hostname
+  ansible.builtin.set_fact:
+    clickhouse_autodetected_current_node: "{{ item.name }}"
+  when: >
+    (CLICKHOUSE_CURRENT_NODE | default('') | string | length) == 0 and
+    (
+      item.host == (ansible_default_ipv4.address | default('')) or
+      item.name == inventory_hostname or
+      item.name == ansible_hostname
+    )
+  loop: "{{ CLICKHOUSE_CLUSTER_NODES }}"
+
+- name: Set effective current ClickHouse node name
+  ansible.builtin.set_fact:
+    clickhouse_effective_current_node: >-
+      {{
+        CLICKHOUSE_CURRENT_NODE
+        if (CLICKHOUSE_CURRENT_NODE | default('') | string | length) > 0
+        else clickhouse_autodetected_current_node | default('')
+      }}
+
+- name: Validate current ClickHouse node resolution
+  ansible.builtin.assert:
+    that:
+      - clickhouse_effective_current_node | length > 0
+      - (CLICKHOUSE_CLUSTER_NODES | selectattr('name', 'equalto', clickhouse_effective_current_node) | list | length) == 1
+    fail_msg: "Unable to resolve current ClickHouse node."
+
+- name: Store current ClickHouse node configuration
+  ansible.builtin.set_fact:
+    clickhouse_current_node_config: >-
+      {{
+        (CLICKHOUSE_CLUSTER_NODES
+        | selectattr('name', 'equalto', clickhouse_effective_current_node)
+        | list
+        | first)
+      }}
+
+- name: Show selected ClickHouse node
+  ansible.builtin.debug:
+    msg:
+      - "Current node: {{ clickhouse_effective_current_node }}"
+      - "Private host/IP: {{ clickhouse_current_node_config.host }}"
+      - "Keeper server_id: {{ clickhouse_current_node_config.id }}"
+      - "Hostname requested through COMMON_HOSTNAME: {{ COMMON_HOSTNAME | default('') }}"
+
+- name: Install Docker repo prerequisites on Debian/Ubuntu
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Create Docker apt keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  when: ansible_os_family == "Debian"
+
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+    filename: docker
+  when: ansible_os_family == "Debian"
+
+- name: Remove conflicting distro Docker packages
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose
+      - docker-compose-v2
+      - docker-doc
+      - podman-docker
+      - containerd
+      - runc
+    state: absent
+    purge: true
+  when: ansible_os_family == "Debian"
+  ignore_errors: true
+
+- name: Install Docker packages on Debian/Ubuntu
+  ansible.builtin.apt:
+    name: "{{ CLICKHOUSE_DOCKER_PACKAGES }}"
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Create ClickHouse host directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: "{{ CLICKHOUSE_BASE_DIR }}", owner: "root", group: "root", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_BASE_DIR }}/config.d", owner: "root", group: "root", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_BASE_DIR }}/users.d", owner: "root", group: "root", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_BASE_DIR }}/sql", owner: "root", group: "root", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_DATA_DIR }}", owner: "{{ CLICKHOUSE_CONTAINER_UID }}", group: "{{ CLICKHOUSE_CONTAINER_GID }}", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_LOG_DIR }}", owner: "{{ CLICKHOUSE_CONTAINER_UID }}", group: "{{ CLICKHOUSE_CONTAINER_GID }}", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_USER_FILES_DIR }}", owner: "{{ CLICKHOUSE_CONTAINER_UID }}", group: "{{ CLICKHOUSE_CONTAINER_GID }}", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_FORMAT_SCHEMA_DIR }}", owner: "{{ CLICKHOUSE_CONTAINER_UID }}", group: "{{ CLICKHOUSE_CONTAINER_GID }}", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_ACCESS_DIR }}", owner: "{{ CLICKHOUSE_CONTAINER_UID }}", group: "{{ CLICKHOUSE_CONTAINER_GID }}", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_KEEPER_LOG_DIR }}", owner: "{{ CLICKHOUSE_CONTAINER_UID }}", group: "{{ CLICKHOUSE_CONTAINER_GID }}", mode: "0755" }
+    - { path: "{{ CLICKHOUSE_KEEPER_SNAPSHOT_DIR }}", owner: "{{ CLICKHOUSE_CONTAINER_UID }}", group: "{{ CLICKHOUSE_CONTAINER_GID }}", mode: "0755" }
+
+- name: Render ClickHouse docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ CLICKHOUSE_BASE_DIR }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: Restart clickhouse container
+
+- name: Render ClickHouse config.d files
+  ansible.builtin.template:
+    src: "config.d/{{ item }}.j2"
+    dest: "{{ CLICKHOUSE_BASE_DIR }}/config.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "0640"
+  loop:
+    - network.xml
+    - remote-servers.xml
+    - zookeeper.xml
+    - keeper.xml
+    - macros.xml
+    - logging.xml
+    - distributed-ddl.xml
+    - zz-extra.xml
+  notify: Restart clickhouse container
+
+- name: Render ClickHouse users.d files
+  ansible.builtin.template:
+    src: users.d/users.xml.j2
+    dest: "{{ CLICKHOUSE_BASE_DIR }}/users.d/users.xml"
+    owner: root
+    group: root
+    mode: "0640"
+  no_log: true
+  notify: Restart clickhouse container
+
+- name: Render replicated schema example
+  ansible.builtin.template:
+    src: sql/replicated-schema-example.sql.j2
+    dest: "{{ CLICKHOUSE_BASE_DIR }}/sql/replicated-schema-example.sql"
+    owner: root
+    group: root
+    mode: "0644"
+  when: CLICKHOUSE_RENDER_SCHEMA_EXAMPLE | bool
+
+- name: Restart ClickHouse immediately when configuration changed
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure ClickHouse container is running
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - -f
+      - "{{ CLICKHOUSE_BASE_DIR }}/docker-compose.yml"
+      - up
+      - -d
+      - --remove-orphans
+  changed_when: false
+
+- name: Wait for local ClickHouse HTTP ping
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ CLICKHOUSE_HTTP_PORT }}/ping"
+    method: GET
+    return_content: true
+    status_code: 200
+  register: clickhouse_http_ping
+  retries: 20
+  delay: 3
+  until: clickhouse_http_ping.status == 200 and 'Ok.' in clickhouse_http_ping.content
+
+- name: Show ClickHouse deployment summary
+  ansible.builtin.debug:
+    msg:
+      - "Container: {{ CLICKHOUSE_CONTAINER_NAME }}"
+      - "Cluster: {{ CLICKHOUSE_CLUSTER_NAME }} / shard {{ clickhouse_current_node_config.shard }} / replicas {{ CLICKHOUSE_CLUSTER_NODES | length }}"
+      - "Current node: {{ clickhouse_current_node_config.name }} / server_id {{ clickhouse_current_node_config.id }} / host {{ clickhouse_current_node_config.host }}"
+      - "HTTP ping status: {{ clickhouse_http_ping.status }}"

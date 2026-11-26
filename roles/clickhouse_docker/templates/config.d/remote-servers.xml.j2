@@ -1,0 +1,17 @@
+<clickhouse>
+    <remote_servers>
+        <{{ CLICKHOUSE_CLUSTER_NAME }}>
+{% for shard in (CLICKHOUSE_CLUSTER_NODES | map(attribute='shard') | list | unique) %}
+            <shard>
+                <internal_replication>true</internal_replication>
+{%   for node in CLICKHOUSE_CLUSTER_NODES if node.shard == shard %}
+                <replica>
+                    <host>{{ node.host }}</host>
+                    <port>{{ CLICKHOUSE_NATIVE_PORT }}</port>
+                </replica>
+{%   endfor %}
+            </shard>
+{% endfor %}
+        </{{ CLICKHOUSE_CLUSTER_NAME }}>
+    </remote_servers>
+</clickhouse>

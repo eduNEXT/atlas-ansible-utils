@@ -1,0 +1,11 @@
+---
+# Local execution variant for SSM sessions.
+# Use this when you are already inside the target server and cannot run
+# Ansible from a command-and-control host.
+- name: Deploy ClickHouse Docker locally
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+  roles:
+    - role: clickhouse

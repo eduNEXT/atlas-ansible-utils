@@ -1,0 +1,8 @@
+---
+- name: Provision ClickHouse Docker locally
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+  roles:
+    - clickhouse_docker
