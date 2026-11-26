@@ -68,6 +68,8 @@ jobs:
     # extraEnvs:
     #   - name: ATLAS_ANSIBLE_PLAYBOOK_EXTRA_PARAMS
     #     value: -vvv
+    # schedule: "0 2 * * *"  # defaults to @yearly
+    # suspend: false         # defaults to true
     # successfulJobsHistoryLimit: 2
     # failedJobsHistoryLimit: 2
     # startingDeadlineSeconds: 300
