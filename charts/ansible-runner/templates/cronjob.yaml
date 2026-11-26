@@ -13,7 +13,7 @@ spec:
   successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit | default 1 }}
   failedJobsHistoryLimit: {{ .failedJobsHistoryLimit | default 1 }}
   startingDeadlineSeconds: {{ .startingDeadlineSeconds | default 900 }}
-  suspend: true
+  suspend: {{ hasKey . "suspend" | ternary .suspend true }}
   jobTemplate:
     spec:
       backoffLimit: 1
